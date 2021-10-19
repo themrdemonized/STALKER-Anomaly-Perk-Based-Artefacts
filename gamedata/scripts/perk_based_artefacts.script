@@ -894,11 +894,26 @@ if ayykyu_fp_death and ayykyu_fp_death.actor_on_before_death then
 	end
 end
 
--- Actor effects patch
-local originalUW = actor_effects.use_weapon
-actor_effects.use_weapon = function(f)
-	if artefacts.af_star_phantom then return end
-	originalUW(f)
+-- Patch for Food Drug Drink Animations
+if enhanced_animations and enhanced_animations.use_item then	
+
+	local fdda_use_item = enhanced_animations.use_item
+	enhanced_animations.use_item = function(obj)
+		if artefacts.af_star_phantom then
+			artefact_props.af_star_phantom.weapon_hidden = false
+			db.actor:restore_weapon()
+		end
+		fdda_use_item(obj)
+	end
+
+	local call_my_slot_back = enhanced_animations.call_my_slot_back
+	enhanced_animations.call_my_slot_back = function()
+		call_my_slot_back()
+		artefact_props.af_star_phantom.weapon_hidden = true
+		db.actor:hide_weapon()
+		return true
+	end
+
 end
 
 -- Patch for Quick Throw
