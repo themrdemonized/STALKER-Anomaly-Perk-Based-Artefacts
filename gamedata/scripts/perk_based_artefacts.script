@@ -10,13 +10,17 @@
 local AC_ID = AC_ID
 local alife_create_item = alife_create_item
 local alife_release_id = alife_release_id
+local CreateTimeEvent = CreateTimeEvent
+local get_console = get_console
 local hit = hit
 local IsMoveState = IsMoveState
 local printf = printf
 local random_float = random_float
 local random_number = random_number
 local RegisterScriptCallback = RegisterScriptCallback
+local random_float = random_float
 local round_100 = round_100
+local SYS_GetParam = SYS_GetParam
 local time_global = time_global
 local UnregisterScriptCallback = UnregisterScriptCallback
 local vector_rotate_y = vector_rotate_y
@@ -876,6 +880,60 @@ local artefact_on_equip_functions = {
 
 }
 
+-- Special monkey patches for some artefacts to make their effects work
+-- Patch for First Person Death
+if ayykyu_fp_death and ayykyu_fp_death.actor_on_before_death then
+	local fp_death = ayykyu_fp_death.actor_on_before_death
+	ayykyu_fp_death.actor_on_before_death = function(whoID, flags)
+		for artefact, props in pairs(artefacts) do
+			if artefact_on_before_death_functions[artefact] then -- prevent dying with First Person Death mod enabled
+				return
+			end
+		end
+		fp_death(whoID, flags)
+	end
+end
+
+-- Actor effects patch
+local originalUW = actor_effects.use_weapon
+actor_effects.use_weapon = function(f)
+	if artefacts.af_star_phantom then return end
+	originalUW(f)
+end
+
+-- Patch for Quick Throw
+local quick_throw = actor_effects.Hit_GrenadeQuickthrow
+actor_effects.Hit_GrenadeQuickthrow = function()
+	if artefacts.af_star_phantom then return end -- Phantom Pacifist perk to prevent quick throwing a grenade
+	quick_throw()
+end
+
+-- Patch for Quick Melee
+if quickdraw and quickdraw.hit_key then
+	local quick_melee = quickdraw.hit_key
+	quickdraw.hit_key = function()
+		if artefacts.af_star_phantom then return end -- Phantom Pacifist perk to prevent quick melee with that mod enabled
+		quick_melee()
+	end
+end
+
+-- Disable talk possibility for Phantom Pacifist
+local process_npc_usability = xr_meet.process_npc_usability
+xr_meet.process_npc_usability = function(npc)
+	if artefacts.af_star_phantom then
+		npc:disable_talk()
+		return
+	end
+	process_npc_usability(npc)
+end
+
+-- Disable npc evaluation for Phantom Pacifist
+local evaluate = xr_meet.evaluator_contact.evaluate
+xr_meet.evaluator_contact.evaluate = function(self)
+	if artefacts.af_star_phantom then return false end
+	return evaluate(self)
+end
+
 local function process_artefacts(artefacts_table, ...)
 	for artefact, props in pairs(artefacts) do
 		if artefacts_table[artefact] then
@@ -978,42 +1036,6 @@ local function monster_on_death_callback(monster, who)
 	end
 
 	process_artefacts(artefact_on_monster_death_functions, monster, who, last_monster_hit, last_monster_hit_bone_index)
-end
-
--- Patch for First Person Death
-if ayykyu_fp_death and ayykyu_fp_death.actor_on_before_death then
-	local fp_death = ayykyu_fp_death.actor_on_before_death
-	ayykyu_fp_death.actor_on_before_death = function(whoID, flags)
-		for artefact, props in pairs(artefacts) do
-			if artefact_on_before_death_functions[artefact] then -- prevent dying with First Person Death mod enabled
-				return
-			end
-		end
-		fp_death(whoID, flags)
-	end
-end
-
--- Actor effects patch
-local originalUW = actor_effects.use_weapon
-actor_effects.use_weapon = function(f)
-	if artefacts.af_star_phantom then return end
-	originalUW(f)
-end
-
--- Patch for Quick Throw
-local quick_throw = actor_effects.Hit_GrenadeQuickthrow
-actor_effects.Hit_GrenadeQuickthrow = function()
-	if artefacts.af_star_phantom then return end -- Phantom Pacifist perk to prevent quick throwing a grenade
-	quick_throw()
-end
-
--- Patch for Quick Melee
-if quickdraw and quickdraw.hit_key then
-	local quick_melee = quickdraw.hit_key
-	quickdraw.hit_key = function()
-		if artefacts.af_star_phantom then return end -- Phantom Pacifist perk to prevent quick melee with that mod enabled
-		quick_melee()
-	end
 end
 
 local function actor_on_first_update()

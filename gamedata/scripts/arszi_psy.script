@@ -362,17 +362,20 @@ function get_distance(position_1, position_2)
     return distance
 end
 
-function get_psy_health()
-    return psy_table.actor_psy_health
-end
-
 function set_psy_health(amount)
     psy_table.actor_psy_health = amount
+end
+
+-- code by demonized
+-- added getter and changer for psy health
+function get_psy_health()
+    return psy_table.actor_psy_health
 end
 
 function change_psy_health(amount)
     psy_table.actor_psy_health = psy_table.actor_psy_health + amount
 end
+-- code by demonized end
 
 function show_message(msg)
     actor_menu.set_msg(1, msg,4)
