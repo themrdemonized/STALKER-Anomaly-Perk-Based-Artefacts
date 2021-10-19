@@ -1,0 +1,7 @@
+Dragon's Eye: Kills make enemies explode - use at your own risk
+Tapeworm: Constantly drains health. Kills restore health.
+Basilisk: Melee attacks have a small chance to be immediately fatal.
+Heart: Rapidly drains hunger to stop bleeding.
+-- Lamp, passive glow around player
+-- Medal, when player uses this artifact he gains passive psy health regeneration. That is if medal is turned with the right pole. From time to time player would need to turn artifact to not go insane.
+-- Death Lamp, player can use this artifact to hit enemies in a short radius at the cost of his health. Cooldown - 2 hours

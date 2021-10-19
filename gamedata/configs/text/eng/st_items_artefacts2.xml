@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<!--
+	New Artefacts
+-->
+<string_table>
+  <string id="st_af_cocoon_name">
+    <text>Cocoon</text>
+  </string>
+  <string id="st_af_cocoon_descr">
+    <text>A small, irregularly-shaped artifact formed in gravitational anomalies. Its exterior structure resembles caterpillar silk. Cocoons are not radioactive and have little value to stalkers, but can fetch a good price with artifact collectors.\n \n
+		%c[ui_gray_2]PROPERTIES:\n
+		%c[ui_cyan] • %c[ui_gray_2] inert artifact\n
+		%c[d_cyan] • %c[ui_gray_2] valuable</text>
+  </string>
+  <string id="st_af_cell_name">
+    <text>Cell</text>
+  </string>
+  <string id="st_af_cell_descr">
+    <text>An artifact formed in gravitational anomalies, likely due to intense localized magnetic fields. Its interior structure spins perpetually on its axis as long as it is not disturbed. A useless trinket to stalkers, it is highly valued by collectors and scientists. Not radioactive.\n \n
+		%c[ui_gray_2]PROPERTIES:\n
+		%c[ui_cyan] • %c[ui_gray_2] inert artifact\n
+		%c[d_cyan] • %c[ui_gray_2] valuable</text>
+  </string>
+  <string id="st_af_fountain_name">
+    <text>Fountain</text>
+  </string>
+  <string id="st_af_fountain_descr">
+    <text>A common artifact formed in gravitational anomalies. It does not have any useful properties to stalkers, but because of its bizarre shape it is very valued by collectors. Not radioactive.\n \n
+		%c[ui_gray_2]PROPERTIES:\n
+		%c[ui_cyan] • %c[ui_gray_2] inert artifact\n
+		%c[d_cyan] • %c[ui_gray_2] valuable</text>
+  </string>
+  <string id="st_af_spaika_name">
+    <text>Spike</text>
+  </string>
+  <string id="st_af_spaika_descr">
+    <text>A common artifact formed in gravitational anomalies, that resembles petrified wood or bone. Has no useful properties to stalkers and is not radioactive, but can be sold as a trinket outside the Zone.\n \n
+		%c[ui_gray_2]PROPERTIES:\n
+		%c[ui_cyan] • %c[ui_gray_2] inert artifact\n
+		%c[d_cyan] • %c[ui_gray_2] valuable</text>
+  </string>
+  <string id="st_af_signet_name">
+    <text>Signet</text>
+  </string>
+  <string id="st_af_signet_descr">
+    <text>An artifact that appears to be a warped metal nut. Occasionally also called an "Amulet". Quite useless, though some stalkers believe that wearing one of these brings good luck. Not radioactive.\n \n
+		%c[ui_gray_2]PROPERTIES:\n
+		%c[ui_cyan] • %c[ui_gray_2] inert artifact\n
+		%c[d_cyan] • %c[ui_gray_2] valuable</text>
+  </string>
+  <string id="st_af_repei_name">
+    <text>Thistle</text>
+  </string>
+  <string id="st_af_repei_descr">
+    <text>A common artifact spawned in gravitational anomalies. Despite their prickly appearances, Thistles seem incapable of penetrating flesh or damaging the body in any way. These artifacts are light, non-radioactive, and highly valued by jewelers and collectors.\n \n
+		%c[ui_gray_2]PROPERTIES:\n
+		%c[ui_cyan] • %c[ui_gray_2] inert artifact\n
+		%c[d_cyan] • %c[ui_gray_2] valuable</text>
+  </string>
+  <string id="st_af_bat_name">
+    <text>Bat</text>
+  </string>
+  <string id="st_af_bat_descr">
+    <text>A rare and beautiful artifact, consisting of two irregularly-shaped "wings" protecting a lustrous spherical core. Does not emit radiation, but has no useful properties to stalkers, and is quite heavy. Highly valued by collectors.\n \n
+		%c[ui_gray_2]PROPERTIES:\n
+		%c[ui_cyan] • %c[ui_gray_2] inert artifact\n
+		%c[d_cyan] • %c[ui_gray_2] valuable</text>
+  </string>
+  <string id="st_af_sun_name">
+    <text>Sun</text>
+  </string>
+  <string id="st_af_sun_descr">
+    <text>A rare artifact that is very much appreciated by collectors. Its exterior shell is unremarkable, but if cracked like a geode, reveals a swirling luminous core that emits a constant source of warm yellow light. These specimens are not otherwise radioactive.\n \n
+		%c[ui_gray_2]PROPERTIES:\n
+		%c[ui_cyan] • %c[ui_gray_2] inert artifact\n
+		%c[d_cyan] • %c[ui_gray_2] valuable</text>
+  </string>
+  <string id="st_af_ear_name">
+    <text>Heart</text>
+  </string>
+  <string id="st_af_ear_descr">
+    <text>A bizarrely-shaped artifact, whose crystalline core resembles a miniature human circulatory system. Has no useful properties to stalkers and is not radioactive, but is valuable to collectors outside of the Zone.\n \n
+		%c[ui_gray_2]PROPERTIES:\n
+		%c[ui_cyan] • %c[ui_gray_2] inert artifact\n
+		%c[d_cyan] • %c[ui_gray_2] valuable</text>
+  </string>
+  <string id="st_af_chelust_name">
+    <text>Chain</text>
+  </string>
+  <string id="st_af_chelust_descr">
+    <text>An unusual circular artifact, not to be confused with a Ring. Generates a strong gravitational field while nothing touches it. Has no useful properties to stalkers and is suprisingly heavy. Valuable to artifact collectors outside of the Zone.\n \n
+		%c[ui_gray_2]PROPERTIES:\n
+		%c[ui_cyan] • %c[ui_gray_2] inert artifact\n
+		%c[d_cyan] • %c[ui_gray_2] valuable</text>
+  </string>
+  <string id="st_af_atom_name">
+    <text>Atom</text>
+  </string>
+  <string id="st_af_atom_descr">
+    <text>A rare and unusual artifact that resembles the old Bohr model of an atom. Not radioactive, but does produce a small amount of heat. Has no useful properties to stalkers, but is very valuable to collectors and scientists.\n \n
+		%c[ui_gray_2]PROPERTIES:\n
+		%c[ui_cyan] • %c[ui_gray_2] inert artifact\n
+		%c[d_cyan] • %c[ui_gray_2] valuable</text>
+  </string>
+  <string id="st_af_lighthouse_name">
+    <text>Beacon</text>
+  </string>
+  <string id="st_af_lighthouse_descr">
+    <text>A clotted mass of superdense ferrous metals. Not radioactive, and contains rare minerals that are used in industrial production, so there is a high demand for this artifact outside the Zone. Has no other useful properties to stalkers in the field.\n \n
+		%c[ui_gray_2]PROPERTIES:\n
+		%c[ui_cyan] • %c[ui_gray_2] inert artifact\n
+		%c[d_cyan] • %c[ui_gray_2] valuable</text>
+  </string>
+  <string id="st_af_fire_loop_name">
+    <text>Knot</text>
+  </string>
+  <string id="st_af_fire_loop_descr">
+    <text>This artifact is occasionally formed in the extreme heat of thermal anomalies. It has an odd, lustrous appearance and is therefore appreciated by collectors. Not radioactive, and has no useful properties to stalkers.\n \n
+		%c[ui_gray_2]PROPERTIES:\n
+		%c[ui_cyan] • %c[ui_gray_2] inert artifact\n
+		%c[d_cyan] • %c[ui_gray_2] valuable</text>
+  </string>
+  <string id="st_af_zhelch_name">
+    <text>Scar</text>
+  </string>
+  <string id="st_af_zhelch_descr">
+    <text>This artifact allegedly has a calming effect on the human nervous system when held close to the body. It also generates a very weak gravitational and electrostatic field. Despite this, Scars are of little use to professional stalkers. Not radioactive.\n \n
+		%c[ui_gray_2]PROPERTIES:\n
+		%c[ui_cyan] • %c[ui_gray_2] inert artifact\n
+		%c[d_cyan] • %c[ui_gray_2] valuable</text>
+  </string>
+  <string id="st_af_sandstone_name">
+    <text>Sandstone</text>
+  </string>
+  <string id="st_af_sandstone_descr">
+    <text>An artifact sometimes formed in extreme temperature anomalies. Has no useful properties to stalkers and is not radioactive. However, this artifact's core usually contains a small quantity of gold, so it has some value to traders outside the Zone.\n \n
+		%c[ui_gray_2]PROPERTIES:\n
+		%c[ui_cyan] • %c[ui_gray_2] inert artifact\n
+		%c[d_cyan] • %c[ui_gray_2] valuable</text>
+  </string>
+  <string id="st_af_kislushka_name">
+    <text>Sourpuss</text>
+  </string>
+  <string id="st_af_kislushka_descr">
+    <text>A hollow spherical artifact resembling a transparent parchment of some sorts. Covered with a layer of film, it is pleasant to the touch. Has no useful properties, and is not radioactive. Valued by collectors.\n \n
+		%c[ui_gray_2]PROPERTIES:\n
+		%c[ui_cyan] • %c[ui_gray_2] inert artifact\n
+		%c[d_cyan] • %c[ui_gray_2] valuable</text>
+  </string>
+  <string id="st_af_black_angel_name">
+    <text>Black Angel</text>
+  </string>
+  <string id="st_af_black_angel_descr">
+    <text>An artifact of anomalous minerals that has been twisted into an ominous semi-symmetrical formation. Despite emitting no heat or radiation, it can condense water vapor in nearby air into steam. Very valued by collectors, but has no useful properties to stalkers. \n \n
+		%c[ui_gray_2]PROPERTIES:\n
+		%c[ui_cyan] • %c[ui_gray_2] inert artifact\n
+		%c[d_cyan] • %c[ui_gray_2] valuable</text>
+  </string>
+  <string id="st_af_grapes_name">
+    <text>Grapes</text>
+  </string>
+  <string id="st_af_grapes_descr">
+    <text>A heavy artifact sometimes found in gravitational anomalies, it resembles drops of green-tinted amber twisted together. Can be valuable to outside collectors, but is otherwise useless. Not radioactive.\n \n
+		%c[ui_gray_2]PROPERTIES:\n
+		%c[ui_cyan] • %c[ui_gray_2] inert artifact\n
+		%c[d_cyan] • %c[ui_gray_2] valuable</text>
+  </string>
+  <string id="st_af_skull_miser_name">
+    <text>Miser's skull</text>
+  </string>
+  <string id="st_af_skull_miser_descr">
+    <text>A light and fragile artifact consisting of interlinked strands of anomalous plant fibers. A curiosity for outside collectors, but has no usefulness to stalkers. Not radioactive.\n \n
+		%c[ui_gray_2]PROPERTIES:\n
+		%c[ui_cyan] • %c[ui_gray_2] inert artifact\n
+		%c[d_cyan] • %c[ui_gray_2] valuable</text>
+  </string>
+  <string id="st_af_star_phantom_name">
+    <text>Phantom star</text>
+  </string>
+  <string id="st_af_star_phantom_descr">
+    <text>This artifcat appears to be a plasma-like substance suspended within a striated transparent shell. Generates a weak gravitational field, making it difficult to hold still or balance. Not radioactive, but of limited usefulness in the Zone.\n \n
+		%c[ui_gray_2]PROPERTIES:\n
+		%c[ui_cyan] • %c[ui_gray_2] inert artifact\n
+		%c[d_cyan] • %c[ui_gray_2] valuable</text>
+  </string>
+  <string id="st_af_medallion_name">
+    <text>Medal</text>
+  </string>
+  <string id="st_af_medallion_descr">
+    <text>An artifact consisting of a small hoop embedded with four triangular shapes, with a small central sphere embedded in the middle. Pairs of the triangular shapes opposite each other will occasionally 'flip' and trade positions on the outer ring. Valued by collectors and not radioactive, but has no useful properties in the field. \n \n
+		%c[ui_gray_2]PROPERTIES:\n
+		%c[ui_cyan] • %c[ui_gray_2] inert artifact\n
+		%c[d_cyan] • %c[ui_gray_2] valuable</text>
+  </string>
+  <string id="st_af_peas_name">
+    <text>Moon</text>
+  </string>
+  <string id="st_af_peas_descr">
+    <text>An artifact shaped like a lunar crescent. The exterior shell continuously generates a very dim light. Has no useful properties, not radioactive, but has some value to collectors and jewellers.\n \n
+		%c[ui_gray_2]PROPERTIES:\n
+		%c[ui_cyan] • %c[ui_gray_2] inert artifact\n
+		%c[d_cyan] • %c[ui_gray_2] valuable</text>
+  </string>
+  <string id="st_af_generator_name">
+    <text>Generator</text>
+  </string>
+  <string id="st_af_generator_descr">
+    <text>This anomalous disk is not radioactive, but generates a strong, small electromagnetic field. It can easily be made to 'spin' perpetually on its axis, and is therefore very much valued outside the Zone by those researching new sources of energy. Currently has no useful properties to stalkers within the Zone. \n \n
+		%c[ui_gray_2]PROPERTIES:\n
+		%c[ui_cyan] • %c[ui_gray_2] inert artifact\n
+		%c[d_cyan] • %c[ui_gray_2] valuable</text>
+  </string>
+  <string id="st_af_ball_name">
+    <text>Ball</text>
+  </string>
+  <string id="st_af_ball_descr">
+    <text>Despite appearing as a mottled ball of dirt and rock, this artifact is unusually light and bouncy, hence its name. It is believed to be a product of electrical anomalies. Not radioactive, but also not particularly useful to those within the Zone.\n \n
+		%c[ui_gray_2]PROPERTIES:\n
+		%c[ui_cyan] • %c[ui_gray_2] inert artifact\n
+		%c[d_cyan] • %c[ui_gray_2] valuable</text>
+  </string>
+  <string id="st_af_fonar_name">
+    <text>Lamp</text>
+  </string>
+  <string id="st_af_fonar_descr">
+    <text>This light, glassy artifact emits a modest amount of near-ultraviolet light. It does not produce more harmful radiation, but is quite interesting to collectors.\n \n
+		%c[ui_gray_2]PROPERTIES:\n
+		%c[ui_cyan] • %c[ui_gray_2] inert artifact\n
+		%c[d_cyan] • %c[ui_gray_2] valuable</text>
+  </string>
+  <string id="st_af_tapeworm_name">
+    <text>Tapeworm</text>
+  </string>
+  <string id="st_af_tapeworm_descr">
+    <text>This artifact is pure silicon dioxide, twisted into an unusual shape and color by gravitational anomalies. It would be otherwise unremarkable, except for its ability to 'bend' or visually distort objects it comes into contact with. Not particularly useful to stalkers, and not radioactive.\n \n
+		%c[ui_gray_2]PROPERTIES:\n
+		%c[ui_cyan] • %c[ui_gray_2] inert artifact\n
+		%c[d_cyan] • %c[ui_gray_2] valuable</text>
+  </string>
+  <string id="st_af_moh_name">
+    <text>Moss</text>
+  </string>
+  <string id="st_af_moh_descr">
+    <text>An artifact formed in electrial anomalies. It has a sharp, jagged appearance but is actually quite soft and pleasing to the touch. Not radioactive, but not useful aside from as a trinket for collectors.\n \n
+		%c[ui_gray_2]PROPERTIES:\n
+		%c[ui_cyan] • %c[ui_gray_2] inert artifact\n
+		%c[d_cyan] • %c[ui_gray_2] valuable</text>
+  </string>
+  <string id="st_af_serofim_name">
+    <text>Seraphim</text>
+  </string>
+  <string id="st_af_serofim_descr">
+    <text>An artifact sometimes found in electrical anomalies, consisting of several concentric spheres bound together. Periodically emits weak gravitational waves at unpredictable intervals. Not otherwise radioactive, but not useful enough for a stalker in a fight.\n \n
+		%c[ui_gray_2]PROPERTIES:\n
+		%c[ui_cyan] • %c[ui_gray_2] inert artifact\n
+		%c[d_cyan] • %c[ui_gray_2] valuable</text>
+  </string>
+  <string id="st_af_elektron_name">
+    <text>Electron</text>
+  </string>
+  <string id="st_af_elektron_descr">
+    <text>This artifact is a product of electrical anomalies. It is extremely heavy despite its small size. Not radioactive or valued by stalkers, but is reported to be very valued by scientists outside the Zone.\n \n
+		%c[ui_gray_2]PROPERTIES:\n
+		%c[ui_cyan] • %c[ui_gray_2] inert artifact\n
+		%c[d_cyan] • %c[ui_gray_2] valuable</text>
+  </string>
+  <string id="st_af_kogot_name">
+    <text>Claw</text>
+  </string>
+  <string id="st_af_kogot_descr">
+    <text>A beautiful glass-like artifact occasionally fished out of electrostatic anomalies. It emits no radiation, but fetches a high price with collectors and traders.\n \n
+		%c[ui_gray_2]PROPERTIES:\n
+		%c[ui_cyan] • %c[ui_gray_2] inert artifact\n
+		%c[d_cyan] • %c[ui_gray_2] valuable</text>
+  </string>
+  <string id="st_af_vaselisk_name">
+    <text>Basilisk</text>
+  </string>
+  <string id="st_af_vaselisk_descr">
+    <text>One of the few artifacts in the Zone which copes well with all kinds of physical influences on its owner.\n \n
+		%c[ui_gray_2]PROPERTIES:\n
+		%c[ui_cyan] • %c[ui_gray_2] inert artifact\n
+		%c[d_cyan] • %c[ui_gray_2] valuable</text>
+  </string>
+  <string id="st_af_geliy_name">
+    <text>Helium</text>
+  </string>
+  <string id="st_af_geliy_descr">
+    <text>A bright (literally) representative of the family of electrostatic artefacts. It gives off a gaseous substance that has a beneficial effect on the body. Due to its high efficiency, it is in large demand.\n \n
+		%c[ui_gray_2]PROPERTIES:\n
+		%c[ui_cyan] • %c[ui_gray_2] inert artifact\n
+		%c[d_cyan] • %c[ui_gray_2] valuable</text>
+  </string>
+  <string id="st_af_gimlet_name">
+    <text>Gimlet </text>
+  </string>
+  <string id="st_af_gimlet_descr">
+    <text>The bowl-shaped petals of this artifact can release a powerful stimulant vapor which can alter the balance of human hormones. Of little use to stalkers, it is very much sought after for medical research. \n \n
+		%c[ui_gray_2]PROPERTIES:\n
+		%c[ui_cyan] • %c[ui_gray_2] inert artifact\n
+		%c[d_cyan] • %c[ui_gray_2] valuable</text>
+  </string>
+  <string id="st_af_dragon_eye_name">
+    <text>Dragon's eye</text>
+  </string>
+  <string id="st_af_dragon_eye_descr">
+    <text>This artifact is sometimes formed in thermal anomalies, and has the appearance of a reptile's eye. Has no useful properties to stalkers, and is not radioactive.\n \n
+		%c[ui_gray_2]PROPERTIES:\n
+		%c[ui_cyan] • %c[ui_gray_2] inert artifact\n
+		%c[d_cyan] • %c[ui_gray_2] valuable</text>
+  </string>
+  <string id="st_arty_save">
+    <text>Eye of the Noosphere</text>
+  </string>
+  <string id="st_arty_save_descr">
+    <text>One of the most mysterious artefacts in the Zone, the Eye of the Noosphere can transport its wielder back in time, even to escape death. A tight squeeze of the artefact activates its ability, creating a restoration point to go back to on activation or death. Frequent use can cause the artefact to change colour, but if discharged too frequently it may cease to function altogether. The Eye gradually restores its power over time, supposedly being fuelled by the anomalous energy of the Zone.\n \n
+		%c[ui_gray_2]PROPERTIES:\n
+		%c[ui_white] • %c[0,255,215,0] superartefact</text>
+  </string>
+</string_table>
