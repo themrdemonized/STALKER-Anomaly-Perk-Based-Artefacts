@@ -67,7 +67,7 @@ local actor_on_update_time = 0
 local time_elapsed = 0 -- Time from game start used for effects and cooldowns
 local actor_is_dying = false
 
-local hud_state = 1
+hud_state = 1
 
 local c_id_ppe_blur = 5600
 local c_id_ppe_black_infinite = 5606
@@ -601,10 +601,11 @@ local artefact_on_before_hit_functions = {
 function af_serofim_cheat_death() 
 	local actor = db.actor
 	local c_id_ppe_black_infinite = 5606
+	local hud_state = perk_based_artefacts.hud_state
 
 	bind_stalker_ext.invulnerable_time = time_global()
-	enable_input()
-    remove_pp_effector(c_id_ppe_black_infinite)
+	level.enable_input()
+    level.remove_pp_effector(c_id_ppe_black_infinite)
 	get_console():execute("snd_volume_eff " .. _G.amb_vol)
 	get_console():execute("snd_volume_music " .. _G.mus_vol)
     _G.mus_vol = 0
@@ -895,7 +896,7 @@ if ayykyu_fp_death and ayykyu_fp_death.actor_on_before_death then
 end
 
 -- Patch for Food Drug Drink Animations
-if enhanced_animations and enhanced_animations.use_item then	
+if enhanced_animations and enhanced_animations.use_item and enhanced_animations.call_my_slot_back then	
 
 	local fdda_use_item = enhanced_animations.use_item
 	enhanced_animations.use_item = function(obj)
