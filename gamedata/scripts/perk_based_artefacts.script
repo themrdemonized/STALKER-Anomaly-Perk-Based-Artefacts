@@ -371,12 +371,22 @@ end
 -- Table of current active effects, contains tables of these { 
 -- timer = time_elapsed + timer in seconds, how long effect will be applied
 -- effect = function(), the function of the effect
--- on_end = function(), the function on the expiration of effect }
+-- effect_function - string, dump of effect function to store in m_data
+-- effect_args - array, args to effect_function
+-- on_end = function(), the function on the expiration of effect
+-- on_end_function - string, dump of on_end function to store in m_data
+-- on_end_args - array, args to on_end_function 
+-- key - string, custom key to set in timed_effects table, otherwise will be used first available one
+-- not_save - boolean, do not save in mdata }
+-- this is the complex function intended to have persistence between saves, moving to different maps and so on, use if needed
+-- no upvalues are allowed in the functions, best to reference globals by _G. lookup
 -- The precision for both cooldown and timed effects is 0.1 or 100ms, making more precise timer or timed effect is pointless
 local timed_effects = {} 
 local function add_timed_effect(timer, effect_function, effect_args, on_end_function, on_end_args, key, not_save)
 	trace("current_time %s, adding effect %s", time_elapsed, time_elapsed + (timer or 0))
 
+	local effect_args = effect_args or {}
+	local on_end_args = on_end_args or {}
 	local effect = {
 		timer = time_elapsed + (timer or 0),
 		effect = effect_function and function()
@@ -390,6 +400,23 @@ local function add_timed_effect(timer, effect_function, effect_args, on_end_func
 		on_end_function = on_end_function and dump(on_end_function),
 		on_end_args = on_end_args,
 		save = not not_save
+	}
+
+	if key then
+		timed_effects[key] = effect
+	else
+		table_insert(timed_effects, effect)
+	end
+end
+
+-- This is the simpler version of the function above if you do not care about persistence and saving states
+local function add_simple_timed_effect(timer, effect_function, on_end_function, key)
+	trace("current_time %s, adding effect %s", time_elapsed, time_elapsed + (timer or 0))
+
+	local effect = {
+		timer = time_elapsed + (timer or 0),
+		effect = effect_function,
+		on_end = on_end_function
 	}
 
 	if key then
@@ -747,7 +774,7 @@ local artefact_on_before_death_functions = {
 		local amb_vol_coeff = 1
 		_G.mus_vol = get_console():get_float("snd_volume_music")
 		_G.amb_vol = get_console():get_float("snd_volume_eff")
-		add_timed_effect(0.8, function()
+		add_simple_timed_effect(0.8, function()
 			amb_vol_coeff = amb_vol_coeff - 0.08
 			get_console():execute("snd_volume_eff " .. _G.amb_vol * amb_vol_coeff)
 		end)
@@ -777,14 +804,13 @@ local artefact_on_before_death_functions = {
 	    	trace("unregistering callback")
 	    	UnregisterScriptCallback("on_enemy_eval", artefact_props.af_serofim.ignore_enemy_on_down_function)
 	    	actor_is_dying = false
-	    	add_timed_effect(5, revive, nil, function(c_id_ppe_blur, c_id_ppe_snd_shock, c_id_ppe_actor_death, c_id_ppe_rcom_actor_death_quick, ignore_all_damage_function)
-	    		local remove_pp_effector = level.remove_pp_effector
+	    	add_simple_timed_effect(5, revive, function()
 				remove_pp_effector(c_id_ppe_blur)
 		    	remove_pp_effector(c_id_ppe_snd_shock)
 		    	remove_pp_effector(c_id_ppe_actor_death)
 				remove_pp_effector(c_id_ppe_rcom_actor_death_quick)
-		    	UnregisterScriptCallback("actor_on_before_hit", ignore_all_damage_function)
-			end, {c_id_ppe_blur, c_id_ppe_snd_shock, c_id_ppe_actor_death, c_id_ppe_rcom_actor_death_quick, artefact_props.af_serofim.ignore_all_damage_function})
+		    	UnregisterScriptCallback("actor_on_before_hit", artefact_props.af_serofim.ignore_all_damage_function)
+			end)
 	    	return true
 		end)
 		if artefact_ids[1] then
@@ -843,10 +869,9 @@ local artefact_on_npc_before_hit_functions = {
 		s_hit.power = s_hit.power * (1 + artefact_count * 0.1)
 		local health_boost = s_hit.power * 0.0035 * artefact_count
 
-		add_timed_effect(1, function(health_boost)
-			local actor = db.actor
+		add_simple_timed_effect(1, function()
 			actor:change_health(health_boost)
-		end, {health_boost})
+		end)
 	end
 }
 
@@ -920,9 +945,9 @@ local artefact_on_monster_before_hit_functions = {
 		s_hit.power = s_hit.power * (1 + artefact_count * 0.1)
 		local health_boost = s_hit.power * 0.0035 * artefact_count
 
-		add_timed_effect(1, function(health_boost)
+		add_simple_timed_effect(1, function()
 			actor:change_health(health_boost)
-		end, {health_boost})
+		end)
 	end
 
 }
@@ -1215,7 +1240,6 @@ local function load_state(m_data)
 		end
 	end
 	timed_effects = t
-	print_r(timed_effects)
 	cooldowns = m_data.perk_based_artefacts_cooldowns or {}
 end
 
