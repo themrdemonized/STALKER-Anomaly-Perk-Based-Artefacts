@@ -501,8 +501,8 @@ local artefact_on_update_functions = {
 	-- Drains satiety to cure bleeding
 	-- Multiple artefacts increase the cure but also increase the drain
 	af_kislushka = function(actor, artefact_count, artefact_ids, artefact_names)
-		local bleeding_cure_boost = 0.002 * artefact_count
-		local satiety_drain = -0.002 * artefact_count
+		local bleeding_cure_boost = 0.00135 * artefact_count
+		local satiety_drain = -0.0025 * artefact_count
 
 		if actor.bleeding > 0 then
 			trace("before bleeding %s", actor.bleeding)
@@ -551,7 +551,7 @@ local artefact_on_item_use_functions = {
 -- Functions for artefacts which provide perk bonuses on before actor hit
 local artefact_on_before_hit_functions = {
 
-	-- Black Angel, has 20% chance to reflect 25% of bullet damage back
+	-- Black Angel, has 20% chance to reflect 35% of bullet damage back
 	-- Nullify the damage of hit on reflection
 	-- More artefacts increase the chance to reflect with diminishing returns
 	af_black_angel = function(actor, artefact_count, artefact_ids, artefact_names, s_hit, bone_id, flags)
@@ -711,23 +711,26 @@ local artefact_on_before_death_functions = {
 -- Functions for artefacts which provide perk bonuses on actor hit
 local artefact_on_hit_functions = {
 
-	-- Black Angel, has 20% chance to reflect 25% of bullet damage back
+	-- Black Angel, has 20% chance to reflect 35% of bullet damage back
 	-- Nullify the damage of hit on reflection
 	-- More artefacts increase the chance to reflect with diminishing returns
 	af_black_angel = function(actor, artefact_count, artefact_ids, artefact_names, obj, amount, who, last_hit)
+		if artefact_props.af_black_angel.dice_roll > artefact_props.af_black_angel.reflect_chance[artefact_count] then 
+			trace("Black Angel not triggered, dice roll %s, chance %s", artefact_props.af_black_angel.dice_roll, artefact_props.af_black_angel.reflect_chance[artefact_count])
+			return
+		end
 		if not (
-			artefact_props.af_black_angel.dice_roll <= artefact_props.af_black_angel.reflect_chance[artefact_count] and
 			last_hit and
 			artefact_props.af_black_angel.valid_hits[last_hit.type] and
 			who and
 			obj
 		) then
-			trace("Black Angel not triggered")
+			trace("Black Angel not triggered, not valid hit")
 			return
 		end
 
 		local hit = hit(last_hit)
-		hit.power = hit.power * 0.25
+		hit.power = hit.power * 0.35
 		hit.draftsman = actor
 
 		who:hit(hit)
