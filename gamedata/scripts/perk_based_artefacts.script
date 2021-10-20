@@ -54,6 +54,9 @@ local min = math.min
 local random = math.random
 local sqrt = math.sqrt
 
+local dump = string.dump
+local load = loadstring
+
 local table_concat = table.concat
 local table_insert = table.insert
 local table_remove = table.remove
@@ -62,6 +65,8 @@ local table_sort = table.sort
 local tg = 0 --time_global storage used for actor on update limiter
 local actor_on_update_timer = 0.1 -- on update limiter, every 100ms actor_on_update is triggered
 local actor_on_update_time = 0
+
+local tg_lag = 0
 
 local time_elapsed = 0 -- Time from game start used for effects and cooldowns
 local time_factor = 6 -- Default time_factor
@@ -369,14 +374,24 @@ end
 -- on_end = function(), the function on the expiration of effect }
 -- The precision for both cooldown and timed effects is 0.1 or 100ms, making more precise timer or timed effect is pointless
 local timed_effects = {} 
-local function add_timed_effect(timer, effect_function, on_end_function, key, not_save)
+local function add_timed_effect(timer, effect_function, effect_args, on_end_function, on_end_args, key, not_save)
 	trace("current_time %s, adding effect %s", time_elapsed, time_elapsed + (timer or 0))
+
 	local effect = {
 		timer = time_elapsed + (timer or 0),
-		effect = effect_function,
-		on_end = on_end_function,
+		effect = effect_function and function()
+			effect_function(unpack(effect_args))
+		end,
+		effect_function = effect_function and dump(effect_function),
+		effect_args = effect_args,
+		on_end = on_end_function and function()
+			on_end_function(unpack(on_end_args))
+		end,
+		on_end_function = on_end_function and dump(on_end_function),
+		on_end_args = on_end_args,
 		save = not not_save
 	}
+
 	if key then
 		timed_effects[key] = effect
 	else
@@ -578,9 +593,9 @@ local artefact_on_weapon_fired_functions = {
 	-- 		local target_time_factor = 1 / (artefact_count + 1)
 	-- 		add_timed_effect(time, function()
 	-- 			get_console():execute("time_factor " .. target_time_factor)
-	-- 		end, function()
+	-- 		end, nil, function()
 	-- 			get_console():execute("time_factor " .. 1)
-	-- 		end, name, true)
+	-- 		end, nil, name, true)
 	-- 		trace("Knot, effect fired")
 	-- 	else
 	-- 		trace("Knot, effect not fired: elapsed %s, timed_effects %s, alive %s, available %s", ammo_elapsed, actor:alive())
@@ -607,10 +622,11 @@ local artefact_on_item_use_functions = {
 		local sec = obj:section()
 		local satiety_increase = SYS_GetParam(2, sec, "eat_satiety", 0) * health_boost
 		if satiety_increase > 0 then
-			add_timed_effect(1 * artefact_count, function()
+			add_timed_effect(1 * artefact_count, function(satiety_increase)
+				local actor = db.actor
 				actor:change_health(satiety_increase)
-				trace("health increased by %s", satiety_increase)
-			end)
+				_G.printf("health increased by %s", satiety_increase)
+			end, {satiety_increase})
 		end
 	end
 
@@ -659,6 +675,7 @@ local artefact_on_before_hit_functions = {
 		end, actor)
 
 		local function infinite_sprint()
+			local actor = db.actor
 			actor:change_power(1)
 		end 
 
@@ -733,7 +750,7 @@ local artefact_on_before_death_functions = {
 		add_timed_effect(0.8, function()
 			amb_vol_coeff = amb_vol_coeff - 0.08
 			get_console():execute("snd_volume_eff " .. _G.amb_vol * amb_vol_coeff)
-		end, nil, true)
+		end)
 		get_console():execute("snd_volume_music 0")
 
 		flags.ret_value = false
@@ -742,6 +759,7 @@ local artefact_on_before_death_functions = {
 	    RegisterScriptCallback("on_enemy_eval", artefact_props.af_serofim.ignore_enemy_on_down_function)
 	    
 	    local function revive()
+	    	local actor = db.actor
 	    	actor:set_health_ex(0.5)
 			actor.power = 1
 			actor.radiation	= 0
@@ -758,14 +776,15 @@ local artefact_on_before_death_functions = {
 	    CreateTimeEvent("af_serofim", "af_serofim", 2, function()
 	    	trace("unregistering callback")
 	    	UnregisterScriptCallback("on_enemy_eval", artefact_props.af_serofim.ignore_enemy_on_down_function)
-	    	add_timed_effect(5, revive, function()
+	    	actor_is_dying = false
+	    	add_timed_effect(5, revive, nil, function(c_id_ppe_blur, c_id_ppe_snd_shock, c_id_ppe_actor_death, c_id_ppe_rcom_actor_death_quick, ignore_all_damage_function)
+	    		local remove_pp_effector = level.remove_pp_effector
 				remove_pp_effector(c_id_ppe_blur)
 		    	remove_pp_effector(c_id_ppe_snd_shock)
 		    	remove_pp_effector(c_id_ppe_actor_death)
 				remove_pp_effector(c_id_ppe_rcom_actor_death_quick)
-		    	UnregisterScriptCallback("actor_on_before_hit", artefact_props.af_serofim.ignore_all_damage_function)
-		    	actor_is_dying = false
-			end)
+		    	UnregisterScriptCallback("actor_on_before_hit", ignore_all_damage_function)
+			end, {c_id_ppe_blur, c_id_ppe_snd_shock, c_id_ppe_actor_death, c_id_ppe_rcom_actor_death_quick, artefact_props.af_serofim.ignore_all_damage_function})
 	    	return true
 		end)
 		if artefact_ids[1] then
@@ -824,9 +843,10 @@ local artefact_on_npc_before_hit_functions = {
 		s_hit.power = s_hit.power * (1 + artefact_count * 0.1)
 		local health_boost = s_hit.power * 0.0035 * artefact_count
 
-		add_timed_effect(1, function()
+		add_timed_effect(1, function(health_boost)
+			local actor = db.actor
 			actor:change_health(health_boost)
-		end)
+		end, {health_boost})
 	end
 }
 
@@ -900,9 +920,9 @@ local artefact_on_monster_before_hit_functions = {
 		s_hit.power = s_hit.power * (1 + artefact_count * 0.1)
 		local health_boost = s_hit.power * 0.0035 * artefact_count
 
-		add_timed_effect(1, function()
+		add_timed_effect(1, function(health_boost)
 			actor:change_health(health_boost)
-		end)
+		end, {health_boost})
 	end
 
 }
@@ -1143,6 +1163,12 @@ end
 local function actor_on_first_update()
 	time_factor = get_time_factor()
 	refresh_state()
+	local tg_now = time_global()
+	local tg_add = (tg_now - tg_lag) * 0.001
+	trace("tg_now %s, tg_add %s", tg_now, tg_add)
+	for key, effect in pairs(timed_effects) do
+		effect.timer = effect.timer + tg_add
+	end
 	RegisterScriptCallback("actor_item_to_slot", refresh_state)
 	RegisterScriptCallback("actor_item_to_belt", refresh_state)
 	RegisterScriptCallback("actor_item_to_ruck", refresh_state)
@@ -1159,25 +1185,45 @@ local function actor_on_first_update()
 	RegisterScriptCallback("monster_on_death_callback", monster_on_death_callback)
 end
 
--- local function save_state(m_data)
--- 	local t = {}
--- 	for key, effect in pairs(timed_effects) do
--- 		if effect.save then
--- 			t[key] = effect
--- 		end
--- 	end
--- 	m_data.perk_based_artefacts_effects = t
--- 	m_data.perk_based_artefacts_cooldowns = cooldowns
--- end
+local function save_state(m_data)
+	local t = {}
+	for key, effect in pairs(timed_effects) do
+		if effect.save then
+			t[key] = effect
+			t[key].effect = nil
+			t[key].on_end = nil
+		end
+	end
+	m_data.perk_based_artefacts_effects = t
+	m_data.perk_based_artefacts_cooldowns = cooldowns
+end
 
--- local function load_state(m_data) 
--- 	timed_effects = m_data.perk_based_artefacts_effects or {}
--- 	cooldowns = m_data.perk_based_artefacts_cooldowns or {}
--- end
+local function load_state(m_data)
+	local t = m_data.perk_based_artefacts_effects or {}
+	for key, effect in pairs(t) do
+		if t[key].effect_function then
+			local function_string = load(t[key].effect_function)
+			t[key].effect = function()
+				function_string(unpack(t[key].effect_args))
+			end
+		end
+		if t[key].on_end_function then
+			local on_end_string = load(t[key].on_end_function)
+			t[key].on_end = function()
+				on_end_string(unpack(t[key].on_end_args))
+			end
+		end
+	end
+	timed_effects = t
+	print_r(timed_effects)
+	cooldowns = m_data.perk_based_artefacts_cooldowns or {}
+end
 
 function on_game_start()
 	trace("Registering")
+	tg_lag = time_global()
+	trace("tg_on_game_start %s", tg_lag)
 	RegisterScriptCallback("actor_on_first_update", actor_on_first_update)
-	-- RegisterScriptCallback("load_state", load_state)
-	-- RegisterScriptCallback("save_state", save_state)
+	RegisterScriptCallback("load_state", load_state)
+	RegisterScriptCallback("save_state", save_state)
 end
