@@ -369,29 +369,43 @@ end
 -- on_end = function(), the function on the expiration of effect }
 -- The precision for both cooldown and timed effects is 0.1 or 100ms, making more precise timer or timed effect is pointless
 local timed_effects = {} 
-local function add_timed_effect(timer, effect_function, on_end_function)
+local function add_timed_effect(timer, effect_function, on_end_function, key, not_save)
 	trace("current_time %s, adding effect %s", time_elapsed, time_elapsed + (timer or 0))
-	table_insert(timed_effects, {
+	local effect = {
 		timer = time_elapsed + (timer or 0),
 		effect = effect_function,
-		on_end = on_end_function
-	})
+		on_end = on_end_function,
+		save = not not_save
+	}
+	if key then
+		timed_effects[key] = effect
+	else
+		table_insert(timed_effects, effect)
+	end
+end
+
+local function remove_timed_effect(key, on_end)
+	if not timed_effects[key] then return end
+	if on_end and timed_effects[key].on_end then
+		timed_effects[key].on_end()
+	end
+	timed_effects[key] = nil
 end
 
 -- Processing the effects
 -- Whatever lowest time is set for effect, it will be processed at least once on process cycle
 local function process_timed_effects() 
-	for i, props in pairs(timed_effects) do
+	for key, props in pairs(timed_effects) do
 		if props.effect then
 			props.effect()
 		end
-		trace("effect %s, timer %s, current_time %s", i, props.timer, time_elapsed)
+		trace("effect %s, timer %s, current_time %s", key, props.timer, time_elapsed)
 		if props.timer < time_elapsed then
 			trace("removing effect, effect timer %s, current_time %s", props.timer, time_elapsed)
 			if props.on_end then
 				props.on_end()
 			end
-			timed_effects[i] = nil
+			timed_effects[key] = nil
 		end
 	end
 end
@@ -522,6 +536,60 @@ local artefact_on_update_functions = {
 
 }
 
+--Functions for artefacts which provide perk bonuses after weapon fired
+local artefact_on_weapon_fired_functions = {
+
+	-- Knot, Perk: Superhot Deathloop
+	-- Having last bullet in the magazine amplifies your reflexes
+	-- Time around you slows down when you stop and moves normally only when you move
+	-- The effect is short timed, if you missed the opportunity - too bad
+	-- Weapons with no mags or only one bullet in the mag are ignored
+	-- Multiple artefacts increase the magnitude of effect and slightly increase the duration
+	-- SCRAPPED: no possibility to manipulate time factor outside of debug mode
+	-- af_fire_loop = function(actor, artefact_count, artefact_ids, artefact_names, obj, wpn, ammo_elapsed, grenade_elapsed, ammo_type, grenade_type)
+	-- 	local current_weapon = actor:active_item()
+	-- 	if not current_weapon then
+	-- 		trace("Knot, no current_weapon")
+	-- 		return
+	-- 	end
+
+	-- 	local sec = current_weapon:section()
+	-- 	local name = current_weapon:name()
+	-- 	local mag_size = SYS_GetParam(2, sec, "ammo_mag_size", 0)
+	-- 	if mag_size < 2 then
+	-- 		trace("Knot, mag size is too small: %s", mag_size)
+	-- 		return
+	-- 	end
+
+	-- 	local casted_weapon = current_weapon:cast_Weapon()
+	-- 	if not casted_weapon then
+	-- 		trace("Knot, no casted weapon")
+	-- 		return
+	-- 	end
+
+		
+
+	-- 	local ammo_elapsed = ammo_elapsed - 1
+	-- 	trace(ammo_elapsed)
+	-- 	remove_timed_effect(name, true)
+
+	-- 	if ammo_elapsed == 1 and actor:alive() then
+	-- 		local time = 1.5 + artefact_count
+	-- 		local target_time_factor = 1 / (artefact_count + 1)
+	-- 		add_timed_effect(time, function()
+	-- 			get_console():execute("time_factor " .. target_time_factor)
+	-- 		end, function()
+	-- 			get_console():execute("time_factor " .. 1)
+	-- 		end, name, true)
+	-- 		trace("Knot, effect fired")
+	-- 	else
+	-- 		trace("Knot, effect not fired: elapsed %s, timed_effects %s, alive %s, available %s", ammo_elapsed, actor:alive())
+	-- 	end 
+
+	-- end
+
+}
+
 -- Functions for artefacts which provide perk bonuses on item use
 local artefact_on_item_use_functions = {
 
@@ -562,7 +630,7 @@ local artefact_on_before_hit_functions = {
 
 		artefact_props.af_black_angel.dice_roll = random(100)
 		if artefact_props.af_black_angel.dice_roll <= artefact_props.af_black_angel.reflect_chance[artefact_count] then
-			s_hit.power = 0.01
+			s_hit.power = 0.001
 		end
 	end,
 
@@ -665,7 +733,7 @@ local artefact_on_before_death_functions = {
 		add_timed_effect(0.8, function()
 			amb_vol_coeff = amb_vol_coeff - 0.08
 			get_console():execute("snd_volume_eff " .. _G.amb_vol * amb_vol_coeff)
-		end)
+		end, nil, true)
 		get_console():execute("snd_volume_music 0")
 
 		flags.ret_value = false
@@ -998,6 +1066,12 @@ local function actor_on_update()
 	process_timed_effects()
 end
 
+local function actor_on_weapon_fired(obj, wpn, ammo_elapsed, grenade_elapsed, ammo_type, grenade_type)
+	trace("weapon fired %s", wpn:section())
+
+	process_artefacts(artefact_on_weapon_fired_functions, obj, wpn, ammo_elapsed, grenade_elapsed, ammo_type, grenade_type)
+end
+
 local function actor_on_before_hit(s_hit, bone_id, flags)
 	trace("actor_on_before_hit damage type %s", s_hit.type)
 	last_hit = hit(s_hit)
@@ -1072,6 +1146,7 @@ local function actor_on_first_update()
 	RegisterScriptCallback("actor_item_to_slot", refresh_state)
 	RegisterScriptCallback("actor_item_to_belt", refresh_state)
 	RegisterScriptCallback("actor_item_to_ruck", refresh_state)
+	RegisterScriptCallback("actor_on_weapon_fired", actor_on_weapon_fired)
 	RegisterScriptCallback("actor_on_hit_callback", actor_on_hit_callback)
 	RegisterScriptCallback("actor_on_before_hit", actor_on_before_hit)
 	RegisterScriptCallback("actor_on_before_death", actor_on_before_death)
@@ -1084,19 +1159,25 @@ local function actor_on_first_update()
 	RegisterScriptCallback("monster_on_death_callback", monster_on_death_callback)
 end
 
-local function save_state(m_data) 
-	m_data.perk_based_artefacts_effects = timed_effects
-	m_data.perk_based_artefacts_cooldowns = cooldowns
-end
+-- local function save_state(m_data)
+-- 	local t = {}
+-- 	for key, effect in pairs(timed_effects) do
+-- 		if effect.save then
+-- 			t[key] = effect
+-- 		end
+-- 	end
+-- 	m_data.perk_based_artefacts_effects = t
+-- 	m_data.perk_based_artefacts_cooldowns = cooldowns
+-- end
 
-local function load_state(m_data) 
-	timed_effects = m_data.perk_based_artefacts_effects or {}
-	cooldowns = m_data.perk_based_artefacts_cooldowns or {}
-end
+-- local function load_state(m_data) 
+-- 	timed_effects = m_data.perk_based_artefacts_effects or {}
+-- 	cooldowns = m_data.perk_based_artefacts_cooldowns or {}
+-- end
 
 function on_game_start()
 	trace("Registering")
 	RegisterScriptCallback("actor_on_first_update", actor_on_first_update)
-	RegisterScriptCallback("load_state", load_state)
-	RegisterScriptCallback("save_state", save_state)
+	-- RegisterScriptCallback("load_state", load_state)
+	-- RegisterScriptCallback("save_state", save_state)
 end
