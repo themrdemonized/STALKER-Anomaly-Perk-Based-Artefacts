@@ -18,7 +18,6 @@ local printf = printf
 local random_float = random_float
 local random_number = random_number
 local RegisterScriptCallback = RegisterScriptCallback
-local random_float = random_float
 local round_100 = round_100
 local SYS_GetParam = SYS_GetParam
 local time_global = time_global
@@ -27,17 +26,17 @@ local vector_rotate_y = vector_rotate_y
 
 local get_nearby_campfire = bind_campfire.get_nearby_campfire
 
-local level_object_by_id = level.object_by_id
+local add_cam_effector = level.add_cam_effector
+local add_pp_effector = level.add_pp_effector
+local disable_input = level.disable_input
+local enable_input = level.enable_input
 local get_start_time = level.get_start_time
 local get_time_factor = level.get_time_factor 
 local get_time_hours = level.get_time_hours
 local get_time_minutes = level.get_time_minutes
-local enable_input = level.enable_input
+local level_object_by_id = level.object_by_id
 local remove_pp_effector = level.remove_pp_effector
-local disable_input = level.disable_input
-local add_cam_effector = level.add_cam_effector
-local add_pp_effector = level.add_pp_effector
-local remove_pp_effector = level.remove_pp_effector
+local set_time_factor = level.set_time_factor 
 
 local get_weather_manager = level_weathers.get_weather_manager
 
@@ -65,6 +64,8 @@ local actor_on_update_timer = 0.1 -- on update limiter, every 100ms actor_on_upd
 local actor_on_update_time = 0
 
 local time_elapsed = 0 -- Time from game start used for effects and cooldowns
+local time_factor = 6 -- Default time_factor
+
 local actor_is_dying = false
 
 hud_state = 1
@@ -134,7 +135,8 @@ local function get_random_element(t)
 end
 
 local function get_time_elapsed()
-    return floor(tonumber(get_game_time():diffSec(get_start_time())) / get_time_factor() * 10) * 0.1
+	--trace(time_factor)
+    return floor(tonumber(get_game_time():diffSec(get_start_time())) / time_factor * 10) * 0.1
 end
 
 local function get_object_by_id(id) -- same as _g.script one but without spamming in console
@@ -201,7 +203,15 @@ end
 local artefact_props = { -- Special props of artefacts that are used in processing
 	af_black_angel = {
 		dice_roll = 0,
-		reflect_chance = 15,
+		reflect_chance = (function() -- LUT with chances to trigger by artefact count
+			local t = {}
+			for artefact_count = 1, 5 do
+				-- Parabolic curve
+				-- Progression is 20 -> 37.5 -> 50 -> 57.5 -> 60
+				t[artefact_count] = (25 - 2.5 * artefact_count) * artefact_count - 2.5
+			end
+			return t
+		end)(),
 		valid_hits = { -- Valid hit types to trigger
 			[hit.fire_wound] = true
 		}
@@ -348,9 +358,9 @@ local function remove_speed_boosts()
 	end
 end
 
-local cooldown_timers = {} -- Table of cooldowns of artefacts (["artefact"] = time_elapsed + cooldown)
+local cooldowns = {} -- Table of cooldowns of artefacts (["artefact"] = time_elapsed + cooldown)
 local function add_cooldown(artefact, cooldown)
-	cooldown_timers[artefact] = time_elapsed + cooldown
+	cooldowns[artefact] = time_elapsed + cooldown
 end
 
 -- Table of current active effects, contains tables of these { 
@@ -550,11 +560,8 @@ local artefact_on_before_hit_functions = {
 			return
 		end
 
-		-- Parabolic curve
-		-- Progression is 20 -> 37.5 -> 50 -> 57.5 -> 60
 		artefact_props.af_black_angel.dice_roll = random(100)
-		artefact_props.af_black_angel.reflect_chance = (25 - 2.5 * artefact_count) * artefact_count - 2.5
-		if artefact_props.af_black_angel.dice_roll <= artefact_props.af_black_angel.reflect_chance then
+		if artefact_props.af_black_angel.dice_roll <= artefact_props.af_black_angel.reflect_chance[artefact_count] then
 			s_hit.power = 0.01
 		end
 	end,
@@ -709,7 +716,7 @@ local artefact_on_hit_functions = {
 	-- More artefacts increase the chance to reflect with diminishing returns
 	af_black_angel = function(actor, artefact_count, artefact_ids, artefact_names, obj, amount, who, last_hit)
 		if not (
-			artefact_props.af_black_angel.dice_roll <= artefact_props.af_black_angel.reflect_chance and
+			artefact_props.af_black_angel.dice_roll <= artefact_props.af_black_angel.reflect_chance[artefact_count] and
 			last_hit and
 			artefact_props.af_black_angel.valid_hits[last_hit.type] and
 			who and
@@ -962,8 +969,8 @@ local function process_artefacts(artefacts_table, ...)
 end
 
 -- For callbacks
-local function refresh_state(force)
-	if refresh_artefacts(force) then
+local function refresh_state()
+	if refresh_artefacts() then
 		remove_speed_boosts()
 		unregister_callbacks()
 		process_artefacts(artefact_on_equip_functions)
@@ -1057,6 +1064,7 @@ local function monster_on_death_callback(monster, who)
 end
 
 local function actor_on_first_update()
+	time_factor = get_time_factor()
 	refresh_state()
 	RegisterScriptCallback("actor_item_to_slot", refresh_state)
 	RegisterScriptCallback("actor_item_to_belt", refresh_state)
@@ -1073,7 +1081,19 @@ local function actor_on_first_update()
 	RegisterScriptCallback("monster_on_death_callback", monster_on_death_callback)
 end
 
+local function save_state(m_data) 
+	m_data.perk_based_artefacts_effects = timed_effects
+	m_data.perk_based_artefacts_cooldowns = cooldowns
+end
+
+local function load_state(m_data) 
+	timed_effects = m_data.perk_based_artefacts_effects or {}
+	cooldowns = m_data.perk_based_artefacts_cooldowns or {}
+end
+
 function on_game_start()
 	trace("Registering")
 	RegisterScriptCallback("actor_on_first_update", actor_on_first_update)
+	RegisterScriptCallback("load_state", load_state)
+	RegisterScriptCallback("save_state", save_state)
 end
