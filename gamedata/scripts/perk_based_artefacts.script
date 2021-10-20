@@ -66,7 +66,7 @@ local tg = 0 --time_global storage used for actor on update limiter
 local actor_on_update_timer = 0.1 -- on update limiter, every 100ms actor_on_update is triggered
 local actor_on_update_time = 0
 
-local tg_lag = 0
+local tg_lag = 0 --stores the time_global on game start and then used to correct timers for loaded time effects
 
 local time_elapsed = 0 -- Time from game start used for effects and cooldowns
 local time_factor = 6 -- Default time_factor
@@ -786,7 +786,6 @@ local artefact_on_before_death_functions = {
 	    RegisterScriptCallback("on_enemy_eval", artefact_props.af_serofim.ignore_enemy_on_down_function)
 	    
 	    local function revive()
-	    	local actor = db.actor
 	    	actor:set_health_ex(0.5)
 			actor.power = 1
 			actor.radiation	= 0
@@ -803,13 +802,13 @@ local artefact_on_before_death_functions = {
 	    CreateTimeEvent("af_serofim", "af_serofim", 2, function()
 	    	trace("unregistering callback")
 	    	UnregisterScriptCallback("on_enemy_eval", artefact_props.af_serofim.ignore_enemy_on_down_function)
-	    	actor_is_dying = false
 	    	add_simple_timed_effect(5, revive, function()
 				remove_pp_effector(c_id_ppe_blur)
 		    	remove_pp_effector(c_id_ppe_snd_shock)
 		    	remove_pp_effector(c_id_ppe_actor_death)
 				remove_pp_effector(c_id_ppe_rcom_actor_death_quick)
 		    	UnregisterScriptCallback("actor_on_before_hit", artefact_props.af_serofim.ignore_all_damage_function)
+		    	actor_is_dying = false
 			end)
 	    	return true
 		end)
