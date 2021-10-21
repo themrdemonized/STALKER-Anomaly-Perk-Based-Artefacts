@@ -68,3 +68,9 @@ So far the perks are
   -- Become invisible to anybody
   -- You can't draw a weapon, talk to anybody or interact with anything
   -- Does not stack in any way
+
+  -- Dragon's Eye, Perk: Good ol' Ultra-Violence
+  -- Upon killing an npc or mutant there is a small chance it will explode violently
+  -- Explosion spawn meaty gibs and hurts everyone in the radius
+  -- User's discretion is advised
+  -- Multiple artefacts increase the chance to explode

@@ -1,7 +1,8 @@
-Dragon's Eye: Kills make enemies explode - use at your own risk
 Tapeworm: Constantly drains health. Kills restore health.
 Basilisk: Melee attacks have a small chance to be immediately fatal.
 -- Lamp, passive glow around player
 -- Medal, when player uses this artifact he gains passive psy health regeneration. That is if medal is turned with the right pole. From time to time player would need to turn artifact to not go insane.
 -- Death Lamp, player can use this artifact to hit enemies in a short radius at the cost of his health. Cooldown - 2 hours
 Lucifer artefact: Equipping it makes you grant powerful stats, but the artefact slowly degrades. Find more artefacts to prolong your life or face the consequences
+lighthouse - is it possible to see who's in your flashlight cone if it's on?
+Ball - Starter artefact, gived for every new player on game start, provide small but nice bonuses for basic equipment with no stacking
