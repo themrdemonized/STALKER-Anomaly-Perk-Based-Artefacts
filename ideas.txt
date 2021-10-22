@@ -7,4 +7,4 @@ Lucifer artefact: Equipping it makes you grant powerful stats, but the artefact 
 lighthouse - is it possible to see who's in your flashlight cone if it's on?
 Ball - Starter artefact, gived for every new player on game start, provide small but nice bonuses for basic equipment with no stacking
 Artefact that gives significant buff to psy regen but makes you do crazy shit
-critical ascension - consecutive headshots gives boost to damage, missing an enemy resets the stack
+critical ascension - consecutive shots gives boost to damage, headshots give double boost, missing a shot resets the stack

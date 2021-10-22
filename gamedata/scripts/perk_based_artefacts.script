@@ -102,9 +102,13 @@ local last_npc_hit_bone_index
 local last_monster_hit
 local last_monster_hit_bone_index
 
+local debug_mode = true
+
 -- Utils
 local function trace(str, ...)
-	printf("Perk Based Artefacts: " .. str, ...)
+	if debug_mode then
+		printf("Perk Based Artefacts: " .. str, ...)
+	end
 end
 
 local function compare_arrays(t1, t2)
@@ -154,30 +158,30 @@ end
 
 local function get_time_elapsed()
 	--trace(time_factor)
-    return floor(tonumber(get_game_time():diffSec(get_start_time())) / time_factor * 10) * 0.1
+	return floor(tonumber(get_game_time():diffSec(get_start_time())) / time_factor * 10) * 0.1
 end
 
 local function get_object_by_id(id) -- same as _g.script one but without spamming in console
-    if not (id and type(id) == "number") then
-        callstack()
-        --printe("!ERROR get_object_by_id | id (%s) is invalid", id)
-        return
-    end
-    
-    if (id == AC_ID) then
-        return db.actor
-    end
-    
-    local obj = db.storage[id] and db.storage[id].object or level_object_by_id(id)
-    if (not obj) then
-        --printe("!ERROR get_object_by_id | no game object recieved from id (%s)", id)
-        return
-    end
-    return obj
+	if not (id and type(id) == "number") then
+		callstack()
+		--printe("!ERROR get_object_by_id | id (%s) is invalid", id)
+		return
+	end
+	
+	if (id == AC_ID) then
+		return db.actor
+	end
+	
+	local obj = db.storage[id] and db.storage[id].object or level_object_by_id(id)
+	if (not obj) then
+		--printe("!ERROR get_object_by_id | no game object recieved from id (%s)", id)
+		return
+	end
+	return obj
 end
 
 local function get_current_weather()
-  return get_weather_manager():get_curr_weather()
+	return get_weather_manager():get_curr_weather()
 end
 
 local function play_sound_on_actor(snd, volume, actor)
@@ -299,20 +303,20 @@ local artefact_props = { -- Special props of artefacts that are used in processi
 			s_hit.impulse = 0.001
 		end,
 		ignore_enemy_on_down_function = function(obj, enemy, flags) -- Remove evaluation for the down time
-		    if (enemy:id() == AC_ID) then
-		        flags.override = true
-		        flags.result = false
-		        return
+			if (enemy:id() == AC_ID) then
+				flags.override = true
+				flags.result = false
+				return
 			end
 		end
 	},
 	af_star_phantom = {
 		weapon_hidden = false, -- Check for weapon is hidden
 		ignore_enemy_function = function(obj, enemy, flags) -- Remove evaluation
-		    if (enemy:id() == AC_ID) then
-		        flags.override = true
-		        flags.result = false
-		        return
+			if (enemy:id() == AC_ID) then
+				flags.override = true
+				flags.result = false
+				return
 			end
 		end
 	},
@@ -567,14 +571,14 @@ local artefact_on_update_functions = {
 		local health_boost = 0.0007
 
 		local nearby_camp = get_nearby_campfire(5, true)
-    	if nearby_camp and nearby_camp:is_on() then
-    		for i = 1, artefact_count do
-	    		actor:change_health(health_boost)
-	    		arszi_psy.manage_psy_health()
-	    		arszi_psy.manage_psy_health()
-	    		arszi_psy.manage_psy_health()
-	    	end
-    		trace("firing Signet, health %s", actor.health)
+		if nearby_camp and nearby_camp:is_on() then
+			for i = 1, artefact_count do
+				actor:change_health(health_boost)
+				arszi_psy.manage_psy_health()
+				arszi_psy.manage_psy_health()
+				arszi_psy.manage_psy_health()
+			end
+			trace("firing Signet, health %s", actor.health)
 		end
 	end,
 
@@ -783,10 +787,10 @@ function af_serofim_cheat_death()
 
 	bind_stalker_ext.invulnerable_time = time_global()
 	level.enable_input()
-    level.remove_pp_effector(c_id_ppe_black_infinite)
+	level.remove_pp_effector(c_id_ppe_black_infinite)
 	get_console():execute("snd_volume_eff " .. _G.amb_vol)
 	get_console():execute("snd_volume_music " .. _G.mus_vol)
-    _G.mus_vol = 0
+	_G.mus_vol = 0
 	_G.amb_vol = 0
 	get_console():execute("hud_draw " .. hud_state)
 	CreateTimeEvent("af_serofim_cheat_death", "af_serofim_cheat_death", 0.5, function()
@@ -841,11 +845,11 @@ local artefact_on_before_death_functions = {
 
 		flags.ret_value = false
 		
-	    RegisterScriptCallback("actor_on_before_hit", artefact_props.af_serofim.ignore_all_damage_function)
-	    RegisterScriptCallback("on_enemy_eval", artefact_props.af_serofim.ignore_enemy_on_down_function)
-	    
-	    local function revive()
-	    	actor:set_health_ex(0.5)
+		RegisterScriptCallback("actor_on_before_hit", artefact_props.af_serofim.ignore_all_damage_function)
+		RegisterScriptCallback("on_enemy_eval", artefact_props.af_serofim.ignore_enemy_on_down_function)
+		
+		local function revive()
+			actor:set_health_ex(0.5)
 			actor.power = 1
 			actor.radiation	= 0
 			actor.bleeding = 1
@@ -853,23 +857,23 @@ local artefact_on_before_death_functions = {
 			arszi_psy.set_psy_health(1)
 		end
 
-	    revive()
-	    CreateTimeEvent("af_serofim_break_sound", "af_serofim_break_sound", 1.3, function()
-	    	play_snd(actor, nil, {[1] = "material\\bottle\\collide\\bottle_break_1"})
-	    	return true
-	    end)
-	    CreateTimeEvent("af_serofim", "af_serofim", 2, function()
-	    	trace("unregistering callback")
-	    	UnregisterScriptCallback("on_enemy_eval", artefact_props.af_serofim.ignore_enemy_on_down_function)
-	    	add_simple_timed_effect(5, revive, function()
+		revive()
+		CreateTimeEvent("af_serofim_break_sound", "af_serofim_break_sound", 1.3, function()
+			play_snd(actor, nil, {[1] = "material\\bottle\\collide\\bottle_break_1"})
+			return true
+		end)
+		CreateTimeEvent("af_serofim", "af_serofim", 2, function()
+			trace("unregistering callback")
+			UnregisterScriptCallback("on_enemy_eval", artefact_props.af_serofim.ignore_enemy_on_down_function)
+			add_simple_timed_effect(5, revive, function()
 				remove_pp_effector(c_id_ppe_blur)
-		    	remove_pp_effector(c_id_ppe_snd_shock)
-		    	remove_pp_effector(c_id_ppe_actor_death)
+				remove_pp_effector(c_id_ppe_snd_shock)
+				remove_pp_effector(c_id_ppe_actor_death)
 				remove_pp_effector(c_id_ppe_rcom_actor_death_quick)
-		    	UnregisterScriptCallback("actor_on_before_hit", artefact_props.af_serofim.ignore_all_damage_function)
-		    	actor_is_dying = false
+				UnregisterScriptCallback("actor_on_before_hit", artefact_props.af_serofim.ignore_all_damage_function)
+				actor_is_dying = false
 			end)
-	    	return true
+			return true
 		end)
 		if artefact_ids[1] then
 			alife_release_id(artefact_ids[1])
@@ -982,10 +986,10 @@ local artefact_on_npc_death_functions = {
 		for i = 1, artefact_count * 3 do
 			local money_position = npc:position()
 			local money_direction = npc:direction()
-		    money_direction = vector_rotate_y(money_direction, random(-180, 180))
-		    money_position.x = money_position.x + money_direction.x * random_float(0.3, 0.5)
-		    money_position.y = money_position.y + money_direction.y + 2
-		    money_position.z = money_position.z + money_direction.z * random_float(0.3, 0.5)
+			money_direction = vector_rotate_y(money_direction, random(-180, 180))
+			money_position.x = money_position.x + money_direction.x * random_float(0.3, 0.5)
+			money_position.y = money_position.y + money_direction.y + 2
+			money_position.z = money_position.z + money_direction.z * random_float(0.3, 0.5)
 			local money_item = alife_create_item(get_random_array_element(money_items), {money_position, npc_level_vertex_id, npc_game_vertex_id, nil})
 			CreateTimeEvent(money_item.id, money_item.id, 0, money_fountain, money_item.id)
 		end
@@ -1074,10 +1078,10 @@ local artefact_on_monster_death_functions = {
 		for i = 1, artefact_count do
 			local meat_position = monster:position()
 			local meat_direction = monster:direction()
-		    meat_direction = vector_rotate_y(meat_direction, random(-180, 180))
-		    meat_position.x = meat_position.x + meat_direction.x * random_float(0.5, 0.7)
-		    meat_position.y = meat_position.y + meat_direction.y + 1
-		    meat_position.z = meat_position.z + meat_direction.z * random_float(0.5, 0.7)
+			meat_direction = vector_rotate_y(meat_direction, random(-180, 180))
+			meat_position.x = meat_position.x + meat_direction.x * random_float(0.5, 0.7)
+			meat_position.y = meat_position.y + meat_direction.y + 1
+			meat_position.z = meat_position.z + meat_direction.z * random_float(0.5, 0.7)
 			local meat_item = alife_create_item(monster_meat, {meat_position, monster_level_vertex_id, monster_game_vertex_id, nil})
 		end
 	end,
@@ -1123,14 +1127,16 @@ local artefact_on_trade_functions = {
 
 				trace("Fountain, Money given %s", cashback)
 				actor:give_money(cashback)
+
 				local news_text = translate_string(tostring(cashback))
 				local news_caption = translate_string("general_in_money")
 				local news_ico = "ui_inGame2_Dengi_polucheni"
-
 				set_sound_play(AC_ID, "pda_tips")
 				actor:give_game_news(news_caption, news_text, news_ico, 0, 7000, 0)
+
 				artefact_props.af_fountain.cashback_triggered = false
 				actor_last_money = actor:money()
+
 				ui_inventory.GUI:On_Item_Update()
 				return true
 			end
@@ -1391,14 +1397,14 @@ end
 
 local function ActorMenu_on_trade_started()
 	on_trade_started_set_values()
-    RegisterScriptCallback("actor_on_item_take", actor_on_item_buy)
-    RegisterScriptCallback("actor_on_item_drop", actor_on_item_sell)
+	RegisterScriptCallback("actor_on_item_take", actor_on_item_buy)
+	RegisterScriptCallback("actor_on_item_drop", actor_on_item_sell)
 end
 
 local function ActorMenu_on_trade_closed()
 	on_trade_closed_set_values()
-    UnregisterScriptCallback("actor_on_item_take", actor_on_item_buy)
-    UnregisterScriptCallback("actor_on_item_drop", actor_on_item_sell)
+	UnregisterScriptCallback("actor_on_item_take", actor_on_item_buy)
+	UnregisterScriptCallback("actor_on_item_drop", actor_on_item_sell)
 end
 
 local function save_state(m_data)
