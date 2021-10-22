@@ -365,7 +365,14 @@ local artefact_props = { -- Special props of artefacts that are used in processi
 		end
 	},
 	af_fountain = {
-		cashback_triggered = false,
+		cashback_triggered = false, -- Trigger flag to reset time event
+	},
+	af_ball = {
+		basic_weapons = { -- Valid basic weapons to receive bonus
+			wpn_pm = true,
+			wpn_pb = true,
+			wpn_bm16 = true,
+		}
 	}
 }
 
@@ -416,6 +423,10 @@ local speed_boosts = { -- Table of speed boosts for different artefacts
 	af_generator = {
 		name = "af_generator_boost",
 		boost = 0.135
+	},
+	af_ball = {
+		name = "af_ball_boost",
+		boost = 0.07
 	}
 }
 
@@ -544,14 +555,14 @@ local artefact_on_update_functions = {
 	end,
 
 	-- Heart, Perk: Will to Live
-	-- Gives stronger health regen the less health you have if you have lower than 23% of health up to that amount
+	-- Gives stronger health regen the less health you have if you have lower than 25% of health up to that amount
 	-- More artefacts increase the regen and slightly increases the highest health to trigger
 	af_ear = function(actor, artefact_count, artefact_ids, artefact_names)
-		local health_threshold = 0.2 + 0.03 * artefact_count
+		local health_threshold = 0.22 + 0.03 * artefact_count
 
 		local actor_health = round_100(actor.health)
 		if actor_health < health_threshold then
-			local health = (health_threshold - actor_health) * 0.0045 * artefact_count
+			local health = (health_threshold - actor_health) * 0.0042 * artefact_count
 			actor:change_health(health)
 			trace("firing Will to Live, health %s", health)
 		end
@@ -601,8 +612,6 @@ local artefact_on_update_functions = {
 	af_generator = function(actor, artefact_count, artefact_ids, artefact_names)
 		local charge_boost = 0.0001
 
-		add_speed(speed_boosts.af_generator.name, 1 + speed_boosts.af_generator.boost * (artefact_count - 1), true, true)
-
 		--Pda, Detector and NVG slots
 		if IsMoveState("mcSprint") then
 			for i = 8, 10 do
@@ -639,6 +648,19 @@ local artefact_on_update_functions = {
 	af_chelust = function(actor, artefact_count, artefact_ids, artefact_names)
 		local health_boost = 0.0005
 		local power_boost = 0.002
+
+	end,
+
+	-- Ball, Perk: Stalker's Lucky Charm
+	-- Spawns with new game in actor's inventory
+	-- Provides small but nice bonuses to basic starting equipment and some stats
+	-- Needs some introductionary text in the description or in PDA
+	-- Does not stack in any way
+	af_ball = function(actor, artefact_count, artefact_ids, artefact_names)
+		local health_boost = 0.0001
+		local radiation_cure = -0.00003
+		actor:change_health(health_boost)
+		actor:change_radiation(radiation_cure)
 	end
 
 }
@@ -776,6 +798,15 @@ local artefact_on_before_hit_functions = {
 			play_sound_on_actor("perk_based_artefacts\\rnd_scr3", 1, actor)
 			add_timed_effect(6, infinite_sprint)
 		end
+	end,
+
+	-- Ball, Perk: Stalker's Lucky Charm
+	-- Spawns with new game in actor's inventory
+	-- Provides small but nice bonuses to basic starting equipment and some stats
+	-- Needs some introductionary text in the description or in PDA
+	-- Does not stack in any way
+	af_ball = function(actor, artefact_count, artefact_ids, artefact_names, s_hit, bone_id, flags)
+		s_hit.power = s_hit.power * random_float(0.93, 0.98)
 	end
 
 }
@@ -946,6 +977,19 @@ local artefact_on_npc_before_hit_functions = {
 			return
 		end
 		artefact_props.af_dragon_eye.on_before_hit(actor, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
+	end,
+
+	-- Ball, Perk: Stalker's Lucky Charm
+	-- Spawns with new game in actor's inventory
+	-- Provides small but nice bonuses to basic starting equipment and some stats
+	-- Needs some introductionary text in the description or in PDA
+	-- Does not stack in any way
+	af_ball = function(actor, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
+		local weapon = actor:active_item():section()
+		if artefact_props.af_ball.basic_weapons[weapon] then
+			trace("Ball, valid weapon %s", weapon)
+			s_hit.power = s_hit.power * random_float(1.05, 1.1)
+		end
 	end
 }
 
@@ -1018,11 +1062,6 @@ local artefact_on_monster_before_hit_functions = {
 	-- Upon killing certain mutants spawns raw chunk of meat near him
 	-- Stacks with multiple artefacts
 	af_kogot = function(actor, artefact_count, artefact_ids, artefact_names, monster, s_hit, bone_id, flags)
-		if not monster:alive() then
-			trace("Claw, monster %s not alive anymore", monster:section())
-			return
-		end
-
 		if not artefact_props.af_kogot.valid_hits[s_hit.type] then
 			trace("Claw, not a valid hit type %s", s_hit.type)
 			return
@@ -1039,11 +1078,6 @@ local artefact_on_monster_before_hit_functions = {
 	-- Dragon's Eye, Perk: Good ol' Ultra-Violence
 	-- See description at props
 	af_dragon_eye = function(actor, artefact_count, artefact_ids, artefact_names, monster, s_hit, bone_id, flags)
-		if not monster:alive() then
-			trace("Dragon Eye, monster %s not alive anymore", monster:section())
-			return
-		end
-
 		artefact_props.af_dragon_eye.dice_roll = random(100)
 		local chance = 5 * artefact_count
 		if artefact_props.af_dragon_eye.dice_roll > chance then
@@ -1051,6 +1085,19 @@ local artefact_on_monster_before_hit_functions = {
 			return
 		end
 		artefact_props.af_dragon_eye.on_before_hit(actor, artefact_count, artefact_ids, artefact_names, monster, s_hit, bone_id, flags)
+	end,
+
+	-- Ball, Perk: Stalker's Lucky Charm
+	-- Spawns with new game in actor's inventory
+	-- Provides small but nice bonuses to basic starting equipment and some stats
+	-- Needs some introductionary text in the description or in PDA
+	-- Does not stack in any way
+	af_ball = function(actor, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
+		local weapon = actor:active_item():section()
+		if artefact_props.af_ball.basic_weapons[weapon] then
+			trace("Ball, valid weapon %s", weapon)
+			s_hit.power = s_hit.power * random_float(1.05, 1.1)
+		end
 	end
 
 }
@@ -1166,11 +1213,36 @@ local artefact_on_equip_functions = {
 			actor:restore_weapon()
 			artefact_props.af_star_phantom.weapon_hidden = false
 		end)
+	end,
+
+	-- Generator, Perk: Godzilla is Approaching
+	-- Restores batteries charge of items while sprinting
+	-- Won't revive completely dead batteries or devices with no batteries
+	-- More artefacts gives more recharge rate and slight increase in sprint speed
+	af_generator = function(actor, artefact_count, artefact_ids, artefact_names)
+		add_speed(speed_boosts.af_generator.name, 1 + speed_boosts.af_generator.boost * (artefact_count - 1), true, true)
+	end,
+
+	-- Ball, Perk: Stalker's Lucky Charm
+	-- Spawns with new game in actor's inventory
+	-- Provides small but nice bonuses to basic starting equipment and some stats
+	-- Needs some introductionary text in the description or in PDA
+	-- Does not stack in any way
+	af_ball = function(actor, artefact_count, artefact_ids, artefact_names)
+		add_speed(speed_boosts.af_ball.name, 1 + speed_boosts.af_ball.boost, true, true)
 	end
 
 }
 
 -- Special monkey patches for some artefacts to make their effects work
+-- New game equipment patch, give Ball at new game
+local new_game_equippment = itms_manager.new_game_equippment
+itms_manager.new_game_equippment = function()
+	new_game_equippment()
+	alife_create_item("af_ball", db.actor)
+	return true
+end
+
 -- Patch for First Person Death
 if ayykyu_fp_death and ayykyu_fp_death.actor_on_before_death then
 	local fp_death = ayykyu_fp_death.actor_on_before_death
@@ -1348,6 +1420,12 @@ local function monster_on_before_hit(monster, s_hit, bone_id, flags)
 		trace("monster_on_before_hit not triggered %s, %s", monster:section(), s_hit.draftsman:section())
 		return
 	end
+
+	if not monster:alive() then
+		trace("monster_on_before_hit not triggered, monster %s not alive anymore", monster:section())
+		return
+	end
+
 	last_monster_hit = hit(s_hit)
 	last_monster_hit_bone_index = bone_id
 

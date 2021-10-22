@@ -11,7 +11,7 @@ So far the perks are
   -- Effect stacks with each artefact on belt
 
   -- Heart, Perk: Will to Live
-  -- Gives stronger health regen the less health you have if you have lower than 30% of health up to that amount
+  -- Gives stronger health regen the less health you have if you have lower than 25% of health up to that amount
   -- More artefacts increase the regen and slightly increases the highest health to trigger
 
   -- Moon, increases stats after midnight until dawn, gives penalties at day time (WIP)
@@ -79,4 +79,10 @@ So far the perks are
   -- Fountain, Perk: Letyshops Time
   -- Receive 2% cashback on each buy
   -- Stacks with multiple artefacts
+
+  -- Ball, Perk: Stalker's Lucky Charm
+  -- Spawns with new game in actor's inventory
+  -- Provides small but nice bonuses to basic starting equipment and some stats
+  -- Needs some introductionary text in the description or in PDA
+  -- Does not stack in any way
   
