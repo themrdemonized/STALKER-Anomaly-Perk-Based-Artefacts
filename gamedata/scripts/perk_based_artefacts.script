@@ -1107,6 +1107,7 @@ local artefact_on_trade_functions = {
 	-- Stacks with multiple artefacts
 	af_fountain = function(actor, artefact_count, artefact_ids, artefact_names, item, sell_bye)
 		if sell_bye then
+			actor_last_money = actor:money()
 			trace("Fountain not fired, selling item")
 			return
 		end
@@ -1115,6 +1116,7 @@ local artefact_on_trade_functions = {
 			ResetTimeEvent("af_fountain_cashback", "af_fountain_cashback", 0.15)
 		else
 			trace("Fountain fired")
+			
 			local function cashback()
 				local money = actor:money()
 				trace("Actor last money %s, actor current money %s", actor_last_money, money)
