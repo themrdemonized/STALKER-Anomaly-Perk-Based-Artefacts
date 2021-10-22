@@ -1,4 +1,4 @@
-Tapeworm: Constantly drains health. Kills restore health.
+Tapeworm: Stun artefact
 Basilisk: Melee attacks have a small chance to be immediately fatal.
 -- Lamp, passive glow around player
 -- Medal, when player uses this artifact he gains passive psy health regeneration. That is if medal is turned with the right pole. From time to time player would need to turn artifact to not go insane.
@@ -8,5 +8,3 @@ lighthouse - is it possible to see who's in your flashlight cone if it's on?
 Ball - Starter artefact, gived for every new player on game start, provide small but nice bonuses for basic equipment with no stacking
 Artefact that gives significant buff to psy regen but makes you do crazy shit
 critical ascension - consecutive headshots gives boost to damage, missing an enemy resets the stack
-Cash back artefact
-For some majestic reason you receive 2% of your purchase price back. Stacks with multiple artefacts

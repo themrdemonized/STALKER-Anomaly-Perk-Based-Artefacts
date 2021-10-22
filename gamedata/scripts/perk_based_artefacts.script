@@ -20,6 +20,7 @@ local printf = printf
 local random_float = random_float
 local random_number = random_number
 local RegisterScriptCallback = RegisterScriptCallback
+local ResetTimeEvent = ResetTimeEvent
 local round_100 = round_100
 local SYS_GetParam = SYS_GetParam
 local time_global = time_global
@@ -43,10 +44,12 @@ local set_time_factor = level.set_time_factor
 local get_weather_manager = level_weathers.get_weather_manager
 
 local get_game_time = game.get_game_time
+local translate_string = game.translate_string
 
 local play_snd = xr_effects.play_snd
 
 local get_safe_sound_object = xr_sound.get_safe_sound_object
+local set_sound_play = xr_sound.set_sound_play
 
 local abs = math.abs
 local ceil = math.ceil
@@ -55,6 +58,10 @@ local max = math.max
 local min = math.min
 local random = math.random
 local sqrt = math.sqrt
+
+local function round(amount)
+	return floor(amount + 0.5)
+end
 
 local dump = string.dump
 local load = loadstring
@@ -78,6 +85,8 @@ local time_factor = 6 -- Default time_factor
 local actor_is_dying = false
 
 hud_state = 1
+
+local actor_last_money = 0
 
 local c_id_ppe_blur = 5600
 local c_id_ppe_black_infinite = 5606
@@ -309,7 +318,7 @@ local artefact_props = { -- Special props of artefacts that are used in processi
 	},
 	af_dragon_eye = {
 		-- Dragon's Eye, Perk: Good ol' Ultra-Violence
-		-- 5% chance that each shot would be explosive
+		-- 5% chance that the shot would be explosive
 		-- Upon killing an npc or mutant with explosive shot it will explode violently
 		-- Explosion spawn meaty gibs and hurts everyone in the radius
 		-- User's discretion is advised
@@ -350,6 +359,9 @@ local artefact_props = { -- Special props of artefacts that are used in processi
 			local explode_obj = alife_create_item("ied_new_blow", {npc_position, npc_level_vertex_id, npc_game_vertex_id, nil})
 			CreateTimeEvent(explode_obj.id, explode_obj.id, 0, explode, explode_obj.id)
 		end
+	},
+	af_fountain = {
+		cashback_triggered = false,
 	}
 }
 
@@ -1027,7 +1039,7 @@ local artefact_on_monster_before_hit_functions = {
 			trace("Dragon Eye, monster %s not alive anymore", monster:section())
 			return
 		end
-		
+
 		artefact_props.af_dragon_eye.dice_roll = random(100)
 		local chance = 5 * artefact_count
 		if artefact_props.af_dragon_eye.dice_roll > chance then
@@ -1082,6 +1094,54 @@ local artefact_on_monster_death_functions = {
 	end
 
 }
+
+-- Functions for artefacts which provide perk bonuses on trade
+local artefact_on_trade_functions = {
+	
+	-- Fountain, Perk: Letyshops Time
+	-- Receive 2% cashback on each buy
+	-- Stacks with multiple artefacts
+	af_fountain = function(actor, artefact_count, artefact_ids, artefact_names, item, sell_bye)
+		if sell_bye then
+			trace("Fountain not fired, selling item")
+			return
+		end
+
+		if artefact_props.af_fountain.cashback_triggered then
+			ResetTimeEvent("af_fountain_cashback", "af_fountain_cashback", 0.15)
+		else
+			trace("Fountain fired")
+			local function cashback()
+				local money = actor:money()
+				trace("Actor last money %s, actor current money %s", actor_last_money, money)
+				local cashback = round((actor_last_money - money) * 0.02 * artefact_count)
+				if cashback < 1 then
+					trace("Fountain not fired, not enough money")
+					actor_last_money = money
+					return true
+				end
+
+				trace("Fountain, Money given %s", cashback)
+				actor:give_money(cashback)
+				local news_text = translate_string(tostring(cashback))
+				local news_caption = translate_string("general_in_money")
+				local news_ico = "ui_inGame2_Dengi_polucheni"
+
+				set_sound_play(AC_ID, "pda_tips")
+				actor:give_game_news(news_caption, news_text, news_ico, 0, 7000, 0)
+				artefact_props.af_fountain.cashback_triggered = false
+				actor_last_money = actor:money()
+				ui_inventory.GUI:On_Item_Update()
+				return true
+			end
+
+			CreateTimeEvent("af_fountain_cashback", "af_fountain_cashback", 0.15, cashback)
+			artefact_props.af_fountain.cashback_triggered = true
+		end
+	end
+
+}
+
 -- Functions for artefacts which provide perk bonuses on equip
 local artefact_on_equip_functions = {
 
@@ -1234,6 +1294,18 @@ local function actor_on_before_death(whoID, flags)
 	process_artefacts(artefact_on_before_death_functions, whoID, flags)
 end
 
+local function actor_on_item_buy(item)
+	trace("actor_on_item_buy triggered")
+
+	process_artefacts(artefact_on_trade_functions, item, false)
+end
+
+local function actor_on_item_sell(item)
+	trace("actor_on_item_sell triggered")
+
+	process_artefacts(artefact_on_trade_functions, item, true)
+end
+
 local function npc_on_before_hit(npc, s_hit, bone_id, flags)
 	if s_hit.draftsman:id() ~= AC_ID then
 		trace("npc_on_before_hit not triggered %s, %s", npc:section(), s_hit.draftsman:section())
@@ -1308,6 +1380,27 @@ local function actor_on_first_update()
 	RegisterScriptCallback("monster_on_death_callback", monster_on_death_callback)
 end
 
+local function on_trade_started_set_values()
+	artefact_props.af_fountain.cashback_triggered = false
+	actor_last_money = db.actor:money()
+end
+
+local function on_trade_closed_set_values()
+	artefact_props.af_fountain.cashback_triggered = false
+end
+
+local function ActorMenu_on_trade_started()
+	on_trade_started_set_values()
+    RegisterScriptCallback("actor_on_item_take", actor_on_item_buy)
+    RegisterScriptCallback("actor_on_item_drop", actor_on_item_sell)
+end
+
+local function ActorMenu_on_trade_closed()
+	on_trade_closed_set_values()
+    UnregisterScriptCallback("actor_on_item_take", actor_on_item_buy)
+    UnregisterScriptCallback("actor_on_item_drop", actor_on_item_sell)
+end
+
 local function save_state(m_data)
 	local t = {}
 	for key, effect in pairs(timed_effects) do
@@ -1348,4 +1441,6 @@ function on_game_start()
 	RegisterScriptCallback("actor_on_first_update", actor_on_first_update)
 	RegisterScriptCallback("load_state", load_state)
 	RegisterScriptCallback("save_state", save_state)
+	RegisterScriptCallback("ActorMenu_on_trade_started", ActorMenu_on_trade_started)
+	RegisterScriptCallback("ActorMenu_on_trade_closed", ActorMenu_on_trade_closed)
 end

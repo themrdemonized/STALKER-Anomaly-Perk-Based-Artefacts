@@ -70,7 +70,13 @@ So far the perks are
   -- Does not stack in any way
 
   -- Dragon's Eye, Perk: Good ol' Ultra-Violence
-  -- Upon killing an npc or mutant there is a small chance it will explode violently
+  -- 5% chance that the shot would be explosive
+  -- Upon killing an npc or mutant with explosive shot it will explode violently
   -- Explosion spawn meaty gibs and hurts everyone in the radius
   -- User's discretion is advised
   -- Multiple artefacts increase the chance to explode
+
+  -- Fountain, Perk: Letyshops Time
+  -- Receive 2% cashback on each buy
+  -- Stacks with multiple artefacts
+  
