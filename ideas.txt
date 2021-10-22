@@ -8,3 +8,5 @@ lighthouse - is it possible to see who's in your flashlight cone if it's on?
 Ball - Starter artefact, gived for every new player on game start, provide small but nice bonuses for basic equipment with no stacking
 Artefact that gives significant buff to psy regen but makes you do crazy shit
 critical ascension - consecutive headshots gives boost to damage, missing an enemy resets the stack
+Cash back artefact
+For some majestic reason you receive 2% of your purchase price back. Stacks with multiple artefacts

@@ -309,17 +309,16 @@ local artefact_props = { -- Special props of artefacts that are used in processi
 	},
 	af_dragon_eye = {
 		-- Dragon's Eye, Perk: Good ol' Ultra-Violence
-		-- Upon killing an npc or mutant there is a small chance it will explode violently
+		-- 5% chance that each shot would be explosive
+		-- Upon killing an npc or mutant with explosive shot it will explode violently
 		-- Explosion spawn meaty gibs and hurts everyone in the radius
 		-- User's discretion is advised
 		-- Multiple artefacts increase the chance to explode
-		af_dragon_eye_function = function(actor, artefact_count, artefact_ids, artefact_names, npc, who, last_npc_hit, last_npc_hit_bone_index)
-			local dice_roll = random(100)
-			local chance = 100 * artefact_count
-			if random(100) > 10 * artefact_count then
-				trace("Dragon Eye not triggered, dice roll %s, chance %s", dice_roll, chance)
-			end
-
+		dice_roll = 0,
+		on_before_hit = function(actor, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
+			s_hit.power = 1000
+		end,
+		on_death = function(actor, artefact_count, artefact_ids, artefact_names, npc, who, last_npc_hit, last_npc_hit_bone_index)
 			local npc_id = npc:id()
 			trace("Victim's id: %s", npc_id)
 			if npc_id == AC_ID then return end
@@ -919,6 +918,18 @@ local artefact_on_npc_before_hit_functions = {
 		add_simple_timed_effect(1, function()
 			actor:change_health(health_boost)
 		end)
+	end,
+
+	-- Dragon's Eye, Perk: Good ol' Ultra-Violence
+	-- See description at props
+	af_dragon_eye = function(actor, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
+		artefact_props.af_dragon_eye.dice_roll = random(100)
+		local chance = 5 * artefact_count
+		if artefact_props.af_dragon_eye.dice_roll > chance then
+			trace("Dragon Eye not triggered, dice roll %s, chance %s", artefact_props.af_dragon_eye.dice_roll, chance)
+			return
+		end
+		artefact_props.af_dragon_eye.on_before_hit(actor, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
 	end
 }
 
@@ -971,7 +982,13 @@ local artefact_on_npc_death_functions = {
 	-- Dragon's Eye, Perk: Good ol' Ultra-Violence
 	-- See description at props
 	af_dragon_eye = function(actor, artefact_count, artefact_ids, artefact_names, npc, who, last_npc_hit, last_npc_hit_bone_index)
-		artefact_props.af_dragon_eye.af_dragon_eye_function(actor, artefact_count, artefact_ids, artefact_names, npc, who, last_npc_hit, last_npc_hit_bone_index)
+		local chance = 5 * artefact_count
+		if artefact_props.af_dragon_eye.dice_roll > chance then
+			trace("Dragon Eye not triggered, dice roll %s, chance %s", artefact_props.af_dragon_eye.dice_roll, chance)
+			return
+		end
+
+		artefact_props.af_dragon_eye.on_death(actor, artefact_count, artefact_ids, artefact_names, npc, who, last_npc_hit, last_npc_hit_bone_index)
 	end
 
 }
@@ -1001,6 +1018,23 @@ local artefact_on_monster_before_hit_functions = {
 		add_simple_timed_effect(1, function()
 			actor:change_health(health_boost)
 		end)
+	end,
+
+	-- Dragon's Eye, Perk: Good ol' Ultra-Violence
+	-- See description at props
+	af_dragon_eye = function(actor, artefact_count, artefact_ids, artefact_names, monster, s_hit, bone_id, flags)
+		if not monster:alive() then
+			trace("Dragon Eye, monster %s not alive anymore", monster:section())
+			return
+		end
+		
+		artefact_props.af_dragon_eye.dice_roll = random(100)
+		local chance = 5 * artefact_count
+		if artefact_props.af_dragon_eye.dice_roll > chance then
+			trace("Dragon Eye not triggered, dice roll %s, chance %s", artefact_props.af_dragon_eye.dice_roll, chance)
+			return
+		end
+		artefact_props.af_dragon_eye.on_before_hit(actor, artefact_count, artefact_ids, artefact_names, monster, s_hit, bone_id, flags)
 	end
 
 }
@@ -1039,7 +1073,12 @@ local artefact_on_monster_death_functions = {
 	-- Dragon's Eye, Perk: Good ol' Ultra-Violence
 	-- See description at props
 	af_dragon_eye = function(actor, artefact_count, artefact_ids, artefact_names, monster, who, last_monster_hit, last_monster_hit_bone_index)
-		artefact_props.af_dragon_eye.af_dragon_eye_function(actor, artefact_count, artefact_ids, artefact_names, monster, who, last_monster_hit, last_monster_hit_bone_index)
+		local chance = 10 * artefact_count
+		if artefact_props.af_dragon_eye.dice_roll > chance then
+			trace("Dragon Eye not triggered, dice roll %s, chance %s", artefact_props.af_dragon_eye.dice_roll, chance)
+			return
+		end
+		artefact_props.af_dragon_eye.on_death(actor, artefact_count, artefact_ids, artefact_names, monster, who, last_monster_hit, last_monster_hit_bone_index)
 	end
 
 }
