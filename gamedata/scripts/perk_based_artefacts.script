@@ -1261,7 +1261,7 @@ local artefact_on_equip_functions = {
 	-- Tier Based Artefact
 	-- Amplifies players mighty foot and allows him to kick more mutants, resulting in instant death
 	-- Each artefact on the belt allows to kick more monsters
-	-- Has a cooldown of 1 second with 1 artefact, increases with more artefacts on belt by 1 second each
+	-- Has a cooldown of 2 seconds with 1 artefact, increases with more artefacts on belt by 1 second each
 	af_ball = function(actor, artefact_count, artefact_ids, artefact_names)
 		artefact_props.af_ball.monsters = {}
 		for i = 1, artefact_count do

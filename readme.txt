@@ -1,4 +1,4 @@
-Perk Based Artefacts, 0.03
+Perk Based Artefacts, 0.04
 A unique twist on overhauling old junk artefacts beyond the boundaries of simple stat changers
 Junk artefacts are no longer junk and received unique properties or Perks. The degree of perks vary from simple boosters to marvellous staff like recharging batteries by stepping in Electra, receiving Money on Headshots or Even Evading Death itself when all hope is lost.
 Multiple artefacts might or might not stack the effects and penalties of Perks in various ways, and effects are triggered on very various conditions
@@ -80,4 +80,15 @@ So far the perks are
   -- Receive 2% cashback on each buy
   -- Stacks with multiple artefacts
 
+  -- Ball, Perk: Kick Deez Nutz
+  -- Tier Based Artefact
+  -- Amplifies players mighty foot and allows him to kick more mutants, resulting in instant death
+  -- Each artefact on the belt allows to kick more monsters
+  -- Has a cooldown of 2 seconds with 1 artefact, increases with more artefacts on belt by 1 second each
+
+  -- Cell, Perk: Disintegrator
+  -- Disintegrates part of the bullet coming to you. Unfortunately in the process a lot of radiation is emitted, making you ill
+  -- Reduces bullet damage by 15%
+  -- Reduced amount of damage is converted to radiation
+  -- Stacks with multiple artefacts
   
