@@ -184,12 +184,13 @@ local function get_current_weather()
 	return get_weather_manager():get_curr_weather()
 end
 
-local function play_sound_on_actor(snd, volume, actor)
-	local actor = actor or db.actor
+local function play_sound_on_actor(snd, volume, frequency)
+	local actor = db.actor
 	local snd = get_safe_sound_object(snd)
 	if snd then
 		snd:play(actor, 0, sound_object.s2d)
 		snd.volume = volume or 1
+		snd.frequency = frequency or 1
 	end
 end
 
@@ -234,6 +235,11 @@ local artefact_props = { -- Special props of artefacts that are used in processi
 			end
 			return t
 		end)(),
+		valid_hits = { -- Valid hit types to trigger
+			[hit.fire_wound] = true
+		}
+	},
+	af_cell = {
 		valid_hits = { -- Valid hit types to trigger
 			[hit.fire_wound] = true
 		}
@@ -351,6 +357,9 @@ local artefact_props = { -- Special props of artefacts that are used in processi
 					local gibs = particles_object("new_effects\\krovisha_main")
 					if gibs and not gibs:playing() then
 						gibs:play_at_pos(npc_position)
+						local snd = get_safe_sound_object("perk_based_artefacts\\XDEATH" .. random(5))
+						snd:play_at_pos(npc, npc_position, 0, sound_object.s3d)
+						snd.frequency = random_float(0.95, 1.05)
 					else
 						trace("gibs not found")
 					end
@@ -368,11 +377,43 @@ local artefact_props = { -- Special props of artefacts that are used in processi
 		cashback_triggered = false, -- Trigger flag to reset time event
 	},
 	af_ball = {
-		basic_weapons = { -- Valid basic weapons to receive bonus
-			wpn_pm = true,
-			wpn_pb = true,
-			wpn_bm16 = true,
-		}
+		monster_tiers = { -- Monster Tiers opening by artefact count
+			[1] = {
+				clsid.zombie_s,
+				clsid.cat_s,
+				clsid.dog_s,
+				"SM_PIRANHA",
+			},
+			[2] = {
+				clsid.boar_s,
+				clsid.flesh_s,
+				clsid.fracture_s,
+				clsid.pseudodog_s,
+				clsid.psy_dog_s,
+			},
+			[3] = {
+				clsid.bloodsucker_s,
+				clsid.snork_s,
+				"SM_KARLIK",
+				"SM_PSYSUCKER",
+				"SM_LURKER",
+				"SM_VOLK",
+				"SM_POLTER_CORP",
+			},
+			[4] = {
+				clsid.burer_s,
+				clsid.controller_s,
+				"SM_TARK",
+				"SM_VENDIGO",
+			},
+			[5] = {
+				clsid.chimera_s,
+				clsid.gigant_s,
+				"SM_MEDVED",
+				"SM_MONSTER_BOAR",
+			}
+		},
+		monsters = {} -- Generated table to check if current monster is allowed to be kick
 	}
 }
 
@@ -423,10 +464,6 @@ local speed_boosts = { -- Table of speed boosts for different artefacts
 	af_generator = {
 		name = "af_generator_boost",
 		boost = 0.135
-	},
-	af_ball = {
-		name = "af_ball_boost",
-		boost = 0.07
 	}
 }
 
@@ -651,18 +688,6 @@ local artefact_on_update_functions = {
 
 	end,
 
-	-- Ball, Perk: Stalker's Lucky Charm
-	-- Spawns with new game in actor's inventory
-	-- Provides small but nice bonuses to basic starting equipment and some stats
-	-- Needs some introductionary text in the description or in PDA
-	-- Does not stack in any way
-	af_ball = function(actor, artefact_count, artefact_ids, artefact_names)
-		local health_boost = 0.0001
-		local radiation_cure = -0.00003
-		actor:change_health(health_boost)
-		actor:change_radiation(radiation_cure)
-	end
-
 }
 
 --Functions for artefacts which provide perk bonuses after weapon fired
@@ -792,21 +817,41 @@ local artefact_on_before_hit_functions = {
 		end 
 
 		if random(100) < 15 then
-			play_sound_on_actor("perk_based_artefacts\\lyutii", 0.7, actor)
+			play_sound_on_actor("perk_based_artefacts\\lyutii", 0.7)
 			add_timed_effect(12, infinite_sprint)
 		else
-			play_sound_on_actor("perk_based_artefacts\\rnd_scr3", 1, actor)
+			play_sound_on_actor("perk_based_artefacts\\rnd_scr3", 1)
 			add_timed_effect(6, infinite_sprint)
 		end
 	end,
 
-	-- Ball, Perk: Stalker's Lucky Charm
-	-- Spawns with new game in actor's inventory
-	-- Provides small but nice bonuses to basic starting equipment and some stats
-	-- Needs some introductionary text in the description or in PDA
-	-- Does not stack in any way
-	af_ball = function(actor, artefact_count, artefact_ids, artefact_names, s_hit, bone_id, flags)
-		s_hit.power = s_hit.power * random_float(0.93, 0.98)
+	-- Cell, Perk: Disintegrator
+	-- Reduces bullet damage by 15%
+	-- Reduced amount of damage is converted to radiation
+	-- Stacks with multiple artefacts
+	af_cell = function(actor, artefact_count, artefact_ids, artefact_names, s_hit, bone_id, flags)
+		if not artefact_props.af_cell.valid_hits[s_hit.type] then
+			trace("Cage, not a valid hit type %s", s_hit.type)
+			return
+		end
+
+		local rad_k = 0.15 * artefact_count
+		local power = s_hit.power
+		s_hit.power = s_hit.power * (1 - rad_k)
+		power = power - s_hit.power
+		local rad_amount = power * 0.1
+		trace("Cell: resulted radiation %s", rad_amount)
+		actor:change_radiation(rad_amount)
+		play_sound_on_actor("anomaly\\electra_hit" .. get_random_array_element({"", "1"}), 1, 1 - (artefact_count - 1) * 0.1)
+
+		local function rad_sound()
+			play_sound_on_actor("detectors\\geiger_" .. random(8), 1)
+			return true
+		end
+
+		for i = 1, artefact_count do
+			CreateTimeEvent("af_cell" .. i, "af_cell" .. i, random_float(0.15, 0.3) * i, rad_sound)
+		end
 	end
 
 }
@@ -979,18 +1024,6 @@ local artefact_on_npc_before_hit_functions = {
 		artefact_props.af_dragon_eye.on_before_hit(actor, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
 	end,
 
-	-- Ball, Perk: Stalker's Lucky Charm
-	-- Spawns with new game in actor's inventory
-	-- Provides small but nice bonuses to basic starting equipment and some stats
-	-- Needs some introductionary text in the description or in PDA
-	-- Does not stack in any way
-	af_ball = function(actor, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
-		local weapon = actor:active_item():section()
-		if artefact_props.af_ball.basic_weapons[weapon] then
-			trace("Ball, valid weapon %s", weapon)
-			s_hit.power = s_hit.power * random_float(1.05, 1.1)
-		end
-	end
 }
 
 -- Functions for artefacts which provide perk bonuses on npc death
@@ -1087,19 +1120,6 @@ local artefact_on_monster_before_hit_functions = {
 		artefact_props.af_dragon_eye.on_before_hit(actor, artefact_count, artefact_ids, artefact_names, monster, s_hit, bone_id, flags)
 	end,
 
-	-- Ball, Perk: Stalker's Lucky Charm
-	-- Spawns with new game in actor's inventory
-	-- Provides small but nice bonuses to basic starting equipment and some stats
-	-- Needs some introductionary text in the description or in PDA
-	-- Does not stack in any way
-	af_ball = function(actor, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
-		local weapon = actor:active_item():section()
-		if artefact_props.af_ball.basic_weapons[weapon] then
-			trace("Ball, valid weapon %s", weapon)
-			s_hit.power = s_hit.power * random_float(1.05, 1.1)
-		end
-	end
-
 }
 
 -- Functions for artefacts which provide perk bonuses on monster death
@@ -1111,9 +1131,9 @@ local artefact_on_monster_death_functions = {
 	-- Upon killing certain mutants spawns raw chunk of meat near him
 	-- Stacks with multiple artefacts
 	af_kogot = function(actor, artefact_count, artefact_ids, artefact_names, monster, who, last_monster_hit, last_monster_hit_bone_index)
-		local monster_kind = SYS_GetParam(0, monster:section(), "kind")
+		local monster_kind = SYS_GetParam(0, monster:section(), "kind", 0)
 		local monster_cls = monster:clsid()
-		local monster_meat = artefact_props.af_kogot.monster_to_meat[monster_kind or monster_cls]
+		local monster_meat = artefact_props.af_kogot.monster_to_meat[monster_kind] or artefact_props.af_kogot.monster_to_meat[monster_cls]
 		if not (last_monster_hit and artefact_props.af_kogot.valid_hits[last_monster_hit.type] and monster_meat) then
 			trace("Claw not triggered")
 			return
@@ -1223,24 +1243,98 @@ local artefact_on_equip_functions = {
 		add_speed(speed_boosts.af_generator.name, 1 + speed_boosts.af_generator.boost * (artefact_count - 1), true, true)
 	end,
 
-	-- Ball, Perk: Stalker's Lucky Charm
-	-- Spawns with new game in actor's inventory
-	-- Provides small but nice bonuses to basic starting equipment and some stats
-	-- Needs some introductionary text in the description or in PDA
-	-- Does not stack in any way
 	af_ball = function(actor, artefact_count, artefact_ids, artefact_names)
-		add_speed(speed_boosts.af_ball.name, 1 + speed_boosts.af_ball.boost, true, true)
+		artefact_props.af_ball.monsters = {}
+		for i = 1, artefact_count do
+			for j, monster in ipairs(artefact_props.af_ball.monster_tiers[i]) do
+				artefact_props.af_ball.monsters[monster] = true
+			end
+		end
 	end
 
 }
 
 -- Special monkey patches for some artefacts to make their effects work
--- New game equipment patch, give Ball at new game
-local new_game_equippment = itms_manager.new_game_equippment
-itms_manager.new_game_equippment = function()
-	new_game_equippment()
-	alife_create_item("af_ball", db.actor)
-	return true
+-- Ball
+local use_kick = bind_monster.generic_object_binder.use_kick
+bind_monster.generic_object_binder.use_kick = function(self, obj, who)
+	if who:id() ~= AC_ID then
+		use_kick(self, obj, who)
+		return
+	end
+
+	if not obj:alive() then return end
+
+	local actor = db.actor
+	local pos = actor:position()
+	local h = hit()
+	local direction = device().cam_dir
+	local magnitude = artefacts.af_ball.count * 50
+	direction.x = direction.x * 1000 * magnitude
+	direction.y = random_float(0.1, 0.2) * 5000 * magnitude
+	direction.z = direction.z * 1000 * magnitude
+	h.power = 10000
+	h.direction = direction
+	h.bone = "bip01_spine"
+	h.draftsman = actor
+	h.impulse = 10000	--6000
+	h.type = hit.wound
+	obj:hit(h)
+
+	local obj_id = obj:id()
+	local function fly(obj_id)
+		local monster = get_object_by_id(obj_id)
+		if monster and not monster:alive() and monster:get_physics_shell() then
+			trace("monster dead, physics shell works")
+			monster:get_physics_shell():apply_force(direction.x, direction.y, direction.z)
+			play_sound_on_actor("perk_based_artefacts\\BIGGIB0" .. random(6), 1, random_float(0.95, 1.05))
+			local position = monster:position()
+			position.y = position.y + 1
+
+			if artefacts.af_ball.count <= 2 then
+				local gibs = particles_object("artefact\\effects\\af_idle_dist")
+				if gibs and not gibs:playing() then
+					gibs:play_at_pos(position)
+				end
+			end
+
+			if artefacts.af_ball.count > 2 then
+				play_sound_on_actor("perk_based_artefacts\\BONSNAP" .. random(8), 0.8, random_float(0.95, 1.05))
+				local gibs = particles_object("artefact\\artefact_mincer")
+				if gibs and not gibs:playing() then
+					gibs:play_at_pos(position)
+				end
+			end
+
+			if artefacts.af_ball.count > 4 then
+				play_sound_on_actor("perk_based_artefacts\\GNTEAR0" .. random(2), 0.75, random_float(0.95, 1.05))
+				local gibs = particles_object("artefact\\artefact_gravi")
+				if gibs and not gibs:playing() then
+					gibs:play_at_pos(position)
+				end
+			end
+
+			return true
+		end
+		trace("monster not dead yet")
+		return false
+	end
+
+	CreateTimeEvent(obj_id, obj_id, 0, fly, obj_id)
+	--obj:get_physics_shell():apply_force(100 * magnitude, 10000 * magnitude, 100 * magnitude)
+end
+
+local monster_update = bind_monster.generic_object_binder.update
+bind_monster.generic_object_binder.update = function(self, delta)
+	monster_update(self, delta)
+	if not artefacts.af_ball or not self.object:alive() then return end
+
+	local monster_kind = SYS_GetParam(0, self.object:section(), "kind", 0)
+	local monster_cls = self.object:clsid()
+	if artefact_props.af_ball.monsters[monster_kind] or artefact_props.af_ball.monsters[monster_cls] then
+		self.object:set_callback(callback.use_object, self.use_kick, self)
+		self.object:set_tip_text(self.object:set_tip_text(game.translate_string("st_body_kick")))
+	end
 end
 
 -- Patch for First Person Death

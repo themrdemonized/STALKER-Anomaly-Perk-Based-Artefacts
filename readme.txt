@@ -80,9 +80,4 @@ So far the perks are
   -- Receive 2% cashback on each buy
   -- Stacks with multiple artefacts
 
-  -- Ball, Perk: Stalker's Lucky Charm
-  -- Spawns with new game in actor's inventory
-  -- Provides small but nice bonuses to basic starting equipment and some stats
-  -- Needs some introductionary text in the description or in PDA
-  -- Does not stack in any way
   
