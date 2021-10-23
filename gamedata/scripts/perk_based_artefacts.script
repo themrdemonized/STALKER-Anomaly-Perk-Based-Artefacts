@@ -399,18 +399,20 @@ local artefact_props = { -- Special props of artefacts that are used in processi
 				"SM_LURKER",
 				"SM_VOLK",
 				"SM_POLTER_CORP",
+				135, -- Borya
 			},
 			[4] = {
 				clsid.burer_s,
 				clsid.controller_s,
 				"SM_TARK",
-				"SM_VENDIGO",
 			},
 			[5] = {
 				clsid.chimera_s,
 				clsid.gigant_s,
 				"SM_MEDVED",
 				"SM_MONSTER_BOAR",
+				"SM_VENDIGO",
+				131, -- Bibliotekar
 			}
 		},
 		monsters = {} -- Generated table to check if current monster is allowed to be kick
@@ -476,8 +478,19 @@ local function remove_speed_boosts()
 end
 
 local cooldowns = {} -- Table of cooldowns of artefacts (["artefact"] = time_elapsed + cooldown)
-local function add_cooldown(artefact, cooldown)
-	cooldowns[artefact] = time_elapsed + cooldown
+local function add_cooldown(name, cooldown)
+	trace("added cooldown, name %s, time %s, current_time %s", name, time_elapsed + (cooldown or 0), time_elapsed)
+	cooldowns[name] = time_elapsed + (cooldown or 0)
+end
+
+local function check_cooldown(name)
+	if not cooldowns[name] then return true end
+	if time_elapsed >= cooldowns[name] then
+		cooldowns[name] = nil
+		return true
+	end
+	trace("cooldown not expired yet, name %s, time %s, current_time %s", name, cooldowns[name], time_elapsed)
+	return false
 end
 
 -- Table of current active effects, contains tables of these { 
@@ -826,6 +839,7 @@ local artefact_on_before_hit_functions = {
 	end,
 
 	-- Cell, Perk: Disintegrator
+	-- Disintegrates part of the bullet coming to you. Unfortunately in the process a lot of radiation is emitted, making you ill
 	-- Reduces bullet damage by 15%
 	-- Reduced amount of damage is converted to radiation
 	-- Stacks with multiple artefacts
@@ -1243,6 +1257,11 @@ local artefact_on_equip_functions = {
 		add_speed(speed_boosts.af_generator.name, 1 + speed_boosts.af_generator.boost * (artefact_count - 1), true, true)
 	end,
 
+	-- Ball, Perk: Kick Deez Nutz
+	-- Tier Based Artefact
+	-- Amplifies players mighty foot and allows him to kick more mutants, resulting in instant death
+	-- Each artefact on the belt allows to kick more monsters
+	-- Has a cooldown of 1 second with 1 artefact, increases with more artefacts on belt by 1 second each
 	af_ball = function(actor, artefact_count, artefact_ids, artefact_names)
 		artefact_props.af_ball.monsters = {}
 		for i = 1, artefact_count do
@@ -1255,7 +1274,11 @@ local artefact_on_equip_functions = {
 }
 
 -- Special monkey patches for some artefacts to make their effects work
--- Ball
+-- Ball, Perk: Kick Deez Nutz
+-- Tier Based Artefact
+-- Amplifies players mighty foot and allows him to kick more mutants, resulting in instant death
+-- Each artefact on the belt allows to kick more monsters
+-- Has a cooldown of 2 seconds with 1 artefact, increases with more artefacts on belt by 1 second each
 local use_kick = bind_monster.generic_object_binder.use_kick
 bind_monster.generic_object_binder.use_kick = function(self, obj, who)
 	if who:id() ~= AC_ID then
@@ -1263,20 +1286,21 @@ bind_monster.generic_object_binder.use_kick = function(self, obj, who)
 		return
 	end
 
-	if not obj:alive() then return end
+	if not (obj:alive() and check_cooldown("af_ball")) then return end
 
 	local actor = db.actor
 	local pos = actor:position()
 	local h = hit()
 	local direction = device().cam_dir
-	local magnitude = artefacts.af_ball.count * 50
+	local artefact_count = artefacts.af_ball.count
+	local magnitude = artefact_count * 50
 	direction.x = direction.x * 1000 * magnitude
 	direction.y = random_float(0.1, 0.2) * 5000 * magnitude
 	direction.z = direction.z * 1000 * magnitude
 	h.power = 10000
 	h.direction = direction
 	h.bone = "bip01_spine"
-	h.draftsman = actor
+	h.draftsman = obj
 	h.impulse = 10000	--6000
 	h.type = hit.wound
 	obj:hit(h)
@@ -1287,31 +1311,34 @@ bind_monster.generic_object_binder.use_kick = function(self, obj, who)
 		if monster and not monster:alive() and monster:get_physics_shell() then
 			trace("monster dead, physics shell works")
 			monster:get_physics_shell():apply_force(direction.x, direction.y, direction.z)
-			play_sound_on_actor("perk_based_artefacts\\BIGGIB0" .. random(6), 1, random_float(0.95, 1.05))
+			play_sound_on_actor("perk_based_artefacts\\BIGGIB0" .. random(6), 1, random_float(0.9, 1.0))
 			local position = monster:position()
 			position.y = position.y + 1
 
-			if artefacts.af_ball.count <= 2 then
+			if artefact_count <= 2 then
+				play_sound_on_actor("perk_based_artefacts\\BONSNAP" .. random(8), 0.1 + 0.2 * (artefact_count - 1), random_float(0.9, 1.0))
 				local gibs = particles_object("artefact\\effects\\af_idle_dist")
 				if gibs and not gibs:playing() then
 					gibs:play_at_pos(position)
 				end
-			end
+			else
 
-			if artefacts.af_ball.count > 2 then
-				play_sound_on_actor("perk_based_artefacts\\BONSNAP" .. random(8), 0.8, random_float(0.95, 1.05))
-				local gibs = particles_object("artefact\\artefact_mincer")
-				if gibs and not gibs:playing() then
-					gibs:play_at_pos(position)
+				if artefact_count > 2 then
+					play_sound_on_actor("perk_based_artefacts\\BONSNAP" .. random(8), 0.7, random_float(0.9, 1.0))
+					local gibs = particles_object("artefact\\artefact_mincer")
+					if gibs and not gibs:playing() then
+						gibs:play_at_pos(position)
+					end
 				end
-			end
 
-			if artefacts.af_ball.count > 4 then
-				play_sound_on_actor("perk_based_artefacts\\GNTEAR0" .. random(2), 0.75, random_float(0.95, 1.05))
-				local gibs = particles_object("artefact\\artefact_gravi")
-				if gibs and not gibs:playing() then
-					gibs:play_at_pos(position)
+				if artefact_count > 4 then
+					play_sound_on_actor("perk_based_artefacts\\GNTEAR0" .. random(2), 0.75, random_float(0.9, 1.0))
+					local gibs = particles_object("artefact\\artefact_gravi")
+					if gibs and not gibs:playing() then
+						gibs:play_at_pos(position)
+					end
 				end
+
 			end
 
 			return true
@@ -1321,6 +1348,7 @@ bind_monster.generic_object_binder.use_kick = function(self, obj, who)
 	end
 
 	CreateTimeEvent(obj_id, obj_id, 0, fly, obj_id)
+	add_cooldown("af_ball", 1 + 1 * artefact_count)
 	--obj:get_physics_shell():apply_force(100 * magnitude, 10000 * magnitude, 100 * magnitude)
 end
 
