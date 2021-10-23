@@ -12,8 +12,10 @@ local alife_create_item = alife_create_item
 local alife_release = alife_release
 local alife_release_id = alife_release_id
 local CreateTimeEvent = CreateTimeEvent
+local empty_table = empty_table
 local get_console = get_console
 local hit = hit
+local iempty_table = iempty_table
 local IsMoveState = IsMoveState
 local particles_object = particles_object
 local printf = printf
@@ -223,6 +225,25 @@ local function iterate_belt(actor)
 	return artefacts, belt
 end
 
+local function refresh_artefacts(force)
+	trace("refresh artefacts triggered")
+	local new_artefacts, new_belt = iterate_belt(db.actor)
+	if force or not compare_arrays(belt, new_belt) then
+		trace("artefacts are different, refreshing")
+		artefacts = new_artefacts
+		belt = new_belt
+		return true
+	end
+	trace("artefacts are same")
+	return false
+end
+
+-- For time events
+local function refresh_artefacts_time_event_func(force)
+	refresh_artefacts(force)
+	return true
+end
+
 local artefact_props = { -- Special props of artefacts that are used in processing
 	af_black_angel = {
 		dice_roll = 0,
@@ -418,25 +439,6 @@ local artefact_props = { -- Special props of artefacts that are used in processi
 		monsters = {} -- Generated table to check if current monster is allowed to be kick
 	}
 }
-
-local function refresh_artefacts(force)
-	trace("refresh artefacts triggered")
-	local new_artefacts, new_belt = iterate_belt(db.actor)
-	if force or not compare_arrays(belt, new_belt) then
-		trace("artefacts are different, refreshing")
-		artefacts = new_artefacts
-		belt = new_belt
-		return true
-	end
-	trace("artefacts are same")
-	return false
-end
-
--- For time events
-local function refresh_artefacts_time_event_func(force)
-	refresh_artefacts(force)
-	return true
-end
 
 -- Callbacks
 local callbacks = {}
@@ -1263,7 +1265,7 @@ local artefact_on_equip_functions = {
 	-- Each artefact on the belt allows to kick more monsters
 	-- Has a cooldown of 2 seconds with 1 artefact, increases with more artefacts on belt by 1 second each
 	af_ball = function(actor, artefact_count, artefact_ids, artefact_names)
-		artefact_props.af_ball.monsters = {}
+		empty_table(artefact_props.af_ball.monsters)
 		for i = 1, artefact_count do
 			for j, monster in ipairs(artefact_props.af_ball.monster_tiers[i]) do
 				artefact_props.af_ball.monsters[monster] = true
@@ -1642,13 +1644,21 @@ local function load_state(m_data)
 	cooldowns = m_data.perk_based_artefacts_cooldowns or {}
 end
 
+local function on_option_change()
+	if ui_mcm then
+		debug_mode = ui_mcm.get("perk_based_artefacts/debug_mode")
+	end
+end
+
 function on_game_start()
 	trace("Registering")
 	tg_lag = time_global()
 	trace("tg_on_game_start %s", tg_lag)
+	RegisterScriptCallback("actor_on_first_update", on_option_change)
 	RegisterScriptCallback("actor_on_first_update", actor_on_first_update)
 	RegisterScriptCallback("load_state", load_state)
 	RegisterScriptCallback("save_state", save_state)
 	RegisterScriptCallback("ActorMenu_on_trade_started", ActorMenu_on_trade_started)
 	RegisterScriptCallback("ActorMenu_on_trade_closed", ActorMenu_on_trade_closed)
+	RegisterScriptCallback("on_option_change", on_option_change)
 end
