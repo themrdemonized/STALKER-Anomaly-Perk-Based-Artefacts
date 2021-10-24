@@ -17,7 +17,8 @@ So far the perks are
   -- Moon, increases stats after midnight until dawn, gives penalties at day time (WIP)
   -- Effect stacks with each artefact on belt
 
-  -- Signet, restores health and psy while being near campfire, amplifies psy recovery artefacts near campfire
+  -- Signet, Perk: Light of Tranquility
+  -- Restores health and psy while being near campfire, amplifies psy recovery artefacts near campfire
   -- Effect stacks with each artefact on belt
 
   -- Atom, Perk: Arszi's Blessing
