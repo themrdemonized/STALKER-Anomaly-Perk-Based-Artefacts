@@ -1093,6 +1093,7 @@ local artefact_on_hit_functions = {
 		local who_position = who:position()
 
 		local s_hit = hit(last_hit)
+		s_hit.bone = "bip01_spine"
 		s_hit.power = 0.01 * artefact_count
 		s_hit.draftsman = actor
 
@@ -1118,21 +1119,28 @@ local artefact_on_hit_functions = {
 
 			local function hit_enemy(time)
 				who_position = who:position()
-				who:hit(s_hit)
-
-				if who:movement_type() == move.walk or who:movement_type() == move.run then
-		            who:set_movement_type(move.stand)
-		        end
+				
 
 				local snd = get_safe_sound_object("anomaly\\electra_hit" .. get_random_array_element({"", "1"}))
 				snd:play_at_pos(who, who_position, 0, sound_object.s3d)
 				snd.frequency = random_float(0.95, 1.05)
 
-				if anims then
-		        	who:play_cycle(get_random_array_element(anims))
-		        end
+				if who:alive() then
+					who:set_movement_type(move.stand)
+					who:set_body_state(move.standing)
+					who:set_mental_state(anim.panic)
+					who:hit(s_hit)
 
-				trace("time %s, hit %s, last_hit %s", time, s_hit.power, last_hit.power)
+					if anims then
+			        	who:play_cycle(get_random_array_element(anims), true)
+			        end
+
+					trace("time %s, hit %s, last_hit %s", time, s_hit.power, last_hit.power)
+				else
+					if who:get_physics_shell() then
+						who:get_physics_shell():apply_force(random(1000, 2000), random(2000, 4000), random(1000, 2000))
+					end
+				end
 				return true
 			end
 
@@ -1157,6 +1165,8 @@ local artefact_on_hit_functions = {
 		end
 
 		CreateTimeEvent("af_tapeworm" .. who_id, "af_tapeworm" .. who_id .."eval", effect_time + 0.1, function()
+			-- Possible unstuck Fix
+			-- TeleportObject(who:id(), who:position(), who:level_vertex_id(), who:game_vertex_id())
 			UnregisterScriptCallback("on_enemy_eval", ignore_enemy_function)
 			return true
 		end)
