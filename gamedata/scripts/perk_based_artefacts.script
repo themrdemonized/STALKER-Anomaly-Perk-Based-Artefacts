@@ -696,7 +696,8 @@ local artefact_on_update_functions = {
 		actor:change_power(0.001 * artefact_count)
 	end,
 
-	-- Signet, restores health and psy while being near campfire, amplifies psy recovery artefacts near campfire
+	-- Signet, Perk: Tranquility of Light
+	-- Restores health and psy while being near campfire, amplifies psy recovery artefacts near campfire
 	-- Effect stacks with each artefact on belt
 	af_signet = function(actor, artefact_count, artefact_ids, artefact_names)
 		local health_boost = 0.0007
@@ -1113,7 +1114,7 @@ local artefact_on_hit_functions = {
 		RegisterScriptCallback("on_enemy_eval", ignore_enemy_function)
 
 		if IsStalker(who) then
-			s_hit.power = s_hit.power * 0.1
+			s_hit.power = s_hit.power * 0.05
 
 			local function hit_enemy(time)
 				who_position = who:position()
@@ -1128,14 +1129,14 @@ local artefact_on_hit_functions = {
 				snd.frequency = random_float(0.95, 1.05)
 
 				if anims then
-		        	who:play_cycle(get_random_array_element(anims), false)
+		        	who:play_cycle(get_random_array_element(anims))
 		        end
 
 				trace("time %s, hit %s, last_hit %s", time, s_hit.power, last_hit.power)
 				return true
 			end
 
-			for i = 0, effect_time, 0.1 do
+			for i = 0, effect_time, 0.05 do
 				CreateTimeEvent("af_tapeworm" .. who_id, "af_tapeworm" .. who_id .. i, i, hit_enemy, i)
 			end
 		else
@@ -1151,6 +1152,8 @@ local artefact_on_hit_functions = {
 				trace("time %s, hit %s, last_hit %s", time, s_hit.power, last_hit.power)
 				return true
 			end
+
+			hit_enemy(0)
 		end
 
 		CreateTimeEvent("af_tapeworm" .. who_id, "af_tapeworm" .. who_id .."eval", effect_time + 0.1, function()
@@ -1438,6 +1441,11 @@ local artefact_on_equip_functions = {
 local use_kick = bind_monster.generic_object_binder.use_kick
 bind_monster.generic_object_binder.use_kick = function(self, obj, who)
 	if who:id() ~= AC_ID then
+		use_kick(self, obj, who)
+		return
+	end
+
+	if not artefacts.af_ball then
 		use_kick(self, obj, who)
 		return
 	end
