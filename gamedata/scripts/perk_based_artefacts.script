@@ -28,6 +28,7 @@ local SYS_GetParam = SYS_GetParam
 local time_global = time_global
 local UnregisterScriptCallback = UnregisterScriptCallback
 local vector_rotate_y = vector_rotate_y
+local IsAnomaly = IsAnomaly
 
 local get_nearby_campfire = bind_campfire.get_nearby_campfire
 
@@ -182,6 +183,10 @@ local function get_object_by_id(id) -- same as _g.script one but without spammin
 	return obj
 end
 
+local function get_monster_clsid_and_kind(obj)
+	return obj:clsid(), SYS_GetParam(0, obj:section(), "kind", 0)
+end
+
 local function get_current_weather()
 	return get_weather_manager():get_curr_weather()
 end
@@ -268,6 +273,69 @@ local artefact_props = { -- Special props of artefacts that are used in processi
 	af_elektron = {
 		valid_hits = { -- Valid hit types to trigger
 			[hit.shock] = true
+		}
+	},
+	af_tapeworm = {
+		valid_hits = { -- Valid hit types to trigger
+			[hit.wound] = true,
+			[hit.strike] = true
+		},
+		monster_animations = { -- Animations to trigger on hit
+			stalker = {
+			    "norm_2_critical_hit_head_0",
+			    "norm_2_critical_hit_torso_0",
+			    "norm_1_critical_hit_head_0",
+			    "norm_1_critical_hit_torso_0",
+			},
+			[clsid.zombie_s] = {
+				"_stand_idle_0",
+				"_stand_idle_1",
+				"_stand_idle_2",
+			},
+			[clsid.dog_s] = {
+				"critical_hit_head_0",
+				"critical_hit_head_1",
+				"critical_hit_head_2",
+				"critical_hit_torso_0",
+				"critical_hit_torso_1",
+				"critical_hit_torso_2",
+			},
+			-- [1] = {
+			-- 	clsid.zombie_s,
+			-- 	clsid.cat_s,
+			-- 	clsid.dog_s,
+			-- 	"SM_PIRANHA",
+			-- },
+			-- [2] = {
+			-- 	clsid.boar_s,
+			-- 	clsid.flesh_s,
+			-- 	clsid.fracture_s,
+			-- 	clsid.pseudodog_s,
+			-- 	clsid.psy_dog_s,
+			-- },
+			-- [3] = {
+			-- 	clsid.bloodsucker_s,
+			-- 	clsid.snork_s,
+			-- 	"SM_KARLIK",
+			-- 	"SM_PSYSUCKER",
+			-- 	"SM_LURKER",
+			-- 	"SM_VOLK",
+			-- 	"SM_POLTER_CORP",
+			-- 	135, -- Borya
+			-- },
+			-- [4] = {
+			-- 	clsid.burer_s,
+			-- 	clsid.controller_s,
+			-- 	"SM_TARK",
+			-- },
+			-- [5] = {
+			-- 	clsid.chimera_s,
+			-- 	clsid.gigant_s,
+			-- 	"SM_MEDVED",
+			-- 	"SM_MONSTER_BOAR",
+			-- 	"SM_VENDIGO",
+			-- 	131, -- Bibliotekar
+			-- }
 		}
 	},
 	af_kogot = {
@@ -437,7 +505,7 @@ local artefact_props = { -- Special props of artefacts that are used in processi
 			}
 		},
 		monsters = {} -- Generated table to check if current monster is allowed to be kick
-	}
+	},
 }
 
 -- Callbacks
@@ -785,93 +853,6 @@ local artefact_on_item_use_functions = {
 
 }
 
--- Functions for artefacts which provide perk bonuses on before actor hit
-local artefact_on_before_hit_functions = {
-
-	-- Black Angel, has 20% chance to reflect 35% of bullet damage back
-	-- Nullify the damage of hit on reflection
-	-- More artefacts increase the chance to reflect with diminishing returns
-	af_black_angel = function(actor, artefact_count, artefact_ids, artefact_names, s_hit, bone_id, flags)
-		if not artefact_props.af_black_angel.valid_hits[s_hit.type] then
-			trace("Black Angel, not a valid hit type %s", s_hit.type)
-			return
-		end
-
-		artefact_props.af_black_angel.dice_roll = random(100)
-		if artefact_props.af_black_angel.dice_roll <= artefact_props.af_black_angel.reflect_chance[artefact_count] then
-			s_hit.power = 0.001
-		end
-	end,
-
-	-- Electron, Perk: Crank High Voltage
-	-- Stepping on Electra will fully recharge player's batteries of active devices
-	-- Recharges random amount of devices and batteries combined in the inventory
-	-- Gives infinite sprint for some time
-	-- Sometimes the pleasure of fresh charge is too big to handle, making you scream a bit more excited than usual
-	-- Does not stack in any way
-	af_elektron = function(actor, artefact_count, artefact_ids, artefact_names, s_hit, bone_id, flags)
-		if not artefact_props.af_elektron.valid_hits[s_hit.type] then
-			trace("Electron, not a valid hit type %s", s_hit.type)
-			return
-		end
-		for i = 8, 10 do
-			local item = actor:item_in_slot(i)
-			if item then
-				item:set_condition(1)
-			end
-		end
-		actor:iterate_inventory(function(npc, item)
-			local sec = item:section()
-			if (IsItem("device", sec) or sec == "batteries_dead") and random(100) < 40 then
-				item:set_condition(1)
-			end
-		end, actor)
-
-		local function infinite_sprint()
-			db.actor:change_power(1)
-		end 
-
-		if random(100) < 15 then
-			play_sound_on_actor("perk_based_artefacts\\lyutii", 0.7)
-			add_timed_effect(12, infinite_sprint)
-		else
-			play_sound_on_actor("perk_based_artefacts\\rnd_scr3", 1)
-			add_timed_effect(6, infinite_sprint)
-		end
-	end,
-
-	-- Cell, Perk: Disintegrator
-	-- Disintegrates part of the bullet coming to you. Unfortunately in the process a lot of radiation is emitted, making you ill
-	-- Reduces bullet damage by 15%
-	-- Reduced amount of damage is converted to radiation
-	-- Stacks with multiple artefacts
-	af_cell = function(actor, artefact_count, artefact_ids, artefact_names, s_hit, bone_id, flags)
-		if not artefact_props.af_cell.valid_hits[s_hit.type] then
-			trace("Cage, not a valid hit type %s", s_hit.type)
-			return
-		end
-
-		local rad_k = 0.15 * artefact_count
-		local power = s_hit.power
-		s_hit.power = s_hit.power * (1 - rad_k)
-		power = power - s_hit.power
-		local rad_amount = power * 0.1
-		trace("Cell: resulted radiation %s", rad_amount)
-		actor:change_radiation(rad_amount)
-		play_sound_on_actor("anomaly\\electra_hit" .. get_random_array_element({"", "1"}), 1, 1 - (artefact_count - 1) * 0.1)
-
-		local function rad_sound()
-			play_sound_on_actor("detectors\\geiger_" .. random(8), 1)
-			return true
-		end
-
-		for i = 1, artefact_count do
-			CreateTimeEvent("af_cell" .. i, "af_cell" .. i, random_float(0.15, 0.3) * i, rad_sound)
-		end
-	end
-
-}
-
 function af_serofim_cheat_death() 
 	local actor = db.actor
 	local c_id_ppe_black_infinite = 5606
@@ -975,6 +956,93 @@ local artefact_on_before_death_functions = {
 
 }
 
+-- Functions for artefacts which provide perk bonuses on before actor hit
+local artefact_on_before_hit_functions = {
+
+	-- Black Angel, has 20% chance to reflect 35% of bullet damage back
+	-- Nullify the damage of hit on reflection
+	-- More artefacts increase the chance to reflect with diminishing returns
+	af_black_angel = function(actor, artefact_count, artefact_ids, artefact_names, s_hit, bone_id, flags)
+		if not artefact_props.af_black_angel.valid_hits[s_hit.type] then
+			trace("Black Angel, not a valid hit type %s", s_hit.type)
+			return
+		end
+
+		artefact_props.af_black_angel.dice_roll = random(100)
+		if artefact_props.af_black_angel.dice_roll <= artefact_props.af_black_angel.reflect_chance[artefact_count] then
+			s_hit.power = 0.001
+		end
+	end,
+
+	-- Electron, Perk: Crank High Voltage
+	-- Stepping on Electra will fully recharge player's batteries of active devices
+	-- Recharges random amount of devices and batteries combined in the inventory
+	-- Gives infinite sprint for some time
+	-- Sometimes the pleasure of fresh charge is too big to handle, making you scream a bit more excited than usual
+	-- Does not stack in any way
+	af_elektron = function(actor, artefact_count, artefact_ids, artefact_names, s_hit, bone_id, flags)
+		if not artefact_props.af_elektron.valid_hits[s_hit.type] then
+			trace("Electron, not a valid hit type %s", s_hit.type)
+			return
+		end
+		for i = 8, 10 do
+			local item = actor:item_in_slot(i)
+			if item then
+				item:set_condition(1)
+			end
+		end
+		actor:iterate_inventory(function(npc, item)
+			local sec = item:section()
+			if (IsItem("device", sec) or sec == "batteries_dead") and random(100) < 40 then
+				item:set_condition(1)
+			end
+		end, actor)
+
+		local function infinite_sprint()
+			db.actor:change_power(1)
+		end 
+
+		if random(100) < 15 then
+			play_sound_on_actor("perk_based_artefacts\\lyutii", 0.7)
+			add_timed_effect(12, infinite_sprint)
+		else
+			play_sound_on_actor("perk_based_artefacts\\rnd_scr3", 1)
+			add_timed_effect(6, infinite_sprint)
+		end
+	end,
+
+	-- Cell, Perk: Disintegrator
+	-- Disintegrates part of the bullet coming to you. Unfortunately in the process a lot of radiation is emitted, making you ill
+	-- Reduces bullet damage by 15%
+	-- Reduced amount of damage is converted to radiation
+	-- Stacks with multiple artefacts
+	af_cell = function(actor, artefact_count, artefact_ids, artefact_names, s_hit, bone_id, flags)
+		if not artefact_props.af_cell.valid_hits[s_hit.type] then
+			trace("Cage, not a valid hit type %s", s_hit.type)
+			return
+		end
+
+		local rad_k = 0.15 * artefact_count
+		local power = s_hit.power
+		s_hit.power = s_hit.power * (1 - rad_k)
+		power = power - s_hit.power
+		local rad_amount = power * 0.1
+		trace("Cell: resulted radiation %s", rad_amount)
+		actor:change_radiation(rad_amount)
+		play_sound_on_actor("anomaly\\electra_hit" .. get_random_array_element({"", "1"}), 1, 1 - (artefact_count - 1) * 0.1)
+
+		local function rad_sound()
+			play_sound_on_actor("detectors\\geiger_" .. random(8), 1)
+			return true
+		end
+
+		for i = 1, artefact_count do
+			CreateTimeEvent("af_cell" .. i, "af_cell" .. i, random_float(0.15, 0.3) * i, rad_sound)
+		end
+	end
+
+}
+
 -- Functions for artefacts which provide perk bonuses on actor hit
 local artefact_on_hit_functions = {
 
@@ -996,13 +1064,100 @@ local artefact_on_hit_functions = {
 			return
 		end
 
-		local hit = hit(last_hit)
-		hit.power = hit.power * 0.35
-		hit.draftsman = actor
+		local s_hit = hit(last_hit)
+		s_hit.power = s_hit.power * 0.35
+		s_hit.draftsman = actor
 
-		who:hit(hit)
-		trace("hit %s, last_hit %s", hit.power, last_hit.power)
-	end
+		who:hit(s_hit)
+		trace("hit %s, last_hit %s", s_hit.power, last_hit.power)
+	end,
+
+	-- Tapeworm, Perk: Stunner
+	-- Upon receiving melee damage the enemy would be stunned for 2.5 seconds
+	-- While being stunned the enemy is disabled in fight and won't attack
+	-- Each extra artefact adds additional 2 seconds to effect
+	af_tapeworm = function(actor, artefact_count, artefact_ids, artefact_names, obj, amount, who, last_hit)
+		if not (
+			last_hit and
+			artefact_props.af_tapeworm.valid_hits[last_hit.type] and
+			who and
+			not IsAnomaly(who) and
+			obj
+		) then
+			trace("Tapeworm not triggered, not valid hit")
+			return
+		end
+
+		local who_id = who:id()
+		local who_position = who:position()
+
+		local s_hit = hit(last_hit)
+		s_hit.power = 0.01 * artefact_count
+		s_hit.draftsman = actor
+
+		local effect_time = 0.5 + 2 * artefact_count
+
+		local monster_anims = artefact_props.af_tapeworm.monster_animations
+		local monster_cls, monster_kind = get_monster_clsid_and_kind(who)
+		
+		local anims = IsStalker(who) and monster_anims.stalker or monster_anims[monster_kind] or monster_anims[monster_cls]
+
+		local function ignore_enemy_function(obj, enemy, flags) -- Remove evaluation
+			if obj:id() == who_id then
+				flags.override = true
+				flags.result = false
+				return
+			end
+		end
+
+		RegisterScriptCallback("on_enemy_eval", ignore_enemy_function)
+
+		if IsStalker(who) then
+			s_hit.power = s_hit.power * 0.1
+
+			local function hit_enemy(time)
+				who_position = who:position()
+				who:hit(s_hit)
+
+				if who:movement_type() == move.walk or who:movement_type() == move.run then
+		            who:set_movement_type(move.stand)
+		        end
+
+				local snd = get_safe_sound_object("anomaly\\electra_hit" .. get_random_array_element({"", "1"}))
+				snd:play_at_pos(who, who_position, 0, sound_object.s3d)
+				snd.frequency = random_float(0.95, 1.05)
+
+				if anims then
+		        	who:play_cycle(get_random_array_element(anims), false)
+		        end
+
+				trace("time %s, hit %s, last_hit %s", time, s_hit.power, last_hit.power)
+				return true
+			end
+
+			for i = 0, effect_time, 0.1 do
+				CreateTimeEvent("af_tapeworm" .. who_id, "af_tapeworm" .. who_id .. i, i, hit_enemy, i)
+			end
+		else
+			local snd = get_safe_sound_object("anomaly\\electra_blast")
+			snd:play_at_pos(who, who_position, 0, sound_object.s3d)
+			snd.volume = 0.7
+			snd.frequency = random_float(1.1, 1.2)
+
+			local function hit_enemy(time)
+				who_position = who:position()
+				who:hit(s_hit)
+				
+				trace("time %s, hit %s, last_hit %s", time, s_hit.power, last_hit.power)
+				return true
+			end
+		end
+
+		CreateTimeEvent("af_tapeworm" .. who_id, "af_tapeworm" .. who_id .."eval", effect_time + 0.1, function()
+			UnregisterScriptCallback("on_enemy_eval", ignore_enemy_function)
+			return true
+		end)
+	end,
 
 }
 
@@ -1147,8 +1302,7 @@ local artefact_on_monster_death_functions = {
 	-- Upon killing certain mutants spawns raw chunk of meat near him
 	-- Stacks with multiple artefacts
 	af_kogot = function(actor, artefact_count, artefact_ids, artefact_names, monster, who, last_monster_hit, last_monster_hit_bone_index)
-		local monster_kind = SYS_GetParam(0, monster:section(), "kind", 0)
-		local monster_cls = monster:clsid()
+		local monster_cls, monster_kind = get_monster_clsid_and_kind(monster)
 		local monster_meat = artefact_props.af_kogot.monster_to_meat[monster_kind] or artefact_props.af_kogot.monster_to_meat[monster_cls]
 		if not (last_monster_hit and artefact_props.af_kogot.valid_hits[last_monster_hit.type] and monster_meat) then
 			trace("Claw not triggered")
@@ -1359,8 +1513,7 @@ bind_monster.generic_object_binder.update = function(self, delta)
 	monster_update(self, delta)
 	if not artefacts.af_ball or not self.object:alive() then return end
 
-	local monster_kind = SYS_GetParam(0, self.object:section(), "kind", 0)
-	local monster_cls = self.object:clsid()
+	local monster_cls, monster_kind = get_monster_clsid_and_kind(self.object)
 	if artefact_props.af_ball.monsters[monster_kind] or artefact_props.af_ball.monsters[monster_cls] then
 		self.object:set_callback(callback.use_object, self.use_kick, self)
 		self.object:set_tip_text(self.object:set_tip_text(game.translate_string("st_body_kick")))
