@@ -653,7 +653,7 @@ local artefact_on_update_functions = {
 	-- Sun, gives health and stamina boost at clear weather, little stamina boost at partly clear and stamina penalty at not clear and at night
 	-- Effect stacks with each artefact on belt
 	af_sun = function(actor, artefact_count, artefact_ids, artefact_names)
-		local health_boost = 0.0005
+		local health_boost = 0.00035
 		local power_clear_boost = 0.002
 		local power_partly_boost = 0.0005
 		local power_not_clear_penalty = -0.0005
@@ -700,7 +700,7 @@ local artefact_on_update_functions = {
 	-- Restores health and psy while being near campfire, amplifies psy recovery artefacts near campfire
 	-- Effect stacks with each artefact on belt
 	af_signet = function(actor, artefact_count, artefact_ids, artefact_names)
-		local health_boost = 0.0007
+		local health_boost = 0.0005
 
 		local nearby_camp = get_nearby_campfire(5, true)
 		if nearby_camp and nearby_camp:is_on() then
