@@ -1,4 +1,4 @@
-Perk Based Artefacts, 0.04
+Perk Based Artefacts, 0.05
 A unique twist on overhauling old junk artefacts beyond the boundaries of simple stat changers
 Junk artefacts are no longer junk and received unique properties or Perks. The degree of perks vary from simple boosters to marvellous staff like recharging batteries by stepping in Electra, receiving Money on Headshots or Even Evading Death itself when all hope is lost.
 Multiple artefacts might or might not stack the effects and penalties of Perks in various ways, and effects are triggered on very various conditions
@@ -92,3 +92,7 @@ So far the perks are
   -- Reduced amount of damage is converted to radiation
   -- Stacks with multiple artefacts
   
+  -- Tapeworm, Perk: Stunner
+  -- Upon receiving melee damage the enemy would be stunned for 2.5 seconds
+  -- While being stunned the enemy is disabled in fight and won't attack
+  -- Each extra artefact adds additional 2 seconds to effect

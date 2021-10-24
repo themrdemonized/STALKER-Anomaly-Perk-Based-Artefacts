@@ -280,7 +280,7 @@ local artefact_props = { -- Special props of artefacts that are used in processi
 			[hit.wound] = true,
 			[hit.strike] = true
 		},
-		monster_animations = { -- Animations to trigger on hit
+		monster_animations = { -- Animations to trigger on hit (WIP)
 			stalker = {
 			    "norm_2_critical_hit_head_0",
 			    "norm_2_critical_hit_torso_0",
@@ -696,7 +696,7 @@ local artefact_on_update_functions = {
 		actor:change_power(0.001 * artefact_count)
 	end,
 
-	-- Signet, Perk: Tranquility of Light
+	-- Signet, Perk: Light of Tranquility
 	-- Restores health and psy while being near campfire, amplifies psy recovery artefacts near campfire
 	-- Effect stacks with each artefact on belt
 	af_signet = function(actor, artefact_count, artefact_ids, artefact_names)
