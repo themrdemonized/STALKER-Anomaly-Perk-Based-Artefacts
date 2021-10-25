@@ -548,7 +548,7 @@ local function remove_speed_boosts()
 end
 
 local cooldowns = {} -- Table of cooldowns of artefacts (["artefact"] = time_elapsed + cooldown)
-local function add_cooldown(name, cooldown)
+local function add_cooldown(cooldown, name)
 	trace("added cooldown, name %s, time %s, current_time %s", name, time_elapsed + (cooldown or 0), time_elapsed)
 	cooldowns[name] = time_elapsed + (cooldown or 0)
 end
@@ -1076,8 +1076,14 @@ local artefact_on_hit_functions = {
 	-- Tapeworm, Perk: Stunner
 	-- Upon receiving melee damage the enemy would be stunned for 2.5 seconds
 	-- While being stunned the enemy is disabled in fight and won't attack
+	-- Has a cooldown of 2 seconds between uses
 	-- Each extra artefact adds additional 2 seconds to effect
 	af_tapeworm = function(actor, artefact_count, artefact_ids, artefact_names, obj, amount, who, last_hit)
+		if not check_cooldown("af_tapeworm") then
+			trace("Tapeworm not triggered, cooldown active")
+			return
+		end
+
 		if not (
 			last_hit and
 			artefact_props.af_tapeworm.valid_hits[last_hit.type] and
@@ -1170,6 +1176,8 @@ local artefact_on_hit_functions = {
 			UnregisterScriptCallback("on_enemy_eval", ignore_enemy_function)
 			return true
 		end)
+		
+		add_cooldown(2, "af_tapeworm")
 	end,
 
 }
@@ -1480,6 +1488,7 @@ bind_monster.generic_object_binder.use_kick = function(self, obj, who)
 	obj:hit(h)
 
 	local obj_id = obj:id()
+
 	local function fly(obj_id)
 		local monster = get_object_by_id(obj_id)
 		if monster and not monster:alive() and monster:get_physics_shell() then
@@ -1520,9 +1529,9 @@ bind_monster.generic_object_binder.use_kick = function(self, obj, who)
 		trace("monster not dead yet")
 		return false
 	end
-
 	CreateTimeEvent(obj_id, obj_id, 0, fly, obj_id)
-	add_cooldown("af_ball", 1 + 1 * artefact_count)
+
+	add_cooldown(1 + 1 * artefact_count, "af_ball")
 	--obj:get_physics_shell():apply_force(100 * magnitude, 10000 * magnitude, 100 * magnitude)
 end
 
