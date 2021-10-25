@@ -650,26 +650,34 @@ end
 -- Functions for artefacts which provide perk bonuses continuously
 local artefact_on_update_functions = {
 	
-	-- Sun, gives health and stamina boost at clear weather, little stamina boost at partly clear and stamina penalty at not clear and at night
+	-- Sun, Perk: Solar Powered
+	-- Gives health and stamina boost at clear weather, little stamina boost at partly clear and stamina penalty at not clear and at night
 	-- Effect stacks with each artefact on belt
 	af_sun = function(actor, artefact_count, artefact_ids, artefact_names)
-		local health_boost = 0.00035
-		local power_clear_boost = 0.002
-		local power_partly_boost = 0.0005
-		local power_not_clear_penalty = -0.0005
-
 		local current_weather = get_current_weather()
 		if not current_weather then
-			trace("Weather not defined")
+			trace("Sun: Weather not defined")
 			return
 		end
-		if current_weather == "clear" then
-			actor:change_health(health_boost * artefact_count)
-			actor:change_power(power_clear_boost * artefact_count)
-		elseif current_weather == "partly" then
-			actor:change_power(power_partly_boost * artefact_count)
-		else
+
+		local hours = get_time_hours()
+
+		local health_boost = 0.00035
+		local power_clear_boost = 0.002
+		local power_partly_boost = 0.001
+		local power_not_clear_penalty = -0.001
+
+		if hours >= 21 or hours < 5 then
 			actor:change_power(power_not_clear_penalty * artefact_count)
+		else
+			if current_weather == "clear" then
+				actor:change_health(health_boost * artefact_count)
+				actor:change_power(power_clear_boost * artefact_count)
+			elseif current_weather == "partly" then
+				actor:change_power(power_partly_boost * artefact_count)
+			else
+				actor:change_power(power_not_clear_penalty * artefact_count)
+			end
 		end
 		trace("health %s, power %s", actor.health, actor.power)
 	end,
@@ -688,7 +696,8 @@ local artefact_on_update_functions = {
 		end
 	end,
 
-	-- Moon, increases stats after midnight until dawn, gives penalties at day time (WIP)
+	-- Moon, Perk: Friend of the Night 
+	-- Increases stats after midnight until dawn, gives penalties at day time (WIP)
 	-- Effect stacks with each artefact on belt
 	af_moon = function(actor, artefact_count, artefact_ids, artefact_names)
 		local hours = get_time_hours()
@@ -767,8 +776,11 @@ local artefact_on_update_functions = {
 	-- But only those ones who devoted their lives to Vyraj and The Masters can truly realise the potential of the artefact
 	-- Does not stack in any way 
 	af_chelust = function(actor, artefact_count, artefact_ids, artefact_names)
-		local health_boost = 0.0005
-		local power_boost = 0.002
+		local health_boost = 0.0002
+		local power_boost = 0.0025
+
+		actor:change_health(health_boost)
+		actor:change_power(power_boost)
 
 	end,
 
@@ -1176,7 +1188,7 @@ local artefact_on_hit_functions = {
 			UnregisterScriptCallback("on_enemy_eval", ignore_enemy_function)
 			return true
 		end)
-		
+
 		add_cooldown(2, "af_tapeworm")
 	end,
 
