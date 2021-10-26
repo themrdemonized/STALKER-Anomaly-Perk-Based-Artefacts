@@ -49,6 +49,10 @@ local get_weather_manager = level_weathers.get_weather_manager
 local get_game_time = game.get_game_time
 local translate_string = game.translate_string
 
+local is_critical_bone = quickdraw_bone_mapper.is_critical_bone
+
+local get_nearest_stalker = utils_obj.get_nearest_stalker
+
 local play_snd = xr_effects.play_snd
 
 local get_safe_sound_object = xr_sound.get_safe_sound_object
@@ -201,6 +205,62 @@ local function play_sound_on_actor(snd, volume, frequency)
 	end
 end
 
+local smoothed_values = {}
+
+--EMA smoothing for changing values
+local default_smoothing = 25
+local smoothing_alpha = 2.0 / (default_smoothing + 1)
+
+local function set_smoothing(n)
+	local n = math_max(n, 1)
+	smoothing_alpha = 2.0 / (n + 1)
+end
+
+local function ema(key, value)
+	smoothed_values[key] = smoothed_values[key] and smoothed_values[key] + smoothing_alpha * (value - smoothed_values[key]) or value
+	--trace("EMA fired, key %s, target %s, current %s, going %s", key, value, smoothed_values[key], (value > smoothed_values[key] and "up" or "down"))
+	return smoothed_values[key] 
+end
+
+local function look_at_nearest_npc(npc, actor)
+	local actor = actor or db.actor
+	local npc = npc or get_nearest_stalker(actor)
+	if npc then
+		local npc_position = npc:bone_position("bip01_head")
+		local actor_position = actor:position()
+		npc_position.x = ema("look_x", npc_position.x)
+		npc_position.y = ema("look_y", npc_position.y)
+		npc_position.z = ema("look_z", npc_position.z)
+		-- npc_position.y = npc_position.y + 1
+		actor:actor_look_at_point(npc_position)
+	end
+end
+
+-- Custom Dynamic Functors test
+-- NameCustom = ui_inventory.UIInventory.Name_Custom
+-- function ui_inventory.UIInventory:Name_Custom(obj, bag, temp, i)
+--     obj = self:CheckItem(obj,"Name_Custom " .. i)
+--     if i == 2 and has_parts(obj) then -- menu field strip
+--         return menu_field_strip(obj)
+--     elseif i == 3 and has_parts(obj) then -- check unjam
+--         return check_unjam(obj)
+--     else
+--         return NameCustom(self, obj, bag, temp, i)
+--     end
+-- end
+
+-- ActionCustom = ui_inventory.UIInventory.Action_Custom
+-- function ui_inventory.UIInventory:Action_Custom(obj, bag, temp, i)
+--     obj = self:CheckItem(obj,"Action_Custom " .. i)
+--     if i == 2 and has_parts(obj) then -- menu field strip
+--         field_strip(obj)
+--     elseif i == 3 and has_parts(obj) then -- check unjam
+--         unjam_wep(obj)
+--     else
+--         ActionCustom(self, obj, bag, temp, i)
+--     end
+-- end
+
 -- Artefacts
 local artefacts = {}
 local belt = {}
@@ -247,6 +307,145 @@ end
 local function refresh_artefacts_time_event_func(force)
 	refresh_artefacts(force)
 	return true
+end
+
+-- Callbacks
+local callbacks = {}
+local function register_callback(callback, callback_function, on_end_function)
+	trace("registering callback %s", callback)
+	RegisterScriptCallback(callback, callback_function)
+	table_insert(callbacks, {
+		callback = callback,
+		func = callback_function,
+		on_end = on_end_function
+	})
+end
+
+local function unregister_callbacks()
+	for i, props in pairs(callbacks) do
+		trace("unregistering callback %s, %s", i, props.callback)
+		UnregisterScriptCallback(props.callback, props.func)
+		if props.on_end then
+			props.on_end()
+		end
+		callbacks[i] = nil
+	end
+end
+
+-- Effects
+local speed_boosts = { -- Table of speed boosts for different artefacts
+	af_generator = {
+		name = "af_generator_boost",
+		boost = 0.135
+	}
+}
+
+local add_speed = speed.add_speed
+local remove_speed = speed.remove_speed
+local function remove_speed_boosts()
+	for boost, props in pairs(speed_boosts) do
+		remove_speed(props.name)
+	end
+end
+
+local cooldowns = {} -- Table of cooldowns of artefacts (["artefact"] = time_elapsed + cooldown)
+local function add_cooldown(cooldown, name)
+	trace("added cooldown, name %s, time %s, current_time %s", name, time_elapsed + (cooldown or 0), time_elapsed)
+	cooldowns[name] = time_elapsed + (cooldown or 0)
+end
+
+local function check_cooldown(name)
+	if not cooldowns[name] then return true end
+	if time_elapsed >= cooldowns[name] then
+		cooldowns[name] = nil
+		return true
+	end
+	trace("cooldown not expired yet, name %s, time %s, current_time %s", name, cooldowns[name], time_elapsed)
+	return false
+end
+
+-- Table of current active effects, contains tables of these {
+-- timer = time_elapsed + timer in seconds, how long effect will be applied
+-- effect = function(), the function of the effect
+-- effect_function - string, dump of effect function to store in m_data
+-- effect_args - array, args to effect_function
+-- on_end = function(), the function on the expiration of effect
+-- on_end_function - string, dump of on_end function to store in m_data
+-- on_end_args - array, args to on_end_function
+-- key - string, custom key to set in timed_effects table, otherwise will be used first available one
+-- not_save - boolean, do not save in mdata }
+-- this is the complex function intended to have persistence between saves, moving to different maps and so on, use if needed
+-- no upvalues are allowed in the functions, best to reference globals by _G. lookup
+-- The precision for both cooldown and timed effects is 0.1 or 100ms, making more precise timer or timed effect is pointless
+local timed_effects = {}
+local function add_timed_effect(timer, effect_function, effect_args, on_end_function, on_end_args, key, not_save)
+	trace("current_time %s, adding effect %s", time_elapsed, time_elapsed + (timer or 0))
+
+	local effect_args = effect_args or {}
+	local on_end_args = on_end_args or {}
+	local effect = {
+		timer = time_elapsed + (timer or 0),
+		effect = effect_function and function()
+			effect_function(unpack(effect_args))
+		end,
+		effect_function = effect_function and dump(effect_function),
+		effect_args = effect_args,
+		on_end = on_end_function and function()
+			on_end_function(unpack(on_end_args))
+		end,
+		on_end_function = on_end_function and dump(on_end_function),
+		on_end_args = on_end_args,
+		save = not not_save
+	}
+
+	if key then
+		timed_effects[key] = effect
+	else
+		table_insert(timed_effects, effect)
+	end
+end
+
+-- This is the simpler version of the function above if you do not care about persistence and saving states
+local function add_simple_timed_effect(timer, effect_function, on_end_function, key)
+	trace("current_time %s, adding effect %s", time_elapsed, time_elapsed + (timer or 0))
+
+	local effect = {
+		timer = time_elapsed + (timer or 0),
+		effect = effect_function,
+		on_end = on_end_function
+	}
+
+	if key then
+		timed_effects[key] = effect
+	else
+		table_insert(timed_effects, effect)
+	end
+end
+
+local function remove_timed_effect(key, on_end)
+	if not timed_effects[key] then return end
+	if on_end and timed_effects[key].on_end then
+		timed_effects[key].on_end()
+	end
+	timed_effects[key] = nil
+end
+
+-- Processing the effects
+-- Whatever lowest time is set for effect, it will be processed at least once on process cycle
+local function process_timed_effects()
+	for key, props in pairs(timed_effects) do
+		if props.effect then
+			props.effect()
+		end
+		trace("effect %s, timer %s, current_time %s", key, props.timer, time_elapsed)
+		if props.timer < time_elapsed then
+			trace("removing effect, effect timer %s, current_time %s", props.timer, time_elapsed)
+			if props.on_end then
+				props.on_end()
+			end
+			timed_effects[key] = nil
+		end
+	end
 end
 
 local artefact_props = { -- Special props of artefacts that are used in processing
@@ -339,6 +538,11 @@ local artefact_props = { -- Special props of artefacts that are used in processi
 		}
 	},
 	af_kogot = {
+		-- Claw, Perk: Bloodlust
+		-- 10% Increase of melee damage
+		-- Vampire effect: 3.5% of new melee damage is converted to player's health
+		-- Upon killing certain mutants spawns raw chunk of meat near him
+		-- Stacks with multiple artefacts
 		monster_to_meat = { -- Associations of meat chunk to its monster (clsid or kind)
 			["SM_GERMAN_SHEPHERD"] 			= "mutant_part_dog_meat",
 			["SM_FOX"] 	 					= "mutant_part_dog_meat",
@@ -362,7 +566,20 @@ local artefact_props = { -- Special props of artefacts that are used in processi
 		},
 		valid_hits = { -- Valid hit types to trigger
 			[hit.wound] = true
-		}
+		},
+		on_before_hit = function(self, actor, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
+			if not self.valid_hits[s_hit.type] then
+				trace("Claw, not a valid hit type %s", s_hit.type)
+				return
+			end
+
+			s_hit.power = s_hit.power * (1 + artefact_count * 0.1)
+			local health_boost = s_hit.power * 0.0035 * artefact_count
+
+			add_simple_timed_effect(1, function()
+				actor:change_health(health_boost)
+			end)
+		end,
 	},
 	af_skull_miser = {
 		money_items = (function() -- Money items to choose and spawn
@@ -506,146 +723,23 @@ local artefact_props = { -- Special props of artefacts that are used in processi
 		},
 		monsters = {} -- Generated table to check if current monster is allowed to be kick
 	},
-}
-
--- Callbacks
-local callbacks = {}
-local function register_callback(callback, callback_function, on_end_function)
-	trace("registering callback %s", callback)
-	RegisterScriptCallback(callback, callback_function)
-	table_insert(callbacks, {
-		callback = callback,
-		func = callback_function,
-		on_end = on_end_function
-	})
-end
-
-local function unregister_callbacks()
-	for i, props in pairs(callbacks) do
-		trace("unregistering callback %s, %s", i, props.callback)
-		UnregisterScriptCallback(props.callback, props.func)
-		if props.on_end then
-			props.on_end()
-		end
-		callbacks[i] = nil
-	end
-end
-
--- Effects
-local speed_boosts = { -- Table of speed boosts for different artefacts
-	af_generator = {
-		name = "af_generator_boost",
-		boost = 0.135
-	}
-}
-
-local add_speed = speed.add_speed
-local remove_speed = speed.remove_speed
-local function remove_speed_boosts()
-	for boost, props in pairs(speed_boosts) do
-		remove_speed(props.name)
-	end
-end
-
-local cooldowns = {} -- Table of cooldowns of artefacts (["artefact"] = time_elapsed + cooldown)
-local function add_cooldown(cooldown, name)
-	trace("added cooldown, name %s, time %s, current_time %s", name, time_elapsed + (cooldown or 0), time_elapsed)
-	cooldowns[name] = time_elapsed + (cooldown or 0)
-end
-
-local function check_cooldown(name)
-	if not cooldowns[name] then return true end
-	if time_elapsed >= cooldowns[name] then
-		cooldowns[name] = nil
-		return true
-	end
-	trace("cooldown not expired yet, name %s, time %s, current_time %s", name, cooldowns[name], time_elapsed)
-	return false
-end
-
--- Table of current active effects, contains tables of these {
--- timer = time_elapsed + timer in seconds, how long effect will be applied
--- effect = function(), the function of the effect
--- effect_function - string, dump of effect function to store in m_data
--- effect_args - array, args to effect_function
--- on_end = function(), the function on the expiration of effect
--- on_end_function - string, dump of on_end function to store in m_data
--- on_end_args - array, args to on_end_function
--- key - string, custom key to set in timed_effects table, otherwise will be used first available one
--- not_save - boolean, do not save in mdata }
--- this is the complex function intended to have persistence between saves, moving to different maps and so on, use if needed
--- no upvalues are allowed in the functions, best to reference globals by _G. lookup
--- The precision for both cooldown and timed effects is 0.1 or 100ms, making more precise timer or timed effect is pointless
-local timed_effects = {}
-local function add_timed_effect(timer, effect_function, effect_args, on_end_function, on_end_args, key, not_save)
-	trace("current_time %s, adding effect %s", time_elapsed, time_elapsed + (timer or 0))
-
-	local effect_args = effect_args or {}
-	local on_end_args = on_end_args or {}
-	local effect = {
-		timer = time_elapsed + (timer or 0),
-		effect = effect_function and function()
-			effect_function(unpack(effect_args))
+	af_spaika = {
+		-- Spike, Perk: Critical Ascensi0n
+		-- Consecutive hits give 3% bonus to damage of your next shot
+		-- Hitting enemy in the critical place gives 6% bonus
+		-- Missing the shot resets the bonus stack
+		-- Bonus can be stacked infinitely as long as you don't miss
+		-- Each extra artefact adds 2% to both normal and critical hits 
+		ammo_elapsed = 0,
+		damage_multiplier = 1,
+		on_before_hit = function(self, actor, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
+			s_hit.power = s_hit.power * self.damage_multiplier
+			trace("Spike, Final Damage %s, bonus %s", s_hit.power, self.damage_multiplier)
+			
+			self.damage_multiplier = self.damage_multiplier + (is_critical_bone(npc:clsid(), bone_id) and 0.04 + 0.02 * artefact_count or 0.01 + 0.02 * artefact_count)
 		end,
-		effect_function = effect_function and dump(effect_function),
-		effect_args = effect_args,
-		on_end = on_end_function and function()
-			on_end_function(unpack(on_end_args))
-		end,
-		on_end_function = on_end_function and dump(on_end_function),
-		on_end_args = on_end_args,
-		save = not not_save
-	}
-
-	if key then
-		timed_effects[key] = effect
-	else
-		table_insert(timed_effects, effect)
-	end
-end
-
--- This is the simpler version of the function above if you do not care about persistence and saving states
-local function add_simple_timed_effect(timer, effect_function, on_end_function, key)
-	trace("current_time %s, adding effect %s", time_elapsed, time_elapsed + (timer or 0))
-
-	local effect = {
-		timer = time_elapsed + (timer or 0),
-		effect = effect_function,
-		on_end = on_end_function
-	}
-
-	if key then
-		timed_effects[key] = effect
-	else
-		table_insert(timed_effects, effect)
-	end
-end
-
-local function remove_timed_effect(key, on_end)
-	if not timed_effects[key] then return end
-	if on_end and timed_effects[key].on_end then
-		timed_effects[key].on_end()
-	end
-	timed_effects[key] = nil
-end
-
--- Processing the effects
--- Whatever lowest time is set for effect, it will be processed at least once on process cycle
-local function process_timed_effects()
-	for key, props in pairs(timed_effects) do
-		if props.effect then
-			props.effect()
-		end
-		trace("effect %s, timer %s, current_time %s", key, props.timer, time_elapsed)
-		if props.timer < time_elapsed then
-			trace("removing effect, effect timer %s, current_time %s", props.timer, time_elapsed)
-			if props.on_end then
-				props.on_end()
-			end
-			timed_effects[key] = nil
-		end
-	end
-end
+	},
+}
 
 -- Functions for artefacts which provide perk bonuses continuously
 local artefact_on_update_functions = {
@@ -838,6 +932,12 @@ local artefact_on_weapon_fired_functions = {
 
 	-- end
 
+	-- Spike, Perk: Critical Ascensi0n
+	-- See props for description
+	af_spaika = function(actor, artefact_count, artefact_ids, artefact_names, obj, wpn, ammo_elapsed, grenade_elapsed, ammo_type, grenade_type)
+		trace("Spike, Ammo elapsed %s", ammo_elapsed)
+		artefact_props.af_spaika.ammo_elapsed = ammo_elapsed
+	end,
 }
 
 -- Functions for artefacts which provide perk bonuses on item use
@@ -1197,22 +1297,9 @@ local artefact_on_hit_functions = {
 local artefact_on_npc_before_hit_functions = {
 
 	-- Claw, Perk: Bloodlust
-	-- 10% Increase of melee damage
-	-- Vampire effect: 3.5% of new melee damage is converted to player's health
-	-- Upon killing certain mutants spawns raw chunk of meat near him
-	-- Stacks with multiple artefacts
+	-- See props for description
 	af_kogot = function(actor, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
-		if not artefact_props.af_kogot.valid_hits[s_hit.type] then
-			trace("Claw, not a valid hit type %s", s_hit.type)
-			return
-		end
-
-		s_hit.power = s_hit.power * (1 + artefact_count * 0.1)
-		local health_boost = s_hit.power * 0.0035 * artefact_count
-
-		add_simple_timed_effect(1, function()
-			actor:change_health(health_boost)
-		end)
+		artefact_props.af_kogot:on_before_hit(actor, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
 	end,
 
 	-- Dragon's Eye, Perk: Good ol' Ultra-Violence
@@ -1225,6 +1312,12 @@ local artefact_on_npc_before_hit_functions = {
 			return
 		end
 		artefact_props.af_dragon_eye.on_before_hit(actor, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
+	end,
+
+	-- Spike, Perk: Critical Ascensi0n
+	-- See props for description
+	af_spaika = function(actor, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
+		artefact_props.af_spaika:on_before_hit(actor, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
 	end,
 
 }
@@ -1293,22 +1386,9 @@ local artefact_on_npc_death_functions = {
 local artefact_on_monster_before_hit_functions = {
 
 	-- Claw, Perk: Bloodlust
-	-- 10% Increase of melee damage
-	-- Vampire effect: 3.5% of new melee damage is converted to player's health
-	-- Upon killing certain mutants spawns raw chunk of meat near him
-	-- Stacks with multiple artefacts
+	-- See props for description
 	af_kogot = function(actor, artefact_count, artefact_ids, artefact_names, monster, s_hit, bone_id, flags)
-		if not artefact_props.af_kogot.valid_hits[s_hit.type] then
-			trace("Claw, not a valid hit type %s", s_hit.type)
-			return
-		end
-
-		s_hit.power = s_hit.power * (1 + artefact_count * 0.1)
-		local health_boost = s_hit.power * 0.0035 * artefact_count
-
-		add_simple_timed_effect(1, function()
-			actor:change_health(health_boost)
-		end)
+		artefact_props.af_kogot:on_before_hit(actor, artefact_count, artefact_ids, artefact_names, monster, s_hit, bone_id, flags)
 	end,
 
 	-- Dragon's Eye, Perk: Good ol' Ultra-Violence
@@ -1321,6 +1401,12 @@ local artefact_on_monster_before_hit_functions = {
 			return
 		end
 		artefact_props.af_dragon_eye.on_before_hit(actor, artefact_count, artefact_ids, artefact_names, monster, s_hit, bone_id, flags)
+	end,
+
+	-- Spike, Perk: Critical Ascensi0n
+	-- See props for description 
+	af_spaika = function(actor, artefact_count, artefact_ids, artefact_names, monster, s_hit, bone_id, flags)
+		artefact_props.af_spaika:on_before_hit(actor, artefact_count, artefact_ids, artefact_names, monster, s_hit, bone_id, flags)
 	end,
 
 }

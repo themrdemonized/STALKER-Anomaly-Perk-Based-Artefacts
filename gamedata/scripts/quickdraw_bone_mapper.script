@@ -908,3 +908,16 @@ function get_bone_prop(c,bone)
 	return (creature_t and creature_b) or (creatures_cls[clsid.script_stalker][bone]) or {0, normal_damage}
 end
 
+-- code demonized
+-- return if hitted bone is critical
+function is_critical_bone(c, bone)
+	local creature_t = creatures_cls[c]
+	if not creature_t then return false end
+
+	local creature_b = creature_t[bone]
+	if not creature_b then return false end
+
+	--printf("current bone %s, damage %s, critical %s", bone, creature_b[1], creature_b[2] == critical_damage)
+	return creature_b[2] == critical_damage
+end
+-- code demonized end
