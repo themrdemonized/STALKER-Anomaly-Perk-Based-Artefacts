@@ -373,6 +373,7 @@ function get_psy_health()
 end
 
 function change_psy_health(amount)
+    -- printf("psy changed by %s", amount)
     psy_table.actor_psy_health = psy_table.actor_psy_health + amount
 end
 -- code by demonized end

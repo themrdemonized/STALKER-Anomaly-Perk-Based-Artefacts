@@ -3,7 +3,7 @@
 -- Provides special perks and unique properties to junk artefacts
 -- Beyond boundaries of traditional stats
 
--- Inspired by Fallout games and Stalker mods like Golden Sphere (Золотой шар) and others
+-- Inspired by Fallout, Borderlands games and Stalker mods like Golden Sphere (Золотой шар) and others
 -- Written by demonized
 
 
@@ -22,6 +22,7 @@ local printf = printf
 local random_float = random_float
 local random_number = random_number
 local RegisterScriptCallback = RegisterScriptCallback
+local RemoveTimeEvent = RemoveTimeEvent
 local ResetTimeEvent = ResetTimeEvent
 local round_100 = round_100
 local SYS_GetParam = SYS_GetParam
@@ -361,6 +362,22 @@ local function check_cooldown(name)
 		return true
 	end
 	trace("cooldown not expired yet, name %s, time %s, current_time %s", name, cooldowns[name], time_elapsed)
+	return false
+end
+
+local status_effects = {} -- Table of status effects of artefacts (["artefact"] = time_elapsed + cooldown)
+local function add_status_effect(status_effect, name)
+	trace("added status_effect, name %s, time %s, current_time %s", name, time_elapsed + (status_effect or 0), time_elapsed)
+	status_effects[name] = time_elapsed + (status_effect or 0)
+end
+
+local function check_status_effect(name)
+	if not status_effects[name] then return true end
+	if time_elapsed >= status_effects[name] then
+		status_effects[name] = nil
+		return true
+	end
+	trace("status_effect not expired yet, name %s, time %s, current_time %s", name, status_effects[name], time_elapsed)
 	return false
 end
 
@@ -727,19 +744,55 @@ local artefact_props = { -- Special props of artefacts that are used in processi
 		-- Spike, Perk: Critical Ascensi0n
 		-- Consecutive hits give 3% bonus to damage of your next shot
 		-- Hitting enemy in the critical place gives 6% bonus
-		-- Missing the shot resets the bonus stack
+		-- Missing the shot resets the bonus stack and gives psy damage penalty proportional to the stack you had
 		-- Bonus can be stacked infinitely as long as you don't miss
-		-- Each extra artefact adds 2% to both normal and critical hits 
+		-- Each extra artefact adds 2% to both normal and critical hits
+		weapon_shot = false, 
 		ammo_elapsed = 0,
 		damage_multiplier = 1,
+		event_reset = function(self)
+			trace("Spike: event reset")
+			self.weapon_shot = false
+			RemoveTimeEvent("af_spaika", "af_spaika_reset")
+		end,
+		stack_reset = function(self)
+			trace("Spike: stack reset")
+			self.damage_multiplier = 1
+			self:event_reset()
+			trace("Spike, weapon_shot %s", self.weapon_shot)
+		end,
+		effect_reset = function(self)
+			if self.damage_multiplier > 1 then
+				local s_hit = hit()
+				s_hit.power = 0.005
+				s_hit.type = hit.shock
+				s_hit.draftsman = db.actor
+				db.actor:hit(s_hit)
+				arszi_psy.change_psy_health((self.damage_multiplier - 1) * -0.25)
+				play_sound_on_actor("anomaly\\electra_hit1", 1, 1.5)
+			else
+				play_sound_on_actor("decoder", 1, 0.8)
+			end
+			self:stack_reset()
+			--play_sound_on_actor("decoder", 1, 0.8)
+		end,
 		on_before_hit = function(self, actor, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
 			s_hit.power = s_hit.power * self.damage_multiplier
 			trace("Spike, Final Damage %s, bonus %s", s_hit.power, self.damage_multiplier)
+			play_sound_on_actor("decoder", 1, self.damage_multiplier)
 			
 			self.damage_multiplier = self.damage_multiplier + (is_critical_bone(npc:clsid(), bone_id) and 0.04 + 0.02 * artefact_count or 0.01 + 0.02 * artefact_count)
-		end,
+			self:event_reset()
+		end
 	},
 }
+
+-- Removing stack effects on refreshing artefacts
+local function remove_stack_effects()
+	if not artefacts.af_spaika then
+		artefact_props.af_spaika:stack_reset()
+	end
+end
 
 -- Functions for artefacts which provide perk bonuses continuously
 local artefact_on_update_functions = {
@@ -937,6 +990,20 @@ local artefact_on_weapon_fired_functions = {
 	af_spaika = function(actor, artefact_count, artefact_ids, artefact_names, obj, wpn, ammo_elapsed, grenade_elapsed, ammo_type, grenade_type)
 		trace("Spike, Ammo elapsed %s", ammo_elapsed)
 		artefact_props.af_spaika.ammo_elapsed = ammo_elapsed
+
+		trace("Spike, on_weapon_fired weapon_shot %s", artefact_props.af_spaika.weapon_shot)
+
+		if artefact_props.af_spaika.weapon_shot then
+			artefact_props.af_spaika:effect_reset()
+			return
+		end
+
+		artefact_props.af_spaika.weapon_shot = true
+		CreateTimeEvent("af_spaika", "af_spaika_reset", 2, function()
+			trace("Spike, Creating time event")
+			artefact_props.af_spaika:effect_reset()
+			return true
+		end)
 	end,
 }
 
@@ -1727,6 +1794,7 @@ end
 local function refresh_state()
 	if refresh_artefacts() then
 		remove_speed_boosts()
+		remove_stack_effects()
 		unregister_callbacks()
 		process_artefacts(artefact_on_equip_functions)
 	end
@@ -1848,9 +1916,19 @@ local function actor_on_first_update()
 	local tg_now = time_global()
 	local tg_add = (tg_now - tg_lag) * 0.001
 	trace("tg_now %s, tg_add %s", tg_now, tg_add)
+
 	for key, effect in pairs(timed_effects) do
 		effect.timer = effect.timer + tg_add
 	end
+
+	for key, effect in pairs(cooldowns) do
+		cooldowns[key] = cooldowns[key] + tg_add
+	end
+
+	for key, effect in pairs(status_effects) do
+		status_effects[key] = status_effects[key] + tg_add
+	end
+
 	RegisterScriptCallback("actor_item_to_slot", refresh_state)
 	RegisterScriptCallback("actor_item_to_belt", refresh_state)
 	RegisterScriptCallback("actor_item_to_ruck", refresh_state)
@@ -1899,6 +1977,7 @@ local function save_state(m_data)
 	end
 	m_data.perk_based_artefacts_effects = t
 	m_data.perk_based_artefacts_cooldowns = cooldowns
+	m_data.perk_based_artefacts_status_effects = status_effects
 end
 
 local function load_state(m_data)
@@ -1919,6 +1998,7 @@ local function load_state(m_data)
 	end
 	timed_effects = t
 	cooldowns = m_data.perk_based_artefacts_cooldowns or {}
+	status_effects = m_data.perk_based_artefacts_status_effects or {}
 end
 
 local function on_option_change()
