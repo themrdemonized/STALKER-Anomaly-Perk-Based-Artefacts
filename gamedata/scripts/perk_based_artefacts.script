@@ -747,8 +747,8 @@ local artefact_props = { -- Special props of artefacts that are used in processi
 		-- Missing the shot resets the bonus stack and gives psy damage penalty proportional to the stack you had
 		-- Bonus can be stacked infinitely as long as you don't miss
 		-- Each extra artefact adds 2% to both normal and critical hits
+		-- Unequipping all artefacts will remove the stack without penalties
 		weapon_shot = false, 
-		ammo_elapsed = 0,
 		damage_multiplier = 1,
 		event_reset = function(self)
 			trace("Spike: event reset")
@@ -774,7 +774,6 @@ local artefact_props = { -- Special props of artefacts that are used in processi
 				play_sound_on_actor("decoder", 1, 0.8)
 			end
 			self:stack_reset()
-			--play_sound_on_actor("decoder", 1, 0.8)
 		end,
 		on_before_hit = function(self, actor, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
 			s_hit.power = s_hit.power * self.damage_multiplier
@@ -988,9 +987,6 @@ local artefact_on_weapon_fired_functions = {
 	-- Spike, Perk: Critical Ascensi0n
 	-- See props for description
 	af_spaika = function(actor, artefact_count, artefact_ids, artefact_names, obj, wpn, ammo_elapsed, grenade_elapsed, ammo_type, grenade_type)
-		trace("Spike, Ammo elapsed %s", ammo_elapsed)
-		artefact_props.af_spaika.ammo_elapsed = ammo_elapsed
-
 		trace("Spike, on_weapon_fired weapon_shot %s", artefact_props.af_spaika.weapon_shot)
 
 		if artefact_props.af_spaika.weapon_shot then

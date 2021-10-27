@@ -1,4 +1,4 @@
-Perk Based Artefacts, 0.05
+Perk Based Artefacts, 0.06
 A unique twist on overhauling old junk artefacts beyond the boundaries of simple stat changers
 Junk artefacts are no longer junk and received unique properties or Perks. The degree of perks vary from simple boosters to marvellous staff like recharging batteries by stepping in Electra, receiving Money on Headshots or Even Evading Death itself when all hope is lost.
 Multiple artefacts might or might not stack the effects and penalties of Perks in various ways, and effects are triggered on very various conditions
@@ -96,4 +96,13 @@ So far the perks are
   -- Tapeworm, Perk: Stunner
   -- Upon receiving melee damage the enemy would be stunned for 2.5 seconds
   -- While being stunned the enemy is disabled in fight and won't attack
+  -- Has a cooldown of 2 seconds between uses
   -- Each extra artefact adds additional 2 seconds to effect
+
+  -- Spike, Perk: Critical Ascensi0n
+  -- Consecutive hits give 3% bonus to damage of your next shot
+  -- Hitting enemy in the critical place gives 6% bonus
+  -- Missing the shot resets the bonus stack and gives psy damage penalty proportional to the stack you had
+  -- Bonus can be stacked infinitely as long as you don't miss
+  -- Each extra artefact adds 2% to both normal and critical hits
+  -- Unequipping all artefacts will remove the stack without penalties
