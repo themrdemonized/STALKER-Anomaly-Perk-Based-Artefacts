@@ -3,7 +3,7 @@
 -- Provides special perks and unique properties to junk artefacts
 -- Beyond boundaries of traditional stats
 
--- Inspired by Fallout, Borderlands games and Stalker mods like Golden Sphere (Золотой шар) and others
+-- Inspired by Fallout, Borderlands, Dark Souls games and Stalker mods like Golden Sphere (Золотой шар) and others
 -- Written by demonized
 
 
@@ -366,19 +366,27 @@ local function check_cooldown(name)
 end
 
 local status_effects = {} -- Table of status effects of artefacts (["artefact"] = time_elapsed + cooldown)
-local function add_status_effect(status_effect, name)
-	trace("added status_effect, name %s, time %s, current_time %s", name, time_elapsed + (status_effect or 0), time_elapsed)
-	status_effects[name] = time_elapsed + (status_effect or 0)
+local function add_status_effect(timer, effect, key)
+	local t = {
+		timer = time_elapsed + (timer or 0),
+		effect = effect
+	}
+	if key then
+		status_effects[key] = t
+	else
+		table_insert(status_effects, t)
+	end
+	trace("added status_effect, key %s, time %s, current_time %s", key, time_elapsed + (timer or 0), time_elapsed)
 end
 
-local function check_status_effect(name)
-	if not status_effects[name] then return true end
-	if time_elapsed >= status_effects[name] then
-		status_effects[name] = nil
-		return true
+local function check_status_effect(key)
+	if not status_effects[key] then return false end
+	if time_elapsed >= status_effects[key].timer then
+		status_effects[key] = nil
+		return false
 	end
-	trace("status_effect not expired yet, name %s, time %s, current_time %s", name, status_effects[name], time_elapsed)
-	return false
+	trace("status_effect active, key %s, time %s, current_time %s", key, status_effects[key].timer, time_elapsed)
+	return true
 end
 
 -- Table of current active effects, contains tables of these {
@@ -747,7 +755,7 @@ local artefact_props = { -- Special props of artefacts that are used in processi
 		-- Missing the shot resets the bonus stack and gives psy damage penalty proportional to the stack you had
 		-- Bonus can be stacked infinitely as long as you don't miss
 		-- Each extra artefact adds 2% to both normal and critical hits
-		-- Unequipping all artefacts will remove the stack without penalties
+		-- Unequipping all Spike artefacts will remove the stack without penalties
 		weapon_shot = false, 
 		damage_multiplier = 1,
 		event_reset = function(self)
@@ -784,6 +792,72 @@ local artefact_props = { -- Special props of artefacts that are used in processi
 			self:event_reset()
 		end
 	},
+	-- Sandstone, perk: Zone Infusion
+	-- Stepping into anomaly of various types infuse your active weapon
+	-- Infused weapon loses 30% of its raw power but gains 50% of elemental damage power according to the anomaly type
+	-- Only electric, thermal and chemical anomalies are valid for infusion, including fields
+	-- Effect lasts for 3 minutes, the artefact must be equipped for the effect to work
+	-- Does not stack in any way
+	af_sandstone = {
+		valid_hits = { -- Valid hit types to trigger
+			[hit.light_burn] = true,
+			[hit.burn] = true,
+			[hit.shock] = true,
+			[hit.chemical_burn] = true
+		},
+		hit_types_sounds = { -- Hit type to sounds associations
+			[hit.light_burn] = {
+				"perk_based_artefacts\\flamer2",
+			},
+			[hit.burn] = {
+				"perk_based_artefacts\\flamer1",
+			},
+			[hit.shock] = {
+				"anomaly\\electra_blast",
+				"anomaly\\electra_blast1"
+			},
+			[hit.chemical_burn] = {
+				"anomaly\\bfuzz_hit",
+				"anomaly\\buzz_hit"
+			}
+		},
+		hit_types_particles = { -- Hit type to particles associations
+			[hit.light_burn] = {
+				"artefact\\artefact_zharka"
+			},
+			[hit.burn] = {
+				"artefact\\artefact_zharka"
+			},
+			[hit.shock] = {
+				"artefact\\artefact_electra"
+			},
+			[hit.chemical_burn] = {
+				"artefact\\artefact_ameba"
+			}
+		},
+		on_before_hit = function(self, actor, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
+			local actor_weapon = actor:active_item():name()
+			if not check_status_effect("af_sandstone" .. actor_weapon) then
+				trace("Sandstone, weapon %s not infused", actor_weapon)
+				return
+			end
+
+			local effect = status_effects["af_sandstone" .. actor_weapon].effect
+			local elemental_hit = hit(s_hit)
+			s_hit.power = s_hit.power * 0.7
+			elemental_hit.power = elemental_hit.power * 0.5
+			elemental_hit.type = effect.hit_type
+			elemental_hit.draftsman = npc
+			npc:hit(elemental_hit)
+			trace("Sandstone, effect power %s, hit_type %s", elemental_hit.power, elemental_hit.type)
+			local gibs = particles_object(get_random_array_element(self.hit_types_particles[effect.hit_type]))
+			local npc_position = npc:position()
+			npc_position.y = npc_position.y + 0.5
+			if gibs and not gibs:playing() then
+				gibs:play_at_pos(npc_position)
+			end
+		end
+	}
 }
 
 -- Removing stack effects on refreshing artefacts
@@ -1001,6 +1075,20 @@ local artefact_on_weapon_fired_functions = {
 			return true
 		end)
 	end,
+
+	-- Sandstone, perk: Zone Infusion
+	-- See props for description
+	af_sandstone = function(actor, artefact_count, artefact_ids, artefact_names, obj, wpn, ammo_elapsed, grenade_elapsed, ammo_type, grenade_type)
+		local actor_weapon = actor:active_item():name()
+		if not check_status_effect("af_sandstone" .. actor_weapon) then
+			trace("Sandstone, weapon %s not infused", actor_weapon)
+			return
+		end
+
+		local hit_type = status_effects["af_sandstone" .. actor_weapon].effect.hit_type
+		local sandstone = artefact_props.af_sandstone
+		play_sound_on_actor(get_random_array_element(sandstone.hit_types_sounds[hit_type]), 0.35, random_float(0.95, 1.05))
+	end
 }
 
 -- Functions for artefacts which provide perk bonuses on item use
@@ -1354,6 +1442,31 @@ local artefact_on_hit_functions = {
 		add_cooldown(2, "af_tapeworm")
 	end,
 
+	-- Sandstone, perk: Zone Infusion
+	-- See props for description
+	af_sandstone = function(actor, artefact_count, artefact_ids, artefact_names, obj, amount, who, last_hit)
+		if not (last_hit and artefact_props.af_sandstone.valid_hits[last_hit.type]) then
+			trace("Sandstone, not valid hit type")
+			return
+		end
+
+		if not (who and IsAnomaly(who)) then
+			trace("Sandstone, not Anomaly %s", who:section())
+			return
+		end
+
+		local actor_weapon = actor:active_item()
+		if not actor_weapon then
+			trace("Sandstone, no active actor_weapon")
+			return
+		end
+
+		add_status_effect(180, {
+			weapon_name = actor_weapon:name(),
+			hit_type = last_hit.type
+		}, "af_sandstone" .. actor_weapon:name())
+	end
+
 }
 
 -- Functions for artefacts which provide perk bonuses on before npc hit
@@ -1381,6 +1494,12 @@ local artefact_on_npc_before_hit_functions = {
 	-- See props for description
 	af_spaika = function(actor, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
 		artefact_props.af_spaika:on_before_hit(actor, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
+	end,
+
+	-- Sandstone, perk: Zone Infusion
+	-- See props for description
+	af_sandstone = function(actor, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
+		artefact_props.af_sandstone:on_before_hit(actor, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
 	end,
 
 }
@@ -1470,6 +1589,12 @@ local artefact_on_monster_before_hit_functions = {
 	-- See props for description 
 	af_spaika = function(actor, artefact_count, artefact_ids, artefact_names, monster, s_hit, bone_id, flags)
 		artefact_props.af_spaika:on_before_hit(actor, artefact_count, artefact_ids, artefact_names, monster, s_hit, bone_id, flags)
+	end,
+
+	-- Sandstone, perk: Zone Infusion
+	-- See props for description
+	af_sandstone = function(actor, artefact_count, artefact_ids, artefact_names, monster, s_hit, bone_id, flags)
+		artefact_props.af_sandstone:on_before_hit(actor, artefact_count, artefact_ids, artefact_names, monster, s_hit, bone_id, flags)
 	end,
 
 }
@@ -1922,7 +2047,7 @@ local function actor_on_first_update()
 	end
 
 	for key, effect in pairs(status_effects) do
-		status_effects[key] = status_effects[key] + tg_add
+		effect.timer = effect.timer + tg_add
 	end
 
 	RegisterScriptCallback("actor_item_to_slot", refresh_state)

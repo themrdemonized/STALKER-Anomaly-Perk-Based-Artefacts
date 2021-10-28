@@ -1,20 +1,22 @@
-Perk Based Artefacts, 0.06
+Perk Based Artefacts, 0.07
 A unique twist on overhauling old junk artefacts beyond the boundaries of simple stat changers
-Junk artefacts are no longer junk and received unique properties or Perks. The degree of perks vary from simple boosters to marvellous staff like recharging batteries by stepping in Electra, receiving Money on Headshots or Even Evading Death itself when all hope is lost.
+Junk artefacts are no longer junk and received unique special abilities or Perks. The degree of perks vary from simple boosters to marvellous staff like recharging batteries by stepping in Electra, receiving Money on Headshots or Even Evading Death itself when all hope is lost.
 Multiple artefacts might or might not stack the effects and penalties of Perks in various ways, and effects are triggered on very various conditions
 
 This is very first test versions to see the first problems, bugs and compatibility issues. The descriptions of artefacts aren't changed and no balancing of their prices, tiers or relations to usual artefacts were performed. Not all artefacts are affected and their Perks are a subject to change many times
 
 So far the perks are
 
-  -- Sun, gives health and stamina boost at clear weather, little stamina boost at partly clear and stamina penalty at not clear and at night
+  -- Sun, Perk: Solar Powered
+  -- Gives health and stamina boost at clear weather, little stamina boost at partly clear and stamina penalty at not clear and at night
   -- Effect stacks with each artefact on belt
 
   -- Heart, Perk: Will to Live
   -- Gives stronger health regen the less health you have if you have lower than 25% of health up to that amount
   -- More artefacts increase the regen and slightly increases the highest health to trigger
 
-  -- Moon, increases stats after midnight until dawn, gives penalties at day time (WIP)
+  -- Moon, Perk: Friend of the Night
+  -- Increases stats after midnight until dawn, gives penalties at day time (WIP)
   -- Effect stacks with each artefact on belt
 
   -- Signet, Perk: Light of Tranquility
@@ -105,4 +107,11 @@ So far the perks are
   -- Missing the shot resets the bonus stack and gives psy damage penalty proportional to the stack you had
   -- Bonus can be stacked infinitely as long as you don't miss
   -- Each extra artefact adds 2% to both normal and critical hits
-  -- Unequipping all artefacts will remove the stack without penalties
+  -- Unequipping all Spike artefacts will remove the stack without penalties
+
+  -- Sandstone, perk: Zone Infusion
+  -- Stepping into anomaly of various types infuse your active weapon
+  -- Infused weapon loses 30% of its raw power but gains 50% of elemental damage power according to the anomaly type
+  -- Only electric, thermal and chemical anomalies are valid for infusion, including fields
+  -- Effect lasts for 3 minutes, the artefact must be equipped for the effect to work
+  -- Does not stack in any way

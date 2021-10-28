@@ -1,16 +1,16 @@
 Arts to do:
 Bat
-Monolith Shard if needed
+Monolith Shard (if needed)
 Chain (will be Sin exclusive artefact, not programmed yet)
 Cocoon
-Fire Loop
+Fire Loop (Lucifer Artefact)
 Lamp
 Lighthouse
 Medalion
 Moss
 Moon (WIP, wanna make effect more interesting than just an opposite of Sun)
 Thistle
-Scar
+Scar (Crazy stalker artefact)
 
 Ideaz:
 Basilisk: Melee attacks have a small chance to be immediately fatal.
@@ -21,11 +21,6 @@ Lucifer artefact: Equipping it makes you grant powerful stats, but the artefact 
 lighthouse - is it possible to see who's in your flashlight cone if it's on?
 
 Artefact that gives significant buff to psy regen but makes you do crazy shit
-
-Sandstone, perk: Zone Infusion
-Stepping into anomaly of various types infuse your active weapon and changes its damage type according to the anomaly type
-Effect lasts for 5 real minutes
-DOes not stack in any way
 
 5 shots or 6
 there is 50% chance that last shoy in the mag will not consume ammo
