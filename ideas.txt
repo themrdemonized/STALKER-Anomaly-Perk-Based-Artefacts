@@ -3,7 +3,7 @@ Bat
 Monolith Shard (if needed)
 Chain (will be Sin exclusive artefact, not programmed yet)
 Cocoon
-Fire Loop (Lucifer Artefact)
+Knot (Lucifer Artefact)
 Lamp
 Lighthouse
 Medalion

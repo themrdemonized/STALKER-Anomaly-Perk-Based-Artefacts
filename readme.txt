@@ -60,7 +60,7 @@ So far the perks are
   -- Upon killing certain mutants spawns raw chunk of meat near him
   -- Stacks with multiple artefacts
 
-  -- Miser's Skull, Perk: Crack the jackpot
+  -- Miser's Skull, Perk: Crack the Jackpot
   -- Upon killing an npc in the head spawn extra money in a fashionable way
   -- More artefacts will spawn more money items
 
@@ -116,3 +116,25 @@ So far the perks are
   -- Only electric, thermal and chemical anomalies are valid for infusion, including fields
   -- Effect lasts for 3 minutes, the artefact must be equipped for the effect to work
   -- Does not stack in any way
+
+  -- Knot, Perk: Deal with the Devil
+  -- Gamechanger Artefact
+  -- Moving the artefact to belt will sign the Pact with the Zone
+  -- The Zone empowers your Knot and it becomes the mysterious artefact also known as Lucifer
+  -- Lucifer grants you immense strength and abilities, making you a demigod
+  -- Lucifer will always work even from the backpack 
+  -- However, your powers are very short-lived (about 4 days) and drain artefact energy
+  -- With each % of energy loss your powers will be weaker
+  -- At 50% you will have no powers
+  -- Less than 50% the artefact will start to consume your soul to live resulting first in slight loss of stamina
+  -- Less than 30% and your health start to disappear
+  -- You can sacrifice mere usual artefacts to partially restore Lucifer's condition
+  -- Tier 1 artefacts restore 4-6%
+  -- Tier 2 artefacts restore 7-9%
+  -- Tier 3 artefacts restore 10-13%
+  -- Extra Knot artefacts restore 25-35%
+  -- Death Lamp will overcharge artefact, restoring it to 100% and temporarily boosting it even more
+  -- There is a slight chance that overcharging with Death Lamp will tear you apart
+  -- You can not dispose the artefact by any means
+  -- Lucifer has unknown influence on other artefacts, enhancing their effects in various ways 
+  -- Find more artefacts to restore Lucifer's condition or face the consequences
