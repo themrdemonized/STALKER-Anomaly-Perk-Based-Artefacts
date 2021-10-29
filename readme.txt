@@ -121,6 +121,8 @@ So far the perks are
   -- Gamechanger Artefact
   -- Moving the artefact to belt will sign the Pact with the Zone
   -- The Zone empowers your Knot and it becomes the mysterious artefact also known as Lucifer
+
+  -- Lucifer, Perk: The Lucifer Effect
   -- Lucifer grants you immense strength and abilities, making you a demigod
   -- Lucifer will always work even from the backpack 
   -- However, your powers are very short-lived (about 4 days) and drain artefact energy
