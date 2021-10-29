@@ -140,3 +140,7 @@ So far the perks are
   -- You can not dispose the artefact by any means
   -- Lucifer has unknown influence on other artefacts, enhancing their effects in various ways 
   -- Find more artefacts to restore Lucifer's condition or face the consequences
+  -- Table of enhancements:
+  --   Miser's Skull: headshot kills increase condition by 0.5%
+  --   Dragon's Eye: explosive kills increase condition by 1%
+  

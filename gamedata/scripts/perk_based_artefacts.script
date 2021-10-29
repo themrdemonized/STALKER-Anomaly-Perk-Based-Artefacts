@@ -20,6 +20,7 @@ local hit = hit
 local iempty_table = iempty_table
 local IsAnomaly = IsAnomaly
 local IsMoveState = IsMoveState
+local normalize = normalize
 local particles_object = particles_object
 local printf = printf
 local random_float = random_float
@@ -860,6 +861,32 @@ local artefact_props = { -- Special props of artefacts that are used in processi
 				gibs:play_at_pos(npc_position)
 			end
 		end
+	},
+	af_lucifer = {
+		condition = 1,
+		check_lucifer = function(self)
+			-- return has_alife_info("lucifer_active") and db.actor:object("af_lucifer")
+			return artefacts.af_lucifer
+		end,
+		set_condition = function(self, amount, id)
+			if not self:check_lucifer() then return end
+
+			local id = id or artefacts.af_lucifer.ids[1]
+			if not id then return end
+
+			trace("lucifer id %s", id)
+			trace("condition %s", self.condition)
+
+			local af_lucifer = get_object_by_id(id)
+			self.condition = amount
+			af_lucifer:set_condition(self.condition)
+
+			trace("new condition %s", af_lucifer:condition())
+			return self.condition
+		end,
+		change_condition = function(self, amount, id)
+			return self:set_condition(self.condition + amount, id)
+		end	
 	}
 }
 
@@ -984,12 +1011,33 @@ local artefact_on_update_functions = {
 
 	-- Lucifer, Perk: The Lucifer Effect
 	af_lucifer = function(actor, artefact_count, artefact_ids, artefact_names)
-		local health_boost = 0.0002
-		local power_boost = 0.0025
+		local health_boost = 0.001
+		local power_boost = 0.005
+		local bleeding_cure_boost = 0.0025
 
-		actor:change_health(health_boost)
-		actor:change_power(power_boost)
+		local degradation_rate = 0.0001 --25% per day is 0.0000029
 
+		if not artefact_ids[1] then return end
+
+		local af_lucifer = get_object_by_id(artefact_ids[1])
+		local condition = artefact_props.af_lucifer.condition
+		af_lucifer:set_condition(condition) -- Double set to set initial condition after loading state
+
+		if condition > 0.5 then
+			local normal_condition = normalize(condition, 0.5, 1)
+			actor:change_health(health_boost * normal_condition)
+			actor:change_power(power_boost * normal_condition)
+			actor.bleeding = bleeding_cure_boost * normal_condition
+		else
+			local normal_condition = -(1 - normalize(condition, 0, 0.5))
+			actor:change_power(power_boost * normal_condition)
+			if condition < 0.3 then
+				actor:change_health(health_boost * normal_condition)
+			end
+		end
+
+		artefact_props.af_lucifer.condition = condition - degradation_rate
+		af_lucifer:set_condition(artefact_props.af_lucifer.condition)
 	end,
 
 }
@@ -1004,7 +1052,7 @@ local artefact_on_weapon_fired_functions = {
 	-- Weapons with no mags or only one bullet in the mag are ignored
 	-- Multiple artefacts increase the magnitude of effect and slightly increase the duration
 	-- SCRAPPED: no possibility to manipulate time factor outside of debug mode
-	
+
 	-- af_fire_loop = function(actor, artefact_count, artefact_ids, artefact_names, obj, wpn, ammo_elapsed, grenade_elapsed, ammo_type, grenade_type)
 	-- 	local current_weapon = actor:active_item()
 	-- 	if not current_weapon then
@@ -1505,6 +1553,8 @@ local artefact_on_npc_death_functions = {
 			local money_item = alife_create_item(get_random_array_element(money_items), {money_position, npc_level_vertex_id, npc_game_vertex_id, nil})
 			CreateTimeEvent(money_item.id, money_item.id, 0, money_fountain, money_item.id)
 		end
+
+		artefact_props.af_lucifer:change_condition(0.005)
 	end,
 
 	-- Dragon's Eye, Perk: Good ol' Ultra-Violence
@@ -1516,6 +1566,7 @@ local artefact_on_npc_death_functions = {
 		end
 
 		artefact_props.af_dragon_eye.on_death(actor, artefact_count, artefact_ids, artefact_names, npc, who, last_npc_hit, last_npc_hit_bone_index)
+		artefact_props.af_lucifer:change_condition(0.01)
 	end
 
 }
@@ -1585,6 +1636,8 @@ local artefact_on_monster_death_functions = {
 			return
 		end
 		artefact_props.af_dragon_eye.on_death(actor, artefact_count, artefact_ids, artefact_names, monster, who, last_monster_hit, last_monster_hit_bone_index)
+
+		artefact_props.af_lucifer:change_condition(0.01)
 	end
 
 }
@@ -1675,7 +1728,7 @@ local artefact_on_equip_functions = {
 			alife_release_id(artefact_ids[1])
 			give_info("lucifer_active")
 			play_sound_on_actor("perk_based_artefacts\\creep_laugh")
-			force_refresh_state()
+			CreateTimeEvent("lucifer_activate", "lucifer_activate", 0.15, force_refresh_state)
 		end
 	end
 
@@ -1759,7 +1812,6 @@ bind_monster.generic_object_binder.use_kick = function(self, obj, who)
 	CreateTimeEvent(obj_id, obj_id, 0, fly, obj_id)
 
 	add_cooldown(1 + 1 * artefact_count, "af_ball")
-	--obj:get_physics_shell():apply_force(100 * magnitude, 10000 * magnitude, 100 * magnitude)
 end
 
 -- Patch for Ball for kicking monsters
@@ -1878,6 +1930,7 @@ force_refresh_state = function()
 	remove_stack_effects()
 	unregister_callbacks()
 	process_artefacts(artefact_on_equip_functions)
+	return true
 end
 
 local function actor_on_item_use(obj, str)
@@ -2058,6 +2111,7 @@ local function save_state(m_data)
 	m_data.perk_based_artefacts_effects = t
 	m_data.perk_based_artefacts_cooldowns = cooldowns
 	m_data.perk_based_artefacts_status_effects = status_effects
+	m_data.perk_based_artefacts_lucifer_condition = artefact_props.af_lucifer.condition
 end
 
 local function load_state(m_data)
@@ -2079,6 +2133,7 @@ local function load_state(m_data)
 	timed_effects = t
 	cooldowns = m_data.perk_based_artefacts_cooldowns or {}
 	status_effects = m_data.perk_based_artefacts_status_effects or {}
+	artefact_props.af_lucifer.condition = m_data.perk_based_artefacts_lucifer_condition or 1
 end
 
 local function on_option_change()
