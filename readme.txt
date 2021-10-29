@@ -36,7 +36,8 @@ So far the perks are
   -- Provides health bonus on food consume based on its callories.
   -- Effect prolongs with each artefact on belt
 
-  -- Black Angel, has 20% chance to reflect 35% of bullet damage back
+  -- Black Angel, perk: Dodge This
+  -- Has 20% chance to reflect 35% of bullet damage back
   -- Nullify the damage of hit on reflection
   -- More artefacts increase the chance to reflect with diminishing returns
 
@@ -60,10 +61,10 @@ So far the perks are
   -- Stacks with multiple artefacts
 
   -- Miser's Skull, Perk: Crack the jackpot
-  -- Upon killing an npc in the head spawn extra money item near him
+  -- Upon killing an npc in the head spawn extra money in a fashionable way
   -- More artefacts will spawn more money items
 
-  -- Sourpuss, Perk: You Are What You Eat
+  -- Sourpuss, Perk: What Colour Is Your Blood?
   -- Drains satiety to cure bleeding
   -- Multiple artefacts increase the cure but also increase the drain
 

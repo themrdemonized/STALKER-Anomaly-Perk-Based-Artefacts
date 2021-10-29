@@ -976,7 +976,7 @@ local artefact_on_update_functions = {
 		end
 	end,
 
-	-- Sourpuss, Perk: You Are What You Eat
+	-- Sourpuss, Perk: What Colour Is Your Blood?
 	-- Drains satiety to cure bleeding
 	-- Multiple artefacts increase the cure but also increase the drain
 	af_kislushka = function(actor, artefact_count, artefact_ids, artefact_names)
@@ -1223,7 +1223,8 @@ local artefact_on_before_death_functions = {
 -- Functions for artefacts which provide perk bonuses on before actor hit
 local artefact_on_before_hit_functions = {
 
-	-- Black Angel, has 20% chance to reflect 35% of bullet damage back
+	-- Black Angel, perk: Dodge This
+	-- Has 20% chance to reflect 35% of bullet damage back
 	-- Nullify the damage of hit on reflection
 	-- More artefacts increase the chance to reflect with diminishing returns
 	af_black_angel = function(actor, artefact_count, artefact_ids, artefact_names, s_hit, bone_id, flags)
@@ -1310,7 +1311,8 @@ local artefact_on_before_hit_functions = {
 -- Functions for artefacts which provide perk bonuses on actor hit
 local artefact_on_hit_functions = {
 
-	-- Black Angel, has 20% chance to reflect 35% of bullet damage back
+	-- Black Angel, perk: Dodge This
+	-- Has 20% chance to reflect 35% of bullet damage back
 	-- Nullify the damage of hit on reflection
 	-- More artefacts increase the chance to reflect with diminishing returns
 	af_black_angel = function(actor, artefact_count, artefact_ids, artefact_names, obj, amount, who, last_hit)
@@ -1330,7 +1332,7 @@ local artefact_on_hit_functions = {
 
 		local s_hit = hit(last_hit)
 		s_hit.power = s_hit.power * 0.35
-		s_hit.draftsman = actor
+		s_hit.draftsman = who
 
 		who:hit(s_hit)
 		trace("hit %s, last_hit %s", s_hit.power, last_hit.power)
@@ -1364,7 +1366,7 @@ local artefact_on_hit_functions = {
 		local s_hit = hit(last_hit)
 		s_hit.bone = "bip01_spine"
 		s_hit.power = 0.01 * artefact_count
-		s_hit.draftsman = actor
+		s_hit.draftsman = who
 
 		local effect_time = 0.5 + 2 * artefact_count
 
@@ -1508,7 +1510,7 @@ local artefact_on_npc_before_hit_functions = {
 local artefact_on_npc_death_functions = {
 
 	-- Miser's Skull, Perk: Crack the jackpot
-	-- Upon killing an npc in the head spawn extra money item near him
+	-- Upon killing an npc in the head spawn extra money in a fashionable way
 	-- More artefacts will spawn more money items
 	af_skull_miser = function(actor, artefact_count, artefact_ids, artefact_names, npc, who, last_npc_hit, last_npc_hit_bone_index)
 		if not (last_npc_hit and last_npc_hit_bone_index and artefact_props.af_skull_miser.head_bones[last_npc_hit_bone_index]) then
