@@ -124,12 +124,18 @@ So far the perks are
 
   -- Lucifer, Perk: The Lucifer Effect
   -- Lucifer grants you immense strength and abilities, making you a demigod
+  -- At max condition you receive:
+  --   50% reduction of any damage
+  --   35% increase in speed
+  --   1%/sec health regen
+  --   5%/sec psy regen
+  --   +50kg of carry weight
   -- Lucifer will always work even from the backpack 
   -- However, your powers are very short-lived (about 4 days) and drain artefact energy
   -- With each % of energy loss your powers will be weaker
   -- At 50% you will have no powers
   -- Less than 50% the artefact will start to consume your soul to live resulting first in slight loss of stamina
-  -- Less than 30% and your health start to disappear
+  -- Less than 40% and your health start to disappear, first slow, then increasing with decrease of condition
   -- You can sacrifice mere usual artefacts to partially restore Lucifer's condition
   -- Tier 1 artefacts restore 4-6%
   -- Tier 2 artefacts restore 7-9%
@@ -138,9 +144,16 @@ So far the perks are
   -- Death Lamp will overcharge artefact, restoring it to 100% and temporarily boosting it even more
   -- There is a slight chance that overcharging with Death Lamp will tear you apart
   -- You can not dispose the artefact by any means
+  -- Lucifer messed with your PDA radio, seldomly turning the strange song called "The Lucifer Effect". It sounds so horrific that it might be written in the fricking Hell itself (WIP)
   -- Lucifer has unknown influence on other artefacts, enhancing their effects in various ways 
   -- Find more artefacts to restore Lucifer's condition or face the consequences
   -- Table of enhancements:
   --   Miser's Skull: headshot kills increase condition by 0.5%
   --   Dragon's Eye: explosive kills increase condition by 1%
-  
+  --   Seraphim will save you from death but leave only 1% of Lucifer's condition in case of full depletion
+  --   Heart will decrease efficiency with decrease of Lucifer Condition, up to 66% decrease at 0% condition
+  --   Claw: 
+  --     The effect increases with decreasing of Lucifer condition, to the point of dealing double damage at the lowest condition
+  --     In the act of everlasting increase of desperation and agony, Lucifer itself might utterly obliterate in melee your enemy, spawning lots of gibs and meat chunks
+  --     When this happens, 1% of condition is restored
+

@@ -34,6 +34,10 @@ local time_global = time_global
 local UnregisterScriptCallback = UnregisterScriptCallback
 local vector_rotate_y = vector_rotate_y
 
+local change_psy_health = arszi_psy.change_psy_health
+local manage_psy_health = arszi_psy.manage_psy_health
+local set_psy_health = arszi_psy.set_psy_health
+
 local get_nearby_campfire = bind_campfire.get_nearby_campfire
 
 local add_cam_effector = level.add_cam_effector
@@ -52,6 +56,8 @@ local get_weather_manager = level_weathers.get_weather_manager
 
 local get_game_time = game.get_game_time
 local translate_string = game.translate_string
+
+local get_game_factor = game_difficulties.get_game_factor
 
 local is_critical_bone = quickdraw_bone_mapper.is_critical_bone
 
@@ -366,6 +372,10 @@ local speed_boosts = { -- Table of speed boosts for different artefacts
 	af_generator = {
 		name = "af_generator_boost",
 		boost = 0.135
+	},
+	af_lucifer = {
+		name = "af_lucifer_boost",
+		boost = 0.35
 	}
 }
 
@@ -786,7 +796,7 @@ local artefact_props = { -- Special props of artefacts that are used in processi
 				s_hit.type = hit.shock
 				s_hit.draftsman = db.actor
 				db.actor:hit(s_hit)
-				arszi_psy.change_psy_health((self.damage_multiplier - 1) * -0.25)
+				change_psy_health((self.damage_multiplier - 1) * -0.25)
 				play_sound_on_actor("anomaly\\electra_hit1", 1, 1.5)
 			else
 				play_sound_on_actor("decoder", 1, 0.8)
@@ -878,7 +888,7 @@ local artefact_props = { -- Special props of artefacts that are used in processi
 			trace("condition %s", self.condition)
 
 			local af_lucifer = get_object_by_id(id)
-			self.condition = amount
+			self.condition = amount < 1 and amount or 1
 			af_lucifer:set_condition(self.condition)
 
 			trace("new condition %s", af_lucifer:condition())
@@ -889,6 +899,11 @@ local artefact_props = { -- Special props of artefacts that are used in processi
 		end	
 	}
 }
+
+-- Alias for Lucifer Check
+local function check_lucifer()
+	return artefact_props.af_lucifer:check_lucifer()
+end
 
 -- Functions for artefacts which provide perk bonuses continuously
 local artefact_on_update_functions = {
@@ -929,7 +944,7 @@ local artefact_on_update_functions = {
 
 		local actor_health = round_100(actor.health)
 		if actor_health < health_threshold then
-			local health = (health_threshold - actor_health) * 0.0042 * artefact_count
+			local health = (health_threshold - actor_health) * 0.0042 * artefact_count * (check_lucifer() and min(normalize(artefact_props.af_lucifer.condition, -0.25, 0.5), 1) or 1) --66% of reduction at 0 Lucifer condition
 			actor:change_health(health)
 			trace("firing Will to Live, health %s", health)
 		end
@@ -950,9 +965,9 @@ local artefact_on_update_functions = {
 		if nearby_camp and nearby_camp:is_on() then
 			for i = 1, artefact_count do
 				actor:change_health(health_boost)
-				arszi_psy.manage_psy_health()
-				arszi_psy.manage_psy_health()
-				arszi_psy.manage_psy_health()
+				manage_psy_health()
+				manage_psy_health()
+				manage_psy_health()
 			end
 			trace("firing Signet, health %s", actor.health)
 		end
@@ -1012,10 +1027,12 @@ local artefact_on_update_functions = {
 	-- Lucifer, Perk: The Lucifer Effect
 	af_lucifer = function(actor, artefact_count, artefact_ids, artefact_names)
 		local health_boost = 0.001
-		local power_boost = 0.005
+		local psy_boost = 0.005
+		local power_boost = 0.01
 		local bleeding_cure_boost = 0.0025
+		local speed_boost = 0
 
-		local degradation_rate = 0.0001 --25% per day is 0.0000029
+		local degradation_rate = 0.00000029 * time_factor --25% per day is 0.00000029
 
 		if not artefact_ids[1] then return end
 
@@ -1028,16 +1045,31 @@ local artefact_on_update_functions = {
 			actor:change_health(health_boost * normal_condition)
 			actor:change_power(power_boost * normal_condition)
 			actor.bleeding = bleeding_cure_boost * normal_condition
+			change_psy_health(psy_boost * normal_condition)
+			speed_boost = speed_boosts.af_lucifer.boost * normal_condition
+			local cw = (get_game_factor("weight") or 20) + 50 * normal_condition
+			local mww = cw + (ceil(cw * 0.2) * 2)
+			actor:set_actor_max_weight(cw)
+			actor:set_actor_max_walk_weight(mww)
 		else
-			local normal_condition = -(1 - normalize(condition, 0, 0.5))
-			actor:change_power(power_boost * normal_condition)
-			if condition < 0.3 then
-				actor:change_health(health_boost * normal_condition)
+			local normal_condition = normalize(condition, 0, 0.5) - 1
+			actor:change_power(power_boost * normal_condition * 0.5)
+			if condition < 0.4 then
+				actor:change_health(health_boost * normal_condition * 0.35)
+			end
+			if condition < 0.0001 then
+				condition = 0.011
+				artefact_props.af_lucifer:set_condition(condition, artefact_ids[1])
+				actor:set_health_ex(0)
+				return
 			end
 		end
 
+		add_speed(speed_boosts.af_lucifer.name, 1 + speed_boost, true, true)
+
 		artefact_props.af_lucifer.condition = condition - degradation_rate
 		af_lucifer:set_condition(artefact_props.af_lucifer.condition)
+		trace("Lucifer, condition: %s", artefact_props.af_lucifer.condition * 100)
 	end,
 
 }
@@ -1220,7 +1252,7 @@ local artefact_on_before_death_functions = {
 			actor.radiation	= 0
 			actor.bleeding = 1
 			actor.psy_health = 1
-			arszi_psy.set_psy_health(1)
+			set_psy_health(1)
 		end
 
 		revive()
@@ -1321,6 +1353,11 @@ local artefact_on_before_hit_functions = {
 		for i = 1, artefact_count do
 			CreateTimeEvent("af_cell" .. i, "af_cell" .. i, random_float(0.15, 0.3) * i, rad_sound)
 		end
+	end,
+
+	-- Lucifer, Perk: The Lucifer Effect
+	af_lucifer = function(actor, artefact_count, artefact_ids, artefact_names, s_hit, bone_id, flags)
+		s_hit.power = s_hit.power * (1 - normalize(artefact_props.af_lucifer.condition, 0.5, 1.5)) -- 50% reduction at 100% condition
 	end
 
 }
@@ -1730,7 +1767,7 @@ local artefact_on_equip_functions = {
 			play_sound_on_actor("perk_based_artefacts\\creep_laugh")
 			CreateTimeEvent("lucifer_activate", "lucifer_activate", 0.15, force_refresh_state)
 		end
-	end
+	end,
 
 }
 
