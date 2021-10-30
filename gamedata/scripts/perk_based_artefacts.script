@@ -59,7 +59,7 @@ local translate_string = game.translate_string
 
 local get_game_factor = game_difficulties.get_game_factor
 
-local is_critical_bone = quickdraw_bone_mapper.is_critical_bone
+local is_critical_bone = perk_based_artefacts_bone_mapper.is_critical_bone
 
 local get_nearest_stalker = utils_obj.get_nearest_stalker
 
