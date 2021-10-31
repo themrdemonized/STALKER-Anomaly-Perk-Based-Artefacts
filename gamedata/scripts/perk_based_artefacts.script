@@ -20,6 +20,7 @@ local has_alife_info = has_alife_info
 local hit = hit
 local iempty_table = iempty_table
 local IsAnomaly = IsAnomaly
+local IsArtefact = IsArtefact
 local IsMoveState = IsMoveState
 local normalize = normalize
 local particles_object = particles_object
@@ -33,6 +34,7 @@ local round_100 = round_100
 local SYS_GetParam = SYS_GetParam
 local time_global = time_global
 local UnregisterScriptCallback = UnregisterScriptCallback
+local VEC_Y = VEC_Y
 local vector_rotate_y = vector_rotate_y
 
 local change_psy_health = arszi_psy.change_psy_health
@@ -80,6 +82,8 @@ local sqrt = math.sqrt
 local function round(amount)
 	return floor(amount + 0.5)
 end
+
+local string_find = string.find
 
 local dump = string.dump
 local load = loadstring
@@ -217,6 +221,7 @@ local function play_sound_on_actor(snd, volume, frequency)
 		snd:play(actor, 0, sound_object.s2d)
 		snd.volume = volume or 1
 		snd.frequency = frequency or 1
+		return snd
 	end
 end
 
@@ -250,31 +255,6 @@ local function look_at_nearest_npc(npc, actor)
 		actor:actor_look_at_point(npc_position)
 	end
 end
-
--- Custom Dynamic Functors test
--- NameCustom = ui_inventory.UIInventory.Name_Custom
--- function ui_inventory.UIInventory:Name_Custom(obj, bag, temp, i)
---     obj = self:CheckItem(obj,"Name_Custom " .. i)
---     if i == 2 and has_parts(obj) then -- menu field strip
---         return menu_field_strip(obj)
---     elseif i == 3 and has_parts(obj) then -- check unjam
---         return check_unjam(obj)
---     else
---         return NameCustom(self, obj, bag, temp, i)
---     end
--- end
-
--- ActionCustom = ui_inventory.UIInventory.Action_Custom
--- function ui_inventory.UIInventory:Action_Custom(obj, bag, temp, i)
---     obj = self:CheckItem(obj,"Action_Custom " .. i)
---     if i == 2 and has_parts(obj) then -- menu field strip
---         field_strip(obj)
---     elseif i == 3 and has_parts(obj) then -- check unjam
---         unjam_wep(obj)
---     else
---         ActionCustom(self, obj, bag, temp, i)
---     end
--- end
 
 -- Artefacts
 local iterate_belt
@@ -878,9 +858,21 @@ local artefact_props = { -- Special props of artefacts that are used in processi
 		end
 	},
 	af_lucifer = {
-		ignore_tiers = { -- Tier to condition ignore list
-			["af_serofim"] = true
-		},
+		ignore_tiers = (function()  -- Artefacts ignore list
+			local t = {}
+			t["af_serofim"] = true -- Seraphim
+			t["af_lucifer"] = true -- Can't sacrifice itself
+			ini_sys:section_for_each(function(sec)
+				if SYS_GetParam(0, sec, "kind", "") == "i_arty_cont" then -- Exclude artefacts in containers
+					t[sec] = true
+				elseif SYS_GetParam(0, sec, "kind", "") == "i_attach" then -- Exclude attachments
+					t[sec] = true
+				elseif SYS_GetParam(1, sec, "quest_item", false) then -- Exclude quest items
+					t[sec] = true
+				end
+			end)
+			return t
+		end)(),
 		sacrifice_tiers = { -- Tier to condition restore associations
 			[1] = {
 				min = 3,
@@ -907,7 +899,7 @@ local artefact_props = { -- Special props of artefacts that are used in processi
 					"perk_based_artefacts\\item-soul-gold",
 				}
 			},
-			["af_knot"] = {
+			["af_fire_loop"] = {
 				min = 20,
 				max = 30,
 				sound = {
@@ -947,12 +939,55 @@ local artefact_props = { -- Special props of artefacts that are used in processi
 		change_condition = function(self, amount, id)
 			return self:set_condition(self.condition + amount, id)
 		end,
-		sacrifice_artefact = function(self, section, id)
+		sacrifice_artefact = function(self, obj, id)
+			local section = obj:section()
 			if self.ignore_tiers[section] then return end
-			local tier = self.sacrifice_tiers[section] or self.sacrifice_tiers[clamp(SYS_GetParam(0, section, "tier", 0), 0, 3)]
+			local tier = self.sacrifice_tiers[section] or self.sacrifice_tiers[clamp(SYS_GetParam(2, section, "tier", 0), 0, 3)]
 			if tier then
-				play_sound_on_actor(get_random_array_element(tier.sound), 1, random_float(0.93, 1))
-				return self:change_condition(random(tier.min, tier.max), id)
+				alife_release_id(obj:id())
+				CreateTimeEvent("refresh_artefacts", "refresh_artefacts", 0.15, refresh_artefacts_time_event_func, true)
+				local snd = play_sound_on_actor(get_random_array_element(tier.sound), 1, random_float(0.93, 1))
+				if section == "af_death_lamp" then
+					-- Put Overcharge Bonus There
+					if random(100) < 50 then
+						CreateTimeEvent("af_death_lamp", "af_death_lamp", 2, function()
+							snd:stop()
+
+							local actor = db.actor
+							local actor_id = AC_ID
+							local actor_position = actor:position()
+							local actor_level_vertex_id = actor:level_vertex_id()
+							local actor_game_vertex_id = actor:game_vertex_id()
+
+							local function explode(explode_id)
+								local explode_obj = get_object_by_id(explode_id)
+								if explode_obj then
+									trace("explode_obj spawned")
+									explode_obj:explode(0)
+									trace("explode obj exploded")
+
+									local s_hit = hit()
+									s_hit.power = 1000
+									s_hit.type = hit.explosion
+									s_hit.impulse = 10000
+									s_hit.direction = VEC_Y
+									s_hit.draftsman = actor
+
+									actor:hit(s_hit)
+
+									return true
+								end
+								trace("explode_obj not spawned yet")
+								return false
+							end
+
+							local explode_obj = alife_create_item("ied_new_blow", {actor_position, actor_level_vertex_id, actor_game_vertex_id, nil})
+							CreateTimeEvent(explode_obj.id, explode_obj.id, 0, explode, explode_obj.id)
+							return true
+						end)
+					end
+				end
+				return self:change_condition(random(tier.min, tier.max) * 0.01, id)
 			end
 		end
 	}
@@ -1830,6 +1865,37 @@ local artefact_on_equip_functions = {
 }
 
 -- Special monkey patches for some artefacts to make their effects work
+-- Custom Dynamic Functors for Lucifer
+local function check_sacrifice(sec)
+	if not artefact_props.af_lucifer.ignore_tiers[sec] then
+		trace("%s is valid", sec)
+		return "st_pba_sacrifice"
+	end
+end
+
+local NameCustom = ui_inventory.UIInventory.Name_Custom
+function ui_inventory.UIInventory:Name_Custom(obj, bag, temp, i)
+    obj = self:CheckItem(obj,"Name_Custom " .. i)
+    trace(obj:section())
+    if i == 2 and IsArtefact(obj) and check_lucifer() then
+    	trace("%s checking for sacrifice", obj:section())
+        return check_sacrifice(obj:section())
+    else
+        return NameCustom(self, obj, bag, temp, i)
+    end
+end
+
+local ActionCustom = ui_inventory.UIInventory.Action_Custom
+function ui_inventory.UIInventory:Action_Custom(obj, bag, temp, i)
+    obj = self:CheckItem(obj,"Action_Custom " .. i)
+    trace(obj:section())
+    if i == 2 and IsArtefact(obj) and check_lucifer() then
+        return artefact_props.af_lucifer:sacrifice_artefact(obj)
+    else
+        return ActionCustom(self, obj, bag, temp, i)
+    end
+end
+
 -- Patch for Ball for kicking monsters
 local use_kick = bind_monster.generic_object_binder.use_kick
 bind_monster.generic_object_binder.use_kick = function(self, obj, who)
