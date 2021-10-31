@@ -11,6 +11,7 @@ local AC_ID = AC_ID
 local alife_create_item = alife_create_item
 local alife_release = alife_release
 local alife_release_id = alife_release_id
+local clamp = clamp
 local CreateTimeEvent = CreateTimeEvent
 local empty_table = empty_table
 local get_console = get_console
@@ -206,6 +207,10 @@ local function get_current_weather()
 end
 
 local function play_sound_on_actor(snd, volume, frequency)
+	if not snd then
+		trace("snd is nil")
+		return
+	end
 	local actor = db.actor
 	local snd = get_safe_sound_object(snd)
 	if snd then
@@ -873,6 +878,51 @@ local artefact_props = { -- Special props of artefacts that are used in processi
 		end
 	},
 	af_lucifer = {
+		ignore_tiers = { -- Tier to condition ignore list
+			["af_serofim"] = true
+		},
+		sacrifice_tiers = { -- Tier to condition restore associations
+			[1] = {
+				min = 3,
+				max = 5,
+				sound = {
+					"perk_based_artefacts\\item-soul-take",
+					"perk_based_artefacts\\item-soul-take1",
+					"perk_based_artefacts\\item-soul-take2",
+					"perk_based_artefacts\\item-soul-take3",
+					"perk_based_artefacts\\item-soul-take4",
+				}
+			},
+			[2] = {
+				min = 6,
+				max = 9,
+				sound = {
+					"perk_based_artefacts\\item-soul-red",
+				}
+			},
+			[3] = {
+				min = 10,
+				max = 13,
+				sound = {
+					"perk_based_artefacts\\item-soul-gold",
+				}
+			},
+			["af_knot"] = {
+				min = 20,
+				max = 30,
+				sound = {
+					"perk_based_artefacts\\take-megahealth",
+				}
+			},
+			["af_death_lamp"] = {
+				min = 100,
+				max = 100,
+				sound = {
+					"perk_based_artefacts\\item-wm-take-mono",
+					"perk_based_artefacts\\item-wm-take",
+				}
+			}
+		},
 		condition = 1,
 		check_lucifer = function(self)
 			-- return has_alife_info("lucifer_active") and db.actor:object("af_lucifer")
@@ -896,7 +946,15 @@ local artefact_props = { -- Special props of artefacts that are used in processi
 		end,
 		change_condition = function(self, amount, id)
 			return self:set_condition(self.condition + amount, id)
-		end	
+		end,
+		sacrifice_artefact = function(self, section, id)
+			if self.ignore_tiers[section] then return end
+			local tier = self.sacrifice_tiers[section] or self.sacrifice_tiers[clamp(SYS_GetParam(0, section, "tier", 0), 0, 3)]
+			if tier then
+				play_sound_on_actor(get_random_array_element(tier.sound), 1, random_float(0.93, 1))
+				return self:change_condition(random(tier.min, tier.max), id)
+			end
+		end
 	}
 }
 

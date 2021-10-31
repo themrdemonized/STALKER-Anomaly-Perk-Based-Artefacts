@@ -141,6 +141,7 @@ So far the perks are
   -- Tier 2 artefacts restore 7-9%
   -- Tier 3 artefacts restore 10-13%
   -- Extra Knot artefacts restore 25-35%
+  -- Seraphim can't be sacrificed
   -- Death Lamp will overcharge artefact, restoring it to 100% and temporarily boosting it even more
   -- There is a slight chance that overcharging with Death Lamp will tear you apart
   -- You can not dispose the artefact by any means

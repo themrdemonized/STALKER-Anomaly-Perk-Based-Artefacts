@@ -25,7 +25,7 @@ Artefact that gives significant buff to psy regen but makes you do crazy shit
 5 shots or 6
 there is 50% chance that last shoy in the mag will not consume ammo
 
-Moss, Perk: The Call of Feral
+Moss, Perk: Culinary Hyperversity
 Eating raw uncooked mutant meat grants you temporary change of stats
 The degree of bonuses varies, mutant parts can give boost to some stats and give penalty to others
 Extra artefacts and eating same part multiple times does not stack the effect
@@ -38,7 +38,7 @@ Unfortunately it's kinda painful and shameful so you will get 5% of health and 1
 
 cocoon, perk: Stone Skin
 Receiving melee damage grants you stone skin stack
-With each stack you get 10% melee damage protection but receive 10% speed penalty
+With receiving stack you get 10% melee damage protection but receive 10% speed penalty
 Each stack grows protection with diminishing returns and penalize speed more
 Maximum 10 stacks is possible, at which you receive 75% reduction of melee damage but become completely immobilized
 Effect last for 10 seconds, after which all stacks are burned
