@@ -12,12 +12,12 @@ local alife_create_item = alife_create_item
 local alife_release = alife_release
 local alife_release_id = alife_release_id
 local clamp = clamp
+local copy_table = copy_table
 local CreateTimeEvent = CreateTimeEvent
 local empty_table = empty_table
 local get_console = get_console
 local give_info = give_info
 local has_alife_info = has_alife_info
-local hit = hit
 local iempty_table = iempty_table
 local IsAnomaly = IsAnomaly
 local IsArtefact = IsArtefact
@@ -891,7 +891,7 @@ local artefact_props = { -- Special props of artefacts that are used in processi
 			play_sound_on_actor("perk_based_artefacts\\cocoon" .. random(4), 1, random_float(0.92, 1))
 
 			if self.protection_stacks < 10 then
-				self.protection_stacks = self.protection_stacks + 1 * artefact_count
+				self.protection_stacks = min(self.protection_stacks + 1 * artefact_count, 10)
 			end
 
 			add_speed(self.speed_penalty_name, self.speed_penalty[self.protection_stacks], false, true)
@@ -994,41 +994,35 @@ local artefact_props = { -- Special props of artefacts that are used in processi
 				if section == "af_death_lamp" then
 					-- Put Overcharge Bonus There
 					if random(100) < 50 then
-						CreateTimeEvent("af_death_lamp", "af_death_lamp", 2, function()
-							snd:stop()
 
-							local actor = db.actor
-							local actor_id = AC_ID
-							local actor_position = actor:position()
-							local actor_level_vertex_id = actor:level_vertex_id()
-							local actor_game_vertex_id = actor:game_vertex_id()
+						local function die()
+							local s_hit = _G.hit()
+							s_hit.power = 1000
+							s_hit.type = hit.explosion
+							s_hit.impulse = 10000
+							s_hit.direction = _G.VEC_Y
+							s_hit.draftsman = db.actor
+
+							bind_stalker_ext.invulnerable_time = _G.time_global() - 500  -- Prevent cheating death on save/load
 
 							local function explode(explode_id)
-								local explode_obj = get_object_by_id(explode_id)
+								local explode_obj = _G.get_object_by_id(explode_id)
 								if explode_obj then
-									trace("explode_obj spawned")
 									explode_obj:explode(0)
-									trace("explode obj exploded")
-
-									local s_hit = hit()
-									s_hit.power = 1000
-									s_hit.type = hit.explosion
-									s_hit.impulse = 10000
-									s_hit.direction = VEC_Y
-									s_hit.draftsman = actor
-
-									actor:hit(s_hit)
-
+									if snd then snd:stop() end
 									return true
 								end
-								trace("explode_obj not spawned yet")
 								return false
 							end
 
-							local explode_obj = alife_create_item("ied_new_blow", {actor_position, actor_level_vertex_id, actor_game_vertex_id, nil})
-							CreateTimeEvent(explode_obj.id, explode_obj.id, 0, explode, explode_obj.id)
-							return true
-						end)
+							_G.printf("p %s, t %s, i %s, d %s, dm %s", s_hit.power, s_hit.type, s_hit.impulse, s_hit.direction, s_hit.draftsman)
+							db.actor:hit(s_hit)
+
+							local explode_obj = _G.alife_create_item("ied_new_blow", {db.actor:position(), db.actor:level_vertex_id(), db.actor:game_vertex_id(), nil})
+							_G.CreateTimeEvent(explode_obj.id, explode_obj.id, 0, explode, explode_obj.id)
+						end
+
+						add_timed_effect(1.8, nil, nil, die, nil, "af_death_lamp_die")
 					end
 				end
 				return self:change_condition(random(tier.min, tier.max) * 0.01, id)
@@ -2319,7 +2313,8 @@ local function save_state(m_data)
 	local t = {}
 	for key, effect in pairs(timed_effects) do
 		if effect.save then
-			t[key] = effect
+			t[key] = {}
+			copy_table(t[key], effect)
 			t[key].effect = nil
 			t[key].on_end = nil
 		end
