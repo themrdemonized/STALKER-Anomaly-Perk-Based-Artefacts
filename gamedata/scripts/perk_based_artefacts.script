@@ -368,25 +368,6 @@ local function unregister_callbacks()
 end
 
 -- Effects
-local speed_boosts = { -- Table of speed boosts for different artefacts
-	af_generator = {
-		name = "af_generator_boost",
-		boost = 0.135
-	},
-	af_lucifer = {
-		name = "af_lucifer_boost",
-		boost = 0.35
-	}
-}
-
-local add_speed = speed.add_speed
-local remove_speed = speed.remove_speed
-local function remove_speed_boosts()
-	for boost, props in pairs(speed_boosts) do
-		remove_speed(props.name)
-	end
-end
-
 local cooldowns = {} -- Table of cooldowns of artefacts (["artefact"] = time_elapsed + cooldown)
 local function add_cooldown(cooldown, name)
 	trace("added cooldown, name %s, time %s, current_time %s", name, time_elapsed + (cooldown or 0), time_elapsed)
@@ -508,6 +489,25 @@ local function process_timed_effects()
 			end
 			timed_effects[key] = nil
 		end
+	end
+end
+
+local speed_boosts = { -- Table of speed boosts for different artefacts
+	af_generator = {
+		name = "af_generator_boost",
+		boost = 0.135
+	},
+	af_lucifer = {
+		name = "af_lucifer_boost",
+		boost = 0.35
+	}
+}
+
+local add_speed = speed.add_speed
+local remove_speed = speed.remove_speed
+local function remove_speed_boosts()
+	for boost, props in pairs(speed_boosts) do
+		remove_speed(props.name)
 	end
 end
 
@@ -944,7 +944,7 @@ local artefact_on_update_functions = {
 
 		local actor_health = round_100(actor.health)
 		if actor_health < health_threshold then
-			local health = (health_threshold - actor_health) * 0.0042 * artefact_count * (check_lucifer() and min(normalize(artefact_props.af_lucifer.condition, -0.25, 0.5), 1) or 1) --66% of reduction at 0 Lucifer condition
+			local health = (health_threshold - actor_health) * 0.0042 * artefact_count * (artefact_props.af_lucifer:check_lucifer() and min(normalize(artefact_props.af_lucifer.condition, -0.25, 0.5), 1) or 1) --66% of reduction at 0 Lucifer condition
 			actor:change_health(health)
 			trace("firing Will to Live, health %s", health)
 		end

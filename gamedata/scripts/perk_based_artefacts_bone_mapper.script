@@ -918,7 +918,7 @@ function is_critical_bone(c, bone)
 	local creature_b = creature_t[bone]
 	if not creature_b then return false end
 
-	--printf("current bone %s, damage %s, critical %s", bone, creature_b[1], creature_b[2] == critical_damage)
+	--printf("current bone %s, name %s, critical %s", bone, creature_b[1], creature_b[2] == critical_damage)
 	return creature_b[2] == critical_damage
 end
 -- code demonized end
