@@ -2,8 +2,6 @@ Arts to do:
 Bat
 Monolith Shard (if needed)
 Chain (will be Sin exclusive artefact, not programmed yet)
-Cocoon
-Knot (Lucifer Artefact)
 Lamp
 Lighthouse
 Medalion
@@ -35,12 +33,4 @@ Eating different mutant meat overrides previous effect and reset the timer
 Medallion, perk: Golden rain
 Roubles will drop from the sky right on top of your head
 Unfortunately it's kinda painful and shameful so you will get 5% of health and 10% of psy damage on each occurrence 
-
-cocoon, perk: Stone Skin
-Receiving melee damage grants you stone skin stack
-With receiving stack you get 10% melee damage protection but receive 10% speed penalty
-Each stack grows protection with diminishing returns and penalize speed more
-Maximum 10 stacks is possible, at which you receive 75% reduction of melee damage but become completely immobilized
-Effect last for 10 seconds, after which all stacks are burned
-Multiple artefact increase the rate of gaining stacks
 

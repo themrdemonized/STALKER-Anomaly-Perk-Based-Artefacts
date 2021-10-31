@@ -1,4 +1,4 @@
-Perk Based Artefacts, 0.07
+Perk Based Artefacts, 0.08
 A unique twist on overhauling old junk artefacts beyond the boundaries of simple stat changers
 Junk artefacts are no longer junk and received unique special abilities or Perks. The degree of perks vary from simple boosters to marvellous staff like recharging batteries by stepping in Electra, receiving Money on Headshots or Even Evading Death itself when all hope is lost.
 Multiple artefacts might or might not stack the effects and penalties of Perks in various ways, and effects are triggered on very various conditions
@@ -116,6 +116,14 @@ So far the perks are
   -- Only electric, thermal and chemical anomalies are valid for infusion, including fields
   -- Effect lasts for 3 minutes, the artefact must be equipped for the effect to work
   -- Does not stack in any way
+
+  -- Cocoon, perk: Stone Skin
+  -- Receiving melee damage grants you stone skin stack
+  -- With receiving stack you get 10% melee damage protection but receive 10% speed penalty
+  -- Each stack grows protection with diminishing returns and penalize speed more
+  -- Maximum 10 stacks is possible, at which you receive 75% reduction of melee damage but become completely immobilized
+  -- Effect lasts for 10 seconds, after which all stacks are burned
+  -- Multiple artefact increase the rate of gaining stacks
 
   -- Knot, Perk: Deal with the Devil
   -- Gamechanger Artefact

@@ -857,6 +857,50 @@ local artefact_props = { -- Special props of artefacts that are used in processi
 			end
 		end
 	},
+	af_cocoon = {
+		valid_hits = { -- Valid hit types to trigger
+			[hit.wound] = true,
+			[hit.strike] = true
+		},
+		protection_stacks = 0,
+		protection_bonus = (function()
+			local t = {}
+			t[0] = 1
+			for stacks = 1, 10 do
+				t[stacks] = 1 - round((10.277777 - 0.277777 * stacks) * stacks) * 0.01 -- 10 -> 75% parabolic curve
+			end
+			return t
+		end)(),
+		speed_penalty_name = "af_cocoon_speed_penalty",
+		speed_penalty = (function()
+			local t = {}
+			for stacks = 1, 10 do
+				t[stacks] = 1 - stacks * 0.1
+			end
+			return t
+		end)(),
+		stack_reset = function(self)
+			trace("Cocoon: stack reset")
+			self.protection_stacks = 0
+			remove_speed(self.speed_penalty_name)
+			play_sound_on_actor("perk_based_artefacts\\cocoon_free", 1, random_float(0.92, 1))
+		end,
+		on_before_hit = function(self, actor, artefact_count, artefact_ids, artefact_names, s_hit, bone_id, flags)
+			trace("Cocoon, stacks %s, reduction %s", self.protection_stacks, self.protection_bonus[self.protection_stacks])
+			s_hit.power = s_hit.power * self.protection_bonus[self.protection_stacks]
+			play_sound_on_actor("perk_based_artefacts\\cocoon" .. random(4), 1, random_float(0.92, 1))
+
+			if self.protection_stacks < 10 then
+				self.protection_stacks = self.protection_stacks + 1 * artefact_count
+			end
+
+			add_speed(self.speed_penalty_name, self.speed_penalty[self.protection_stacks], false, true)
+			add_speed(self.speed_penalty_name, self.speed_penalty[self.protection_stacks], true, true)
+			add_simple_timed_effect(10, nil, function()
+				self:stack_reset()
+			end, "af_cocoon_speed_penalty")
+		end
+	},
 	af_lucifer = {
 		ignore_tiers = (function()  -- Artefacts ignore list
 			local t = {}
@@ -1159,6 +1203,7 @@ local artefact_on_update_functions = {
 		end
 
 		add_speed(speed_boosts.af_lucifer.name, 1 + speed_boost, true, true)
+		add_speed(speed_boosts.af_lucifer.name, 1 + speed_boost, false, true)
 
 		artefact_props.af_lucifer.condition = condition - degradation_rate
 		af_lucifer:set_condition(artefact_props.af_lucifer.condition)
@@ -1446,6 +1491,16 @@ local artefact_on_before_hit_functions = {
 		for i = 1, artefact_count do
 			CreateTimeEvent("af_cell" .. i, "af_cell" .. i, random_float(0.15, 0.3) * i, rad_sound)
 		end
+	end,
+
+	-- Cocoon, perk: Stone Skin
+	af_cocoon = function(actor, artefact_count, artefact_ids, artefact_names, s_hit, bone_id, flags)
+		if not artefact_props.af_cocoon.valid_hits[s_hit.type] then
+			trace("Cocoon, not a valid hit type %s", s_hit.type)
+			return
+		end
+
+		artefact_props.af_cocoon:on_before_hit(actor, artefact_count, artefact_ids, artefact_names, s_hit, bone_id, flags)
 	end,
 
 	-- Lucifer, Perk: The Lucifer Effect
@@ -1877,7 +1932,7 @@ local NameCustom = ui_inventory.UIInventory.Name_Custom
 function ui_inventory.UIInventory:Name_Custom(obj, bag, temp, i)
     obj = self:CheckItem(obj,"Name_Custom " .. i)
     trace(obj:section())
-    if i == 2 and IsArtefact(obj) and check_lucifer() then
+    if i == 10 and IsArtefact(obj) and check_lucifer() then
     	trace("%s checking for sacrifice", obj:section())
         return check_sacrifice(obj:section())
     else
@@ -1889,7 +1944,7 @@ local ActionCustom = ui_inventory.UIInventory.Action_Custom
 function ui_inventory.UIInventory:Action_Custom(obj, bag, temp, i)
     obj = self:CheckItem(obj,"Action_Custom " .. i)
     trace(obj:section())
-    if i == 2 and IsArtefact(obj) and check_lucifer() then
+    if i == 10 and IsArtefact(obj) and check_lucifer() then
         return artefact_props.af_lucifer:sacrifice_artefact(obj)
     else
         return ActionCustom(self, obj, bag, temp, i)
