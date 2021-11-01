@@ -1,0 +1,78 @@
+-- Custom Dynamic Functors
+local function func_index(t,a,b)
+	return (t[a].index) < (t[b].index)
+end
+
+local spairs = spairs
+local string_find = string.find
+local string_gsub = string.gsub
+local tonumber = tonumber
+
+ui_inventory.UIInventory.get_max_custom_functor = function(self)
+	local max = 0
+	local max_custom = {}
+	local max_index = 0
+	for k, v in spairs(self.properties, func_index) do
+	    if string_find(k, "custom_.*") then
+	    	if v.index > max_index then
+				max_index = v.index
+			end
+	        x = tonumber(string_gsub(k, "custom_(.*)", "%1"), nil)
+	        if x > max then
+	            max = x
+	            max_custom = v
+	        end
+	    end
+	end
+	return max, max_custom, max_index
+end
+
+ui_inventory.UIInventory.add_custom_functor = function(self)
+	local max, max_custom, max_index = self:get_max_custom_functor()
+	local custom_num = max + 1
+	for k, v in spairs(self.properties, func_index) do
+        if v.index > max_index then
+            v.index = v.index + 1
+        end
+    end
+	self.properties["custom_" .. custom_num] = {
+	    index = max_index + 1,
+	    name_func = {"Name_Custom", max_custom["name_func"][2] + 1},
+	    mode_func = {"Mode_Custom", max_custom["mode_func"][2] + 1},
+	    cont_func = {"Cont_Custom", max_custom["cont_func"][2] + 1},
+	    precondition1 = {"Name_Custom", max_custom["precondition1"][2] + 1},
+	    action = {"Action_Custom", max_custom["action"][2] + 1}
+	}
+	return custom_num
+end
+
+function add_functor(name, cond_name, func_name, cond_action, func_action)
+	if not name then return end
+
+	local ui_inventory_init = ui_inventory.UIInventory.__init
+	ui_inventory.UIInventory.__init = function(self)
+		ui_inventory_init(self)
+		self[name] = self:add_custom_functor()
+	end
+
+	local NameCustom = ui_inventory.UIInventory.Name_Custom
+	function ui_inventory.UIInventory:Name_Custom(obj, bag, temp, i)
+	    obj = self:CheckItem(obj,"Name_Custom " .. i)
+	    if i == self[name] and cond_name(obj) then
+	        return func_name(obj)
+	    else
+	        return NameCustom(self, obj, bag, temp, i)
+	    end
+	end
+
+	local ActionCustom = ui_inventory.UIInventory.Action_Custom
+	function ui_inventory.UIInventory:Action_Custom(obj, bag, temp, i)
+	    obj = self:CheckItem(obj,"Action_Custom " .. i)
+	    if i == self[name] and cond_action(obj) then
+	        return func_action(obj)
+	    else
+	        return ActionCustom(self, obj, bag, temp, i)
+	    end
+	end
+
+end

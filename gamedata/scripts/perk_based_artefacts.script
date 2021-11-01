@@ -19,6 +19,7 @@ local get_console = get_console
 local give_info = give_info
 local has_alife_info = has_alife_info
 local iempty_table = iempty_table
+local ini_sys = ini_sys
 local IsAnomaly = IsAnomaly
 local IsArtefact = IsArtefact
 local IsMoveState = IsMoveState
@@ -31,6 +32,7 @@ local RegisterScriptCallback = RegisterScriptCallback
 local RemoveTimeEvent = RemoveTimeEvent
 local ResetTimeEvent = ResetTimeEvent
 local round_100 = round_100
+local spairs = spairs
 local SYS_GetParam = SYS_GetParam
 local time_global = time_global
 local UnregisterScriptCallback = UnregisterScriptCallback
@@ -84,6 +86,7 @@ local function round(amount)
 end
 
 local string_find = string.find
+local string_gsub = string.gsub
 
 local dump = string.dump
 local load = loadstring
@@ -997,7 +1000,7 @@ local artefact_props = { -- Special props of artefacts that are used in processi
 
 						local function die()
 							local s_hit = _G.hit()
-							s_hit.power = 1000
+							s_hit.power = 10000
 							s_hit.type = hit.explosion
 							s_hit.impulse = 10000
 							s_hit.direction = _G.VEC_Y
@@ -1915,35 +1918,23 @@ local artefact_on_equip_functions = {
 
 -- Special monkey patches for some artefacts to make their effects work
 -- Custom Dynamic Functors for Lucifer
-local function check_sacrifice(sec)
-	if not artefact_props.af_lucifer.ignore_tiers[sec] then
-		trace("%s is valid", sec)
+local function check_lucifer_condition(obj)
+	return IsArtefact(obj) and check_lucifer()
+end
+
+local function check_sacrifice(obj)
+	if not artefact_props.af_lucifer.ignore_tiers[obj:section()] then
+		trace("%s is valid", obj:section())
 		return "st_pba_sacrifice"
 	end
 end
 
-local NameCustom = ui_inventory.UIInventory.Name_Custom
-function ui_inventory.UIInventory:Name_Custom(obj, bag, temp, i)
-    obj = self:CheckItem(obj,"Name_Custom " .. i)
-    trace(obj:section())
-    if i == 10 and IsArtefact(obj) and check_lucifer() then
-    	trace("%s checking for sacrifice", obj:section())
-        return check_sacrifice(obj:section())
-    else
-        return NameCustom(self, obj, bag, temp, i)
-    end
+local function lucifer_sacrifice(obj)
+	return artefact_props.af_lucifer:sacrifice_artefact(obj)
 end
 
-local ActionCustom = ui_inventory.UIInventory.Action_Custom
-function ui_inventory.UIInventory:Action_Custom(obj, bag, temp, i)
-    obj = self:CheckItem(obj,"Action_Custom " .. i)
-    trace(obj:section())
-    if i == 10 and IsArtefact(obj) and check_lucifer() then
-        return artefact_props.af_lucifer:sacrifice_artefact(obj)
-    else
-        return ActionCustom(self, obj, bag, temp, i)
-    end
-end
+local add_functor = custom_functor_autoinject.add_functor
+add_functor("lucifer", check_lucifer_condition, check_sacrifice, check_lucifer_condition, lucifer_sacrifice)
 
 -- Patch for Ball for kicking monsters
 local use_kick = bind_monster.generic_object_binder.use_kick
