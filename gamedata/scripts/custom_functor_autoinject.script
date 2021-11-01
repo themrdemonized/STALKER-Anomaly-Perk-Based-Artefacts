@@ -11,6 +11,12 @@ local function func_value(t, a, b)
 	return t[a] < t[b]
 end
 
+local spairs = spairs
+local string_find = string.find
+local string_gsub = string.gsub
+local table_remove = table.remove
+local tonumber = tonumber
+
 -- Removing element from table and shifting down both key and value
 -- Modes: 0 - index, 1 - value, 2 - key, 3 - key-index
 local function table_remove_shift(t, val, mode)
@@ -62,12 +68,6 @@ local function table_remove_shift(t, val, mode)
 	end
 	return res
 end
-
-local spairs = spairs
-local string_find = string.find
-local string_gsub = string.gsub
-local table_remove = table.remove
-local tonumber = tonumber
 
 local ui_inventory_init = ui_inventory.UIInventory.__init
 ui_inventory.UIInventory.__init = function(self)
