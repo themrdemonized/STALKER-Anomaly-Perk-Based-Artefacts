@@ -1052,7 +1052,11 @@ artefact_props = { -- Special props of artefacts that are used in processing
 		sacrifice_artefact = function(self, obj, id)
 			local section = obj:section()
 			if self.ignore_tiers[section] then return end
-			local tier = self.sacrifice_tiers[section] or self.sacrifice_tiers[clamp(SYS_GetParam(2, section, "tier", 0), 0, 3)]
+			local tier_level = SYS_GetParam(2, section, "tier", 0)
+			if tier_level > 1 then
+				tier_level = tier_level - 1 -- Lower tier level by 1 of all tier 2+ artefacts
+			end
+			local tier = self.sacrifice_tiers[section] or self.sacrifice_tiers[clamp(tier_level, 0, 3)] 
 			if tier then
 				alife_release_id(obj:id())
 				CreateTimeEvent("refresh_artefacts", "refresh_artefacts", 0.15, refresh_artefacts_time_event_func, true)
