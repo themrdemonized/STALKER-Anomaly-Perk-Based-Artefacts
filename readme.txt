@@ -153,7 +153,6 @@ So far the perks are
   -- Death Lamp will overcharge artefact, restoring it to 100% and temporarily boosting it even more
   -- There is a slight chance that overcharging with Death Lamp will tear you apart
   -- You can not dispose the artefact by any means
-  -- Lucifer messed with your PDA radio, seldomly turning the strange song called "The Lucifer Effect". It sounds so horrific that it might be written in the fricking Hell itself (WIP)
   -- Lucifer has unknown influence on other artefacts, enhancing their effects in various ways 
   -- Find more artefacts to restore Lucifer's condition or face the consequences
   -- Table of enhancements:
