@@ -499,7 +499,8 @@ local function remove_speed_boosts()
 	end
 end
 
-local artefact_props = { -- Special props of artefacts that are used in processing
+local artefact_props
+artefact_props = { -- Special props of artefacts that are used in processing
 	af_black_angel = {
 		dice_roll = 0,
 		reflect_chance = (function() -- LUT with chances to trigger by artefact count
@@ -613,19 +614,81 @@ local artefact_props = { -- Special props of artefacts that are used in processi
 		valid_hits = { -- Valid hit types to trigger
 			[hit.wound] = true
 		},
+		dice_roll = 0,
 		on_before_hit = function(self, actor, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
 			if not self.valid_hits[s_hit.type] then
 				trace("Claw, not a valid hit type %s", s_hit.type)
 				return
 			end
 
-			s_hit.power = s_hit.power * (1 + artefact_count * 0.1)
+			local lucifer_bonus = max(1 - normalize(artefact_props.af_lucifer.condition, 0, 0.5), 0)
+
+			s_hit.power = s_hit.power * (1 + artefact_count * 0.1) * (1 + lucifer_bonus)
 			local health_boost = s_hit.power * 0.0035 * artefact_count
 
 			add_simple_timed_effect(1, function()
 				actor:change_health(health_boost)
 			end)
+
+			self.dice_roll = random()
+			if artefact_props.af_lucifer:check_lucifer() and self.dice_roll < (lucifer_bonus * lucifer_bonus) then -- Squared chance to have less proc on better condition
+				s_hit.power = 10000
+				play_sound_on_actor("perk_based_artefacts\\GNTEAR0" .. random(2), 0.75, random_float(0.9, 1.0))
+			end
 		end,
+		on_death = function(self, actor, artefact_count, artefact_ids, artefact_names, monster, who, last_monster_hit, last_monster_hit_bone_index)
+			local monster_id = monster:id()
+			local monster_position = monster:position()
+			local monster_direction = monster:direction()
+			local monster_level_vertex_id = monster:level_vertex_id()
+			local monster_game_vertex_id = monster:game_vertex_id()
+
+			local lucifer_bonus = max(1 - normalize(artefact_props.af_lucifer.condition, 0, 0.5), 0)
+			lucifer_bonus = lucifer_bonus * lucifer_bonus -- Squared chance to have less proc on better condition
+
+			if artefact_props.af_lucifer:check_lucifer() and self.dice_roll < lucifer_bonus then
+				trace("Overpowered Claw, dice_roll %s, chance %s", self.dice_roll, lucifer_bonus)
+				local sim = alife()
+				sim:release(sim:object(monster_id))
+				local gibs = particles_object("new_effects\\krovisha_main")
+				if gibs and not gibs:playing() then
+					gibs:play_at_pos(monster_position)
+					local snd = get_safe_sound_object("perk_based_artefacts\\XDEATH" .. random(5))
+					snd:play_at_pos(monster, monster_position, 0, sound_object.s3d)
+					snd.frequency = random_float(0.95, 1.05)
+				else
+					trace("gibs not found")
+				end
+				artefact_props.af_lucifer:change_condition(0.01)
+			end
+
+			local monster_cls, monster_kind = get_monster_clsid_and_kind(monster)
+			local monster_meat = artefact_props.af_kogot.monster_to_meat[monster_kind] or artefact_props.af_kogot.monster_to_meat[monster_cls]
+			if not (last_monster_hit and artefact_props.af_kogot.valid_hits[last_monster_hit.type] and monster_meat) then
+				trace("Claw not triggered")
+				return
+			end
+
+			local function spawn_meat()
+				local meat_position = monster:position()
+				local meat_direction = monster:direction()
+				meat_direction = vector_rotate_y(meat_direction, random(-180, 180))
+				meat_position.x = meat_position.x + meat_direction.x * random_float(0.5, 0.7)
+				meat_position.y = meat_position.y + meat_direction.y + 1
+				meat_position.z = meat_position.z + meat_direction.z * random_float(0.5, 0.7)
+				local meat_item = alife_create_item(monster_meat, {meat_position, monster_level_vertex_id, monster_game_vertex_id, nil})
+			end
+
+			for i = 1, artefact_count do
+				spawn_meat()
+			end
+
+			if artefact_props.af_lucifer:check_lucifer() and self.dice_roll < lucifer_bonus then
+				for i = 1, 5 do
+					spawn_meat()
+				end
+			end
+		end
 	},
 	af_skull_miser = {
 		money_items = (function() -- Money items to choose and spawn
@@ -1739,6 +1802,11 @@ local artefact_on_npc_death_functions = {
 		artefact_props.af_lucifer:change_condition(0.005)
 	end,
 
+	-- Claw, Perk: Bloodlust
+	af_kogot = function(actor, artefact_count, artefact_ids, artefact_names, npc, who, last_npc_hit, last_npc_hit_bone_index)
+		artefact_props.af_kogot:on_death(actor, artefact_count, artefact_ids, artefact_names, npc, who, last_npc_hit, last_npc_hit_bone_index)
+	end,
+
 	-- Dragon's Eye, Perk: Good ol' Ultra-Violence
 	af_dragon_eye = function(actor, artefact_count, artefact_ids, artefact_names, npc, who, last_npc_hit, last_npc_hit_bone_index)
 		local chance = 5 * artefact_count
@@ -1789,25 +1857,7 @@ local artefact_on_monster_death_functions = {
 
 	-- Claw, Perk: Bloodlust
 	af_kogot = function(actor, artefact_count, artefact_ids, artefact_names, monster, who, last_monster_hit, last_monster_hit_bone_index)
-		local monster_cls, monster_kind = get_monster_clsid_and_kind(monster)
-		local monster_meat = artefact_props.af_kogot.monster_to_meat[monster_kind] or artefact_props.af_kogot.monster_to_meat[monster_cls]
-		if not (last_monster_hit and artefact_props.af_kogot.valid_hits[last_monster_hit.type] and monster_meat) then
-			trace("Claw not triggered")
-			return
-		end
-
-		local monster_level_vertex_id = monster:level_vertex_id()
-		local monster_game_vertex_id = monster:game_vertex_id()
-
-		for i = 1, artefact_count do
-			local meat_position = monster:position()
-			local meat_direction = monster:direction()
-			meat_direction = vector_rotate_y(meat_direction, random(-180, 180))
-			meat_position.x = meat_position.x + meat_direction.x * random_float(0.5, 0.7)
-			meat_position.y = meat_position.y + meat_direction.y + 1
-			meat_position.z = meat_position.z + meat_direction.z * random_float(0.5, 0.7)
-			local meat_item = alife_create_item(monster_meat, {meat_position, monster_level_vertex_id, monster_game_vertex_id, nil})
-		end
+		artefact_props.af_kogot:on_death(actor, artefact_count, artefact_ids, artefact_names, monster, who, last_monster_hit, last_monster_hit_bone_index)
 	end,
 
 	-- Dragon's Eye, Perk: Good ol' Ultra-Violence
