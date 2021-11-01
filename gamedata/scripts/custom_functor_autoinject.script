@@ -120,6 +120,10 @@ ui_inventory.UIInventory.add_custom_functor = function(self, name, cond_name, fu
 
 	if self.custom_functor_names[name] then
 		custom_functor_slot = self.custom_functor_names[name]
+		self.custom_functor[custom_functor_slot].cond_name = cond_name
+		self.custom_functor[custom_functor_slot].func_name = func_name
+		self.custom_functor[custom_functor_slot].cond_action = cond_action
+		self.custom_functor[custom_functor_slot].func_action = func_action
 	else
 		local max, max_custom, max_index = self:get_max_custom_functor()
 		local custom_num = max + 1
@@ -142,18 +146,17 @@ ui_inventory.UIInventory.add_custom_functor = function(self, name, cond_name, fu
 		    action = {"Action_Custom", max_custom["action"][2] + 1}
 		}
 		custom_functor_slot = custom_num
+		self.custom_functor[custom_functor_slot] = {
+			index = custom_functor_slot,
+			properties_index = properties_num,
+			name = name,
+			cond_name = cond_name,
+			func_name = func_name,
+			cond_action = cond_action,
+			func_action = func_action
+		}
+		self.custom_functor_names[name] = custom_functor_slot
 	end
-
-	self.custom_functor[custom_functor_slot] = {
-		index = custom_functor_slot,
-		properties_index = properties_num,
-		name = name,
-		cond_name = cond_name,
-		func_name = func_name,
-		cond_action = cond_action,
-		func_action = func_action
-	}
-	self.custom_functor_names[name] = custom_functor_slot
 end
 
 ui_inventory.UIInventory.remove_custom_functor = function(self, name)
