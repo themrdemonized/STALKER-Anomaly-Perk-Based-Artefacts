@@ -61,7 +61,7 @@ function add_functor(name, cond_name, func_name, cond_action, func_action)
 		ui_inventory.GUI = ui_inventory.UIInventory()
 	end
 
-	ui_inventory.GUI[name] = ui_inventory.GUI:add_custom_functor()
+	ui_inventory.GUI[name] = ui_inventory.GUI[name] or ui_inventory.GUI:add_custom_functor()
 
 	local NameCustom = ui_inventory.GUI.Name_Custom
 	function ui_inventory.GUI:Name_Custom(obj, bag, temp, i)
