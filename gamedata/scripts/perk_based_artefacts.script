@@ -487,7 +487,7 @@ local speed_boosts = { -- Table of speed boosts for different artefacts
 	},
 	af_lucifer = {
 		name = "af_lucifer_boost",
-		boost = 0.35
+		boost = 0.3
 	}
 }
 
@@ -1910,7 +1910,14 @@ local artefact_on_equip_functions = {
 			alife_release_id(artefact_ids[1])
 			give_info("lucifer_active")
 			play_sound_on_actor("perk_based_artefacts\\creep_laugh")
-			CreateTimeEvent("lucifer_activate", "lucifer_activate", 0.15, force_refresh_state)
+			CreateTimeEvent("lucifer_activate", "lucifer_activate", 0.15, function()
+				force_refresh_state()
+				CreateTimeEvent("lucifer_activate2", "lucifer_activate2", 0.15, function()
+					ui_inventory.GUI:UpdateWeight()
+					return true
+				end)
+				return true
+			end)
 		end
 	end,
 

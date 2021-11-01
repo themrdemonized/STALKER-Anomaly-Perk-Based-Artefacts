@@ -3,6 +3,10 @@ local function func_index(t,a,b)
 	return (t[a].index) < (t[b].index)
 end
 
+local function func_index_reverse(t,a,b)
+	return (t[a].index) > (t[b].index)
+end
+
 local spairs = spairs
 local string_find = string.find
 local string_gsub = string.gsub
@@ -30,9 +34,13 @@ end
 ui_inventory.UIInventory.add_custom_functor = function(self)
 	local max, max_custom, max_index = self:get_max_custom_functor()
 	local custom_num = max + 1
-	for k, v in spairs(self.properties, func_index) do
+	for k, v in spairs(self.properties, func_index_reverse) do
         if v.index > max_index then
+        	-- printf("%s, %s", k, v.index)
             v.index = v.index + 1
+        else
+        	-- printf("%s, %s, max custom_functor reached", k, v.index)
+        	break
         end
     end
 	self.properties["custom_" .. custom_num] = {
