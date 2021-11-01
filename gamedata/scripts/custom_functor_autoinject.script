@@ -12,7 +12,7 @@ ui_inventory.UIInventory.get_max_custom_functor = function(self)
 	local max = 0
 	local max_custom = {}
 	local max_index = 0
-	for k, v in spairs(self.properties, func_index) do
+	for k, v in pairs(self.properties) do
 	    if string_find(k, "custom_.*") then
 	    	if v.index > max_index then
 				max_index = v.index
@@ -49,14 +49,14 @@ end
 function add_functor(name, cond_name, func_name, cond_action, func_action)
 	if not name then return end
 
-	local ui_inventory_init = ui_inventory.UIInventory.__init
-	ui_inventory.UIInventory.__init = function(self)
-		ui_inventory_init(self)
-		self[name] = self:add_custom_functor()
+	if not ui_inventory.GUI then
+		ui_inventory.GUI = ui_inventory.UIInventory()
 	end
 
-	local NameCustom = ui_inventory.UIInventory.Name_Custom
-	function ui_inventory.UIInventory:Name_Custom(obj, bag, temp, i)
+	ui_inventory.GUI[name] = ui_inventory.GUI:add_custom_functor()
+
+	local NameCustom = ui_inventory.GUI.Name_Custom
+	function ui_inventory.GUI:Name_Custom(obj, bag, temp, i)
 	    obj = self:CheckItem(obj,"Name_Custom " .. i)
 	    if i == self[name] and cond_name(obj) then
 	        return func_name(obj)
@@ -65,8 +65,8 @@ function add_functor(name, cond_name, func_name, cond_action, func_action)
 	    end
 	end
 
-	local ActionCustom = ui_inventory.UIInventory.Action_Custom
-	function ui_inventory.UIInventory:Action_Custom(obj, bag, temp, i)
+	local ActionCustom = ui_inventory.GUI.Action_Custom
+	function ui_inventory.GUI:Action_Custom(obj, bag, temp, i)
 	    obj = self:CheckItem(obj,"Action_Custom " .. i)
 	    if i == self[name] and cond_action(obj) then
 	        return func_action(obj)
