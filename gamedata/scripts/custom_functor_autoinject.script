@@ -7,10 +7,94 @@ local function func_index_reverse(t,a,b)
 	return (t[a].index) > (t[b].index)
 end
 
+local function func_value(t, a, b)
+	return t[a] < t[b]
+end
+
+-- Removing element from table and shifting down both key and value
+-- Modes: 0 - index, 1 - value, 2 - key, 3 - key-index
+local function table_remove_shift(t, val, mode)
+	local removed = false
+	local res
+	if mode == 0 then
+		for k, v in spairs(t, func_index) do
+			if removed then
+				t[k - 1] = v
+				t[k - 1].v.index = t[k - 1].v.index - 1
+				t[k] = nil
+			elseif v.index == val then
+				res = t[k]
+				t[k] = nil
+				removed = true
+			end
+		end
+	elseif mode == 1 then
+		for k, v in spairs(t, func_value) do
+			if removed then
+				t[k - 1] = v - 1
+				t[k] = nil
+			elseif v == val then
+				res = t[k]
+				t[k] = nil
+				removed = true
+			end
+		end
+	elseif mode == 2 then
+		for k, v in spairs(t, func_value) do
+			if removed then
+				t[k] = v - 1
+			elseif v == val then
+				res = t[k]
+				t[k] = nil
+				removed = true
+			end
+		end
+	elseif mode == 3 then
+		for k, v in spairs(t, func_index) do
+			if removed then
+				t[k].v.index = t[key].v.index - 1
+			elseif v.index == val then
+				res = t[k]
+				t[k] = nil
+				removed = true
+			end
+		end
+	end
+	return res
+end
+
 local spairs = spairs
 local string_find = string.find
 local string_gsub = string.gsub
+local table_remove = table.remove
 local tonumber = tonumber
+
+local ui_inventory_init = ui_inventory.UIInventory.__init
+ui_inventory.UIInventory.__init = function(self)
+	ui_inventory_init(self)
+	self.custom_functor = {}
+	self.custom_functor_names = {}
+end
+
+local NameCustom = ui_inventory.UIInventory.Name_Custom
+function ui_inventory.UIInventory:Name_Custom(obj, bag, temp, i)
+    obj = self:CheckItem(obj,"Name_Custom " .. i)
+    if self.custom_functor[i] and self.custom_functor[i].cond_name(obj) then
+        return self.custom_functor[i].func_name(obj)
+    else
+        return NameCustom(self, obj, bag, temp, i)
+    end
+end
+
+local ActionCustom = ui_inventory.UIInventory.Action_Custom
+function ui_inventory.UIInventory:Action_Custom(obj, bag, temp, i)
+    obj = self:CheckItem(obj,"Action_Custom " .. i)
+    if self.custom_functor[i] and self.custom_functor[i].cond_action(obj) then
+        return self.custom_functor[i].func_action(obj)
+    else
+        return ActionCustom(self, obj, bag, temp, i)
+    end
+end
 
 ui_inventory.UIInventory.get_max_custom_functor = function(self)
 	local max = 0
@@ -21,7 +105,7 @@ ui_inventory.UIInventory.get_max_custom_functor = function(self)
 	    	if v.index > max_index then
 				max_index = v.index
 			end
-	        x = tonumber(string_gsub(k, "custom_(.*)", "%1"), nil)
+	        local x = tonumber(string_gsub(k, "custom_(.*)", "%1"), nil)
 	        if x > max then
 	            max = x
 	            max_custom = v
@@ -31,27 +115,71 @@ ui_inventory.UIInventory.get_max_custom_functor = function(self)
 	return max, max_custom, max_index
 end
 
-ui_inventory.UIInventory.add_custom_functor = function(self)
-	local max, max_custom, max_index = self:get_max_custom_functor()
-	local custom_num = max + 1
-	for k, v in spairs(self.properties, func_index_reverse) do
-        if v.index > max_index then
-        	-- printf("%s, %s", k, v.index)
-            v.index = v.index + 1
-        else
-        	-- printf("%s, %s, max custom_functor reached", k, v.index)
-        	break
-        end
-    end
-	self.properties["custom_" .. custom_num] = {
-	    index = max_index + 1,
-	    name_func = {"Name_Custom", max_custom["name_func"][2] + 1},
-	    mode_func = {"Mode_Custom", max_custom["mode_func"][2] + 1},
-	    cont_func = {"Cont_Custom", max_custom["cont_func"][2] + 1},
-	    precondition1 = {"Name_Custom", max_custom["precondition1"][2] + 1},
-	    action = {"Action_Custom", max_custom["action"][2] + 1}
+ui_inventory.UIInventory.add_custom_functor = function(self, name, cond_name, func_name, cond_action, func_action)
+	local custom_functor_slot
+
+	if self.custom_functor_names[name] then
+		custom_functor_slot = self.custom_functor_names[name]
+	else
+		local max, max_custom, max_index = self:get_max_custom_functor()
+		local custom_num = max + 1
+		local properties_num = max_index + 1
+		for k, v in spairs(self.properties, func_index_reverse) do
+	        if v.index > max_index then
+	        	printf("%s, %s", k, v.index)
+	            v.index = v.index + 1
+	        else
+	        	printf("%s, %s, max custom_functor reached", k, v.index)
+	        	break
+	        end
+	    end
+		self.properties["custom_" .. custom_num] = {
+		    index = properties_num,
+		    name_func = {"Name_Custom", max_custom["name_func"][2] + 1},
+		    mode_func = {"Mode_Custom", max_custom["mode_func"][2] + 1},
+		    cont_func = {"Cont_Custom", max_custom["cont_func"][2] + 1},
+		    precondition1 = {"Name_Custom", max_custom["precondition1"][2] + 1},
+		    action = {"Action_Custom", max_custom["action"][2] + 1}
+		}
+		custom_functor_slot = custom_num
+	end
+
+	self.custom_functor[custom_functor_slot] = {
+		index = custom_functor_slot,
+		properties_index = properties_num,
+		name = name,
+		cond_name = cond_name,
+		func_name = func_name,
+		cond_action = cond_action,
+		func_action = func_action
 	}
-	return custom_num
+	self.custom_functor_names[name] = custom_functor_slot
+end
+
+ui_inventory.UIInventory.remove_custom_functor = function(self, name)
+	if not self.custom_functor_names[name] then return end
+	local index = table_remove_shift(self.custom_functor_names, self.custom_functor_names[name], 2)
+
+	if not index then return end
+	local custom_functor = table_remove_shift(self.custom_functor, index, 0)
+	
+	if not custom_functor then return end
+	local removed = false
+	for k, v in spairs(self.properties, func_index) do
+		if string_find(k, "custom_.*") then
+			if removed then
+				local x = tonumber(string_gsub(k, "custom_(.*)", "%1"), nil) - 1
+				self.properties["custom_" .. x] = self.properties[k]
+				self.properties["custom_" .. x].index = self.properties["custom_" .. x].index - 1
+				self.properties[k] = nil
+			elseif v.index == custom_functor.properties_index then
+				self.properties[k] = nil
+				removed = true
+			end
+		elseif removed then
+			v.index = v.index - 1
+		end
+	end
 end
 
 function add_functor(name, cond_name, func_name, cond_action, func_action)
@@ -61,26 +189,11 @@ function add_functor(name, cond_name, func_name, cond_action, func_action)
 		ui_inventory.GUI = ui_inventory.UIInventory()
 	end
 
-	ui_inventory.GUI[name] = ui_inventory.GUI[name] or ui_inventory.GUI:add_custom_functor()
+	ui_inventory.GUI:add_custom_functor(name, cond_name, func_name, cond_action, func_action)
+end
 
-	local NameCustom = ui_inventory.GUI.Name_Custom
-	function ui_inventory.GUI:Name_Custom(obj, bag, temp, i)
-	    obj = self:CheckItem(obj,"Name_Custom " .. i)
-	    if i == self[name] and cond_name(obj) then
-	        return func_name(obj)
-	    else
-	        return NameCustom(self, obj, bag, temp, i)
-	    end
-	end
+function remove_functor(name)
+	if not name then return end
 
-	local ActionCustom = ui_inventory.GUI.Action_Custom
-	function ui_inventory.GUI:Action_Custom(obj, bag, temp, i)
-	    obj = self:CheckItem(obj,"Action_Custom " .. i)
-	    if i == self[name] and cond_action(obj) then
-	        return func_action(obj)
-	    else
-	        return ActionCustom(self, obj, bag, temp, i)
-	    end
-	end
-
+	ui_inventory.GUI:remove_custom_functor(name)
 end
