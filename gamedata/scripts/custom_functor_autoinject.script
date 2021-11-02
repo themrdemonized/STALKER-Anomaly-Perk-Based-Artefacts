@@ -164,7 +164,10 @@ local function table_remove_shift(t, val, mode)
 		for k, v in spairs(t, func_index) do
 			if removed then
 				t[k - 1] = v
-				t[k - 1].v.index = t[k - 1].v.index - 1
+				t[k - 1].index = t[k - 1].index - 1
+				if t[k - 1].properties_index then
+					t[k - 1].properties_index = t[k - 1].properties_index - 1
+				end
 				t[k] = nil
 			elseif v.index == val then
 				res = t[k]
@@ -196,7 +199,7 @@ local function table_remove_shift(t, val, mode)
 	elseif mode == 3 then
 		for k, v in spairs(t, func_index) do
 			if removed then
-				t[k].v.index = t[key].v.index - 1
+				t[k].index = t[k].index - 1
 			elseif v.index == val then
 				res = t[k]
 				t[k] = nil
@@ -299,12 +302,13 @@ end
 
 ui_inventory.UIInventory.remove_custom_functor = function(self, name)
 	if not self.custom_functor_names[name] then return end
-	local index = table_remove_shift(self.custom_functor_names, self.custom_functor_names[name], 2)
 
+	local index = table_remove_shift(self.custom_functor_names, self.custom_functor_names[name], 2)
 	if not index then return end
+
 	local custom_functor = table_remove_shift(self.custom_functor, index, 0)
-	
 	if not custom_functor then return end
+	
 	local removed = false
 	for k, v in spairs(self.properties, func_index) do
 		if string_find(k, "custom_.*") then
@@ -312,6 +316,11 @@ ui_inventory.UIInventory.remove_custom_functor = function(self, name)
 				local x = tonumber(string_gsub(k, "custom_(.*)", "%1"), nil) - 1
 				self.properties["custom_" .. x] = self.properties[k]
 				self.properties["custom_" .. x].index = self.properties["custom_" .. x].index - 1
+			    self.properties["custom_" .. x].name_func[2] = self.properties["custom_" .. x].name_func[2] - 1
+			    self.properties["custom_" .. x].mode_func[2] = self.properties["custom_" .. x].mode_func[2] - 1
+			    self.properties["custom_" .. x].cont_func[2] = self.properties["custom_" .. x].cont_func[2] - 1
+			    self.properties["custom_" .. x].precondition1[2] = self.properties["custom_" .. x].precondition1[2] - 1
+			    self.properties["custom_" .. x].action[2] = self.properties["custom_" .. x].action[2] - 1
 				self.properties[k] = nil
 			elseif v.index == custom_functor.properties_index then
 				self.properties[k] = nil
@@ -376,4 +385,20 @@ function print_properties()
 		printf("[" .. k .. "] => ")
 		print_r(v)
 	end
+end
+
+function print_custom_functor()
+	if not ui_inventory.GUI then
+		ui_inventory.GUI = ui_inventory.UIInventory()
+	end
+
+	print_r(ui_inventory.GUI.custom_functor)
+end
+
+function print_custom_functor_names()
+	if not ui_inventory.GUI then
+		ui_inventory.GUI = ui_inventory.UIInventory()
+	end
+
+	print_r(ui_inventory.GUI.custom_functor_names)
 end
