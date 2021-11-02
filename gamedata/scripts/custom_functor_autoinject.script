@@ -1,4 +1,72 @@
--- Custom Dynamic Functors
+-- Custom Dynamic Functors, written by demonized
+-- Allows to add/remove item functors dynamically from script
+-- Can override ltx-defined functors and can remove the override to return back to ltx functor
+
+-- To use in your script look at example below
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- local function name_condition_function(obj)
+-- 	if obj then
+-- 		return true
+-- 	end
+-- end
+
+-- local function name_function(obj)
+-- 	return "st_my_functor_string_in_xml"
+-- end
+
+-- local function action_condition_function(obj)
+-- 	if obj then
+-- 		return true
+-- 	end
+-- end
+
+-- local function action_function(obj)
+-- 	alife_create_item(obj:section(), db.actor)
+-- end
+
+-- local add_functor = custom_functor_autoinject.add_functor
+-- add_functor("my_name_of_functor", name_condition_function, name_function, action_condition_function, action_function)
+-- ---------------------------------------------------------------------------------------------------------------------
+
+-- to add your functor you use add_functor function which requires these arguments in order:
+--    name: string, your name of your functor, can be any string. 
+--          If the name of functor already exists this function will overwrite functions for it
+--    name_condition_function: function, the condition at which you will get your right-click option for item
+--    name_function: function, the name itself, must return string ID defined in XML files for your option.
+--                   if set to return nil, the option won't appear
+--    action_condition_function: function, the condition at which the action will be performed
+--    action_function: function, the action itself to perform
+
+-- removal of functor is done by calling this
+
+-- --------------------------------------------------------------------------------------
+-- local remove_functor = custom_functor_autoinject.remove_functor
+-- remove_functor("my_name_of_functor")
+-- --------------------------------------------------------------------------------------
+
+-- you can also override existing functors defined in item's ltx by using this
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- local override_functor = custom_functor_autoinject.override_functor
+-- override_functor(slot, name_condition_function, name_function, action_condition_function, action_function)
+-- ---------------------------------------------------------------------------------------------------------------------
+
+-- arguments are same, except you have to provide the slot (first argument) for your override. The slots are 1-10
+-- for example if item's ltx have use1_functor and use1_action_functor then
+-- if you want to override it you have to provide slot 1
+-- be aware that if your name_condition_function or action_condition_function may return false
+-- then old functor will be fired
+-- if you don't want that behaviour, you can define generic "return true" function for those
+-- and check condition for firing in name_function and action_function
+
+-- removal of override is done by calling this
+
+-- --------------------------------------------------------------------------------------
+-- local remove_override = custom_functor_autoinject.remove_override
+-- remove_override(4)
+-- --------------------------------------------------------------------------------------
+
 local function func_index(t,a,b)
 	return (t[a].index) < (t[b].index)
 end
@@ -255,6 +323,7 @@ ui_inventory.UIInventory.remove_custom_functor = function(self, name)
 	end
 end
 
+-- Adding
 function add_functor(name, cond_name, func_name, cond_action, func_action)
 	if not name then return end
 
@@ -302,7 +371,7 @@ function print_properties()
 	if not ui_inventory.GUI then
 		ui_inventory.GUI = ui_inventory.UIInventory()
 	end
-	
+
 	for k, v in spairs(ui_inventory.GUI.properties, func_index) do
 		printf("[" .. k .. "] => ")
 		print_r(v)
