@@ -64,7 +64,7 @@
 
 -- --------------------------------------------------------------------------------------
 -- local remove_override = custom_functor_autoinject.remove_override
--- remove_override(4)
+-- remove_override(slot)
 -- --------------------------------------------------------------------------------------
 
 local function func_index(t,a,b)
