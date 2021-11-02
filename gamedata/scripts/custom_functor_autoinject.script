@@ -17,6 +17,76 @@ local string_gsub = string.gsub
 local table_remove = table.remove
 local tonumber = tonumber
 
+--Recursive print of tables similar to PHP print_r function
+local function print_r(t) 
+    local print_r_cache={}
+    local function sub_print_r(t,indent)
+        if (print_r_cache[tostring(t)]) then
+            printf(indent.."*"..tostring(t))
+        else
+            print_r_cache[tostring(t)]=true
+            if (type(t)=="table") then
+                for pos,val in pairs(t) do
+                    if (type(val)=="table") then
+                        printf(indent.."["..pos.."] => "..tostring(t).." {")
+                        sub_print_r(val,indent..string.rep(" ",string.len(pos)+8))
+                        printf(indent..string.rep(" ",string.len(pos)+6).."}")
+                    else
+                        printf(indent.."["..pos.."] => "..tostring(val))
+                    end
+                end
+            else
+                printf(indent..tostring(t))
+            end
+        end
+    end
+    sub_print_r(t,"  ")
+end
+
+local function print_table(table, subs)
+	
+	local sub
+	if subs ~= nil then
+		sub = subs
+	else
+		sub = ""
+	end
+	for k,v in pairs(table) do
+		if type(v) == "table" then
+			print_table(v, sub.."["..k.."]----->")
+		elseif type(v) == "function" then
+			printf(sub.."%s = function",k)
+		elseif type(v) == "userdata" then
+			if (v.x) then
+				printf(sub.."%s = %s",k,utils_data.vector_to_string(v))
+			else
+				printf(sub.."%s = userdata", k)
+			end
+		elseif type(v) == "boolean" then
+					if v == true then
+							if(type(k)~="userdata") then
+									printf(sub.."%s = true",k)
+							else
+									printf(sub.."userdata = true")
+							end
+					else
+							if(type(k)~="userdata") then
+									printf(sub.."%s = false", k)
+							else
+									printf(sub.."userdata = false")
+							end
+					end
+		else
+			if v ~= nil then
+				printf(sub.."%s = %s", k,v)
+			else
+				printf(sub.."%s = nil", k,v)
+			end
+		end
+	end
+	
+end
+
 -- Removing element from table and shifting down both key and value
 -- Modes: 0 - index, 1 - value, 2 - key, 3 - key-index
 local function table_remove_shift(t, val, mode)
@@ -199,4 +269,42 @@ function remove_functor(name)
 	if not name then return end
 
 	ui_inventory.GUI:remove_custom_functor(name)
+end
+
+function override_functor(slot, cond_name, func_name, cond_action, func_action)
+	if slot < 1 or slot > 10 then
+		printf("functor slot is not valid, min 1, max 10, your slot: %s", slot)
+		return
+	end
+
+	if not ui_inventory.GUI then
+		ui_inventory.GUI = ui_inventory.UIInventory()
+	end
+
+	ui_inventory.GUI.custom_functor[slot] = {
+		cond_name = cond_name,
+		func_name = func_name,
+		cond_action = cond_action,
+		func_action = func_action
+	}
+end
+
+function remove_override(slot)
+	if slot < 1 or slot > 10 then
+		printf("functor slot is not valid min 1, max 10, your slot: %s", slot)
+		return
+	end
+
+	ui_inventory.GUI.custom_functor[slot] = nil
+end
+
+function print_properties()
+	if not ui_inventory.GUI then
+		ui_inventory.GUI = ui_inventory.UIInventory()
+	end
+	
+	for k, v in spairs(ui_inventory.GUI.properties, func_index) do
+		printf("[" .. k .. "] => ")
+		print_r(v)
+	end
 end
