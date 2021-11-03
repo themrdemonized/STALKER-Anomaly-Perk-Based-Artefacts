@@ -24,6 +24,7 @@ local IsAnomaly = IsAnomaly
 local IsArtefact = IsArtefact
 local IsMoveState = IsMoveState
 local normalize = normalize
+local parse_list = parse_list
 local particles_object = particles_object
 local printf = printf
 local random_float = random_float
@@ -33,6 +34,7 @@ local RemoveTimeEvent = RemoveTimeEvent
 local ResetTimeEvent = ResetTimeEvent
 local round_100 = round_100
 local spairs = spairs
+local str_explode = str_explode
 local SYS_GetParam = SYS_GetParam
 local time_global = time_global
 local UnregisterScriptCallback = UnregisterScriptCallback
@@ -334,24 +336,41 @@ end
 
 -- Callbacks
 local callbacks = {}
-local function register_callback(callback, callback_function, on_end_function)
+local function register_callback(callback, callback_function, on_end_function, key)
 	trace("registering callback %s", callback)
 	RegisterScriptCallback(callback, callback_function)
-	table_insert(callbacks, {
+
+	local t = {
 		callback = callback,
 		func = callback_function,
 		on_end = on_end_function
-	})
+	}
+
+	local key = key or (#callbacks + 1)
+
+	if callbacks[key] then
+		UnregisterScriptCallback(callbacks[key].callback, callbacks[key].func)
+	end
+
+	callbacks[key] = t
+
+	RegisterScriptCallback(callbacks[key].callback, callbacks[key].func)
+	return key
+end
+
+local function unregister_callback(key)
+	if not callbacks[key] then return end
+	trace("unregistering callback %s, %s", key, callbacks[key].callback)
+	UnregisterScriptCallback(callbacks[key].callback, callbacks[key].func)
+	if callbacks[key].on_end then
+		callbacks[key].on_end()
+	end
+	callbacks[key] = nil
 end
 
 local function unregister_callbacks()
 	for i, props in pairs(callbacks) do
-		trace("unregistering callback %s, %s", i, props.callback)
-		UnregisterScriptCallback(props.callback, props.func)
-		if props.on_end then
-			props.on_end()
-		end
-		callbacks[i] = nil
+		unregister_callback(i)
 	end
 end
 
@@ -743,10 +762,46 @@ artefact_props = { -- Special props of artefacts that are used in processing
 	},
 	af_dragon_eye = {
 		dice_roll = 0,
-		on_before_hit = function(actor, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
+		on_before_hit = function(self, actor, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
+			self.dice_roll = random() * 100 -- Float chance
+
+			local current_weapon = actor:active_item()
+			if not current_weapon then
+				trace("Dragon's Eye, no current_weapon")
+				return
+			end
+
+			local casted_weapon = current_weapon:cast_Weapon()
+			if not casted_weapon then
+				trace("Dragon's Eye, no casted weapon")
+				return
+			end
+
+			local ammo_type = casted_weapon:GetAmmoType() + 1
+			trace("ammo type %s", ammo_type)
+			local ammo_types = str_explode(SYS_GetParam(0, current_weapon:section(), "ammo_class", ""), ",")
+
+			if not ammo_types[ammo_type] then
+				trace("Dragon's Eye, no valid ammo type")
+				return
+			end
+
+			local pellet_count = max(SYS_GetParam(2, ammo_types[ammo_type], "buck_shot", 1), 1)
+
+			local chance = 5 * artefact_count / pellet_count
+			if self.dice_roll > chance then
+				trace("Dragon Eye not triggered, dice roll %s, chance %s", self.dice_roll, chance)
+				return
+			end
 			s_hit.power = 1000
 		end,
-		on_death = function(actor, artefact_count, artefact_ids, artefact_names, npc, who, last_npc_hit, last_npc_hit_bone_index)
+		on_death = function(self, actor, artefact_count, artefact_ids, artefact_names, npc, who, last_npc_hit, last_npc_hit_bone_index)
+			local chance = 10 * artefact_count
+			if self.dice_roll > chance then
+				trace("Dragon Eye not triggered, dice roll %s, chance %s", self.dice_roll, chance)
+				return
+			end
+
 			local npc_id = npc:id()
 			trace("Victim's id: %s", npc_id)
 			if npc_id == AC_ID then return end
@@ -780,6 +835,8 @@ artefact_props = { -- Special props of artefacts that are used in processing
 
 			local explode_obj = alife_create_item("ied_new_blow", {npc_position, npc_level_vertex_id, npc_game_vertex_id, nil})
 			CreateTimeEvent(explode_obj.id, explode_obj.id, 0, explode, explode_obj.id)
+
+			artefact_props.af_lucifer:change_condition(0.01)
 		end
 	},
 	af_fountain = {
@@ -965,6 +1022,231 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			add_simple_timed_effect(10, nil, function()
 				self:stack_reset()
 			end, "af_cocoon_speed_penalty")
+		end
+	},
+	-- Moss, Perk: Culinary Hyperversity
+	af_moh = { -- Mutant parts bonuses
+		add_speed = function(self, amount, is_sprint)
+			add_speed("af_moh", 1 + amount, is_sprint, true)
+		end,
+		remove_speed = function(self)
+			remove_speed("af_moh")
+		end,
+		add_effect = function(self, func, on_end)
+			add_simple_timed_effect(60, func, on_end, "af_moh_effect")
+		end,
+		remove_effect = function(self)
+			remove_timed_effect("ah_moh_effect", true)
+		end,
+		register = function(self, callback, func)
+			register_callback(callback, func, nil, "af_moh")
+		end,
+		unregister = function(self)
+			unregister_callback("af_moh")
+		end,
+		mutant_part_flesh_meat = function(self, actor)
+			local valid_hits = { -- Valid hit types to trigger
+				[hit.fire_wound] = true
+			}
+
+			local health_boost = 0.001
+			self:add_effect(function()
+				actor:change_health(health_boost)
+			end)
+
+			self:register("actor_on_before_hit", function(s_hit, bone_id, flags)
+				if valid_hits[s_hit.type] then
+					s_hit.power = s_hit.power * 1.33
+				end
+			end)
+		end,
+		mutant_part_boar_chop = function(self, actor)
+			local valid_hits = { -- Valid hit types to trigger
+				[hit.strike] = true,
+				[hit.wound] = true
+			}
+			
+			self:register("actor_on_before_hit", function(s_hit, bone_id, flags)
+				if valid_hits[s_hit.type] then
+					s_hit.power = s_hit.power * 0.75
+				end
+			end)
+		end,
+		mutant_part_dog_meat = function(self, actor)
+			local bleeding_cure_boost = 0.0015
+			self:add_effect(function()
+				actor.bleeding = bleeding_cure_boost
+				change_psy_health(0.001)
+			end)
+		end,
+		mutant_part_psevdodog_meat = function(self, actor)
+			local valid_hits = { -- Valid hit types to trigger
+				[hit.telepatic] = true
+			}
+
+			self:add_effect(function()
+				change_psy_health(0.002)
+			end)
+
+			self:register("actor_on_before_hit", function(s_hit, bone_id, flags)
+				if valid_hits[s_hit.type] then
+					trace("pseudodog hit %s", hit.telepatic)
+					s_hit.power = s_hit.power * 0.75
+				end
+			end)
+		end,
+		mutant_part_krovosos_meat = function(self, actor)
+
+			local function ignore_enemy(obj, enemy, flags) -- Remove evaluation
+				if (enemy:id() == AC_ID) then
+					flags.override = true
+					flags.result = false
+					return
+				end
+			end
+
+			local function enable_enemy()
+				UnregisterScriptCallback("on_enemy_eval", ignore_enemy)
+			end
+
+			local function enable_enemy_on_hit(obj, s_hit)
+				if s_hit.draftsman:id() == AC_ID then
+					enable_enemy()
+				end
+			end
+
+			self:register("on_enemy_eval", ignore_enemy)
+			RegisterScriptCallback("actor_on_weapon_fired", enable_enemy)
+			RegisterScriptCallback("monster_on_before_hit", enable_enemy_on_hit)
+			RegisterScriptCallback("npc_on_before_hit", enable_enemy_on_hit)
+
+			local bleeding_cure_boost = 0.003
+			self:add_effect(function()
+				actor.bleeding = bleeding_cure_boost
+			end, function()
+				UnregisterScriptCallback("actor_on_weapon_fired", enable_enemy)
+				UnregisterScriptCallback("monster_on_before_hit", enable_enemy_on_hit)
+				UnregisterScriptCallback("npc_on_before_hit", enable_enemy_on_hit)
+			end)
+		end,
+		mutant_part_psysucker_meat = function(self, actor)
+
+			local function ignore_enemy(obj, enemy, flags) -- Remove evaluation
+				if (enemy:id() == AC_ID) then
+					flags.override = true
+					flags.result = false
+					return
+				end
+			end
+
+			local function enable_enemy()
+				UnregisterScriptCallback("on_enemy_eval", ignore_enemy)
+			end
+
+			local function enable_enemy_on_hit(obj, s_hit)
+				if s_hit.draftsman:id() == AC_ID then
+					enable_enemy()
+				end
+			end
+
+			self:register("on_enemy_eval", ignore_enemy)
+			RegisterScriptCallback("actor_on_weapon_fired", enable_enemy)
+			RegisterScriptCallback("monster_on_before_hit", enable_enemy_on_hit)
+			RegisterScriptCallback("npc_on_before_hit", enable_enemy_on_hit)
+
+			self:add_effect(function()
+				change_psy_health(0.005)
+			end, function()
+				UnregisterScriptCallback("actor_on_weapon_fired", enable_enemy)
+				UnregisterScriptCallback("monster_on_before_hit", enable_enemy_on_hit)
+				UnregisterScriptCallback("npc_on_before_hit", enable_enemy_on_hit)
+			end)
+		end,
+		mutant_part_snork_hand = function(self, actor)
+			local valid_hits = { -- Valid hit types to trigger
+				[hit.radiation] = true,
+			}
+
+			self:add_effect(function()
+				actor:change_power(0.005)
+				actor:change_satiety(-0.001)
+				actor:change_radiation(-0.00024)
+			end)
+
+			self:register("actor_on_before_hit", function(s_hit, bone_id, flags)
+				if valid_hits[s_hit.type] then
+					trace("snork meat active")
+					s_hit.power = s_hit.power * 0.5
+				end
+			end)
+		end,
+		mutant_part_chimera_meat = function(self, actor)
+			local valid_hits = { -- Valid hit types to trigger
+				[hit.radiation] = true,
+			}
+
+			self:add_effect(function()
+				actor:change_health(0.002)
+				actor:change_power(0.01)
+			end)
+
+			self:register("actor_on_before_hit", function(s_hit, bone_id, flags)
+				if valid_hits[s_hit.type] then
+					s_hit.power = s_hit.power * 0.66
+				end
+			end)
+
+		end,
+		mutant_part_lurker_meat = function(self, actor)
+			local valid_hits = { -- Valid hit types to trigger
+				[hit.light_burn] = true,
+				[hit.burn] = true,
+				[hit.shock] = true,
+				[hit.chemical_burn] = true
+			}
+
+			self:register("actor_on_before_hit", function(s_hit, bone_id, flags)
+				if valid_hits[s_hit.type] then
+					s_hit.power = s_hit.power * 0.66
+				end
+			end)
+		end,
+		mutant_part_tushkano_meat = function(self, actor)
+			self:add_speed(0.2, false)
+
+			local valid_hits = { -- Valid hit types to trigger
+				[hit.wound] = true,
+				[hit.strike] = true
+			}
+
+			self:register("actor_on_before_hit", function(s_hit, bone_id, flags)
+				if valid_hits[s_hit.type] then
+					s_hit.power = s_hit.power * 1.2
+				end
+			end)
+		end,
+		activate_effect = function(self, actor, food_section)
+			if self[food_section] then
+				trace("Moss, Eating food %s", food_section)
+
+				-- Remove 80% of satiety increase
+				local satiety_increase = SYS_GetParam(2, food_section, "eat_satiety", 0)
+				local satiety = actor:cast_Actor():conditions():GetSatiety()
+				local required_satiety = 1 - satiety
+				trace("actor satiety %s", satiety)
+				actor:change_satiety(required_satiety > satiety_increase and satiety_increase * -0.8 or required_satiety * -0.8)
+
+				self:remove_effect()
+				self:remove_speed()
+				self:unregister()
+
+				self[food_section](self, actor)
+				add_simple_timed_effect(60, nil, function()
+					self:remove_effect()
+					self:remove_speed()
+					self:unregister()
+				end, "af_moh")
+			end
 		end
 	},
 	af_lucifer = {
@@ -1380,6 +1662,16 @@ local artefact_on_item_use_functions = {
 				_G.printf("health increased by %s", satiety_increase)
 			end, {satiety_increase})
 		end
+	end,
+
+	-- Moss, Perk: Culinary Hyperversity
+	af_moh = function(actor, artefact_count, artefact_ids, artefact_names, obj)
+		if not obj then
+			trace("Food object not found")
+			return
+		end
+
+		artefact_props.af_moh:activate_effect(actor, obj:section())
 	end
 
 }
@@ -1739,13 +2031,7 @@ local artefact_on_npc_before_hit_functions = {
 
 	-- Dragon's Eye, Perk: Good ol' Ultra-Violence
 	af_dragon_eye = function(actor, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
-		artefact_props.af_dragon_eye.dice_roll = random(100)
-		local chance = 5 * artefact_count
-		if artefact_props.af_dragon_eye.dice_roll > chance then
-			trace("Dragon Eye not triggered, dice roll %s, chance %s", artefact_props.af_dragon_eye.dice_roll, chance)
-			return
-		end
-		artefact_props.af_dragon_eye.on_before_hit(actor, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
+		artefact_props.af_dragon_eye:on_before_hit(actor, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
 	end,
 
 	-- Spike, Perk: Critical Ascensi0n
@@ -1813,14 +2099,7 @@ local artefact_on_npc_death_functions = {
 
 	-- Dragon's Eye, Perk: Good ol' Ultra-Violence
 	af_dragon_eye = function(actor, artefact_count, artefact_ids, artefact_names, npc, who, last_npc_hit, last_npc_hit_bone_index)
-		local chance = 5 * artefact_count
-		if artefact_props.af_dragon_eye.dice_roll > chance then
-			trace("Dragon Eye not triggered, dice roll %s, chance %s", artefact_props.af_dragon_eye.dice_roll, chance)
-			return
-		end
-
-		artefact_props.af_dragon_eye.on_death(actor, artefact_count, artefact_ids, artefact_names, npc, who, last_npc_hit, last_npc_hit_bone_index)
-		artefact_props.af_lucifer:change_condition(0.01)
+		artefact_props.af_dragon_eye:on_death(actor, artefact_count, artefact_ids, artefact_names, npc, who, last_npc_hit, last_npc_hit_bone_index)
 	end
 
 }
@@ -1835,13 +2114,7 @@ local artefact_on_monster_before_hit_functions = {
 
 	-- Dragon's Eye, Perk: Good ol' Ultra-Violence
 	af_dragon_eye = function(actor, artefact_count, artefact_ids, artefact_names, monster, s_hit, bone_id, flags)
-		artefact_props.af_dragon_eye.dice_roll = random(100)
-		local chance = 5 * artefact_count
-		if artefact_props.af_dragon_eye.dice_roll > chance then
-			trace("Dragon Eye not triggered, dice roll %s, chance %s", artefact_props.af_dragon_eye.dice_roll, chance)
-			return
-		end
-		artefact_props.af_dragon_eye.on_before_hit(actor, artefact_count, artefact_ids, artefact_names, monster, s_hit, bone_id, flags)
+		artefact_props.af_dragon_eye:on_before_hit(actor, artefact_count, artefact_ids, artefact_names, monster, s_hit, bone_id, flags)
 	end,
 
 	-- Spike, Perk: Critical Ascensi0n
@@ -1866,14 +2139,7 @@ local artefact_on_monster_death_functions = {
 
 	-- Dragon's Eye, Perk: Good ol' Ultra-Violence
 	af_dragon_eye = function(actor, artefact_count, artefact_ids, artefact_names, monster, who, last_monster_hit, last_monster_hit_bone_index)
-		local chance = 10 * artefact_count
-		if artefact_props.af_dragon_eye.dice_roll > chance then
-			trace("Dragon Eye not triggered, dice roll %s, chance %s", artefact_props.af_dragon_eye.dice_roll, chance)
-			return
-		end
-		artefact_props.af_dragon_eye.on_death(actor, artefact_count, artefact_ids, artefact_names, monster, who, last_monster_hit, last_monster_hit_bone_index)
-
-		artefact_props.af_lucifer:change_condition(0.01)
+		artefact_props.af_dragon_eye:on_death(actor, artefact_count, artefact_ids, artefact_names, monster, who, last_monster_hit, last_monster_hit_bone_index)
 	end
 
 }

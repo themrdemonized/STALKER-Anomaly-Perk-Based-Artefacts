@@ -5,7 +5,6 @@ Chain (will be Sin exclusive artefact, not programmed yet)
 Lamp
 Lighthouse
 Medalion
-Moss
 Moon (WIP, wanna make effect more interesting than just an opposite of Sun)
 Thistle
 Scar (Crazy stalker artefact)
@@ -23,14 +22,9 @@ Artefact that gives significant buff to psy regen but makes you do crazy shit
 5 shots or 6
 there is 50% chance that last shoy in the mag will not consume ammo
 
-Moss, Perk: Culinary Hyperversity
-Eating raw uncooked mutant meat grants you temporary change of stats
-The degree of bonuses varies, mutant parts can give boost to some stats and give penalty to others
-Extra artefacts and eating same part multiple times does not stack the effect
-Effect lasts for 1 minute
-Eating different mutant meat overrides previous effect and reset the timer
-
 Medallion, perk: Golden rain
 Roubles will drop from the sky right on top of your head
 Unfortunately it's kinda painful and shameful so you will get 5% of health and 10% of psy damage on each occurrence 
 
+PLAYTEST:
+Lauta_ro: divide Dragon's Eye chance by amount of pellets so shotguns won't have vastly increased chance (Done)

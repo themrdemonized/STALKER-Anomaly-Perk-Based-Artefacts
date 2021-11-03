@@ -1,4 +1,4 @@
-Perk Based Artefacts, 0.1
+Perk Based Artefacts, 0.11
 A unique twist on overhauling old junk artefacts beyond the boundaries of simple stat changers
 Junk artefacts are no longer junk and received unique special abilities or Perks. The degree of perks vary from simple boosters to marvellous staff like recharging batteries by stepping in Electra, receiving Money on Headshots or Even Evading Death itself when all hope is lost.
 Multiple artefacts might or might not stack the effects and penalties of Perks in various ways, and effects are triggered on very various conditions
@@ -125,6 +125,27 @@ So far the perks are
   -- Effect lasts for 10 seconds, after which all stacks are burned
   -- Multiple artefact increase the rate of gaining stacks
 
+  -- Moss, Perk: Culinary Hyperversity
+  -- The artefact will grab almost all energy of raw meat and convert it to temporary special abilities
+  -- Eating raw uncooked mutant will give 80% less calories, but give temporary effects
+  -- The degree of effects varies, mutant parts can give boost to some stats or special abilities and give penalty to others
+  -- Extra artefacts and eating same part multiple times does not stack the effect
+  -- Mutant Part Effect lasts for 1 minute
+  -- Eating different mutant meat overrides previous effect and reset the timer
+  -- The effect is saved after eating regardless of the artefact placed on belt or not
+  -- The debuffs of eating raw part (health loss, thirstiness, radiation illness, etc.) are still intact
+  -- Table of effects:
+  --  flesh meat: 1%/sec health regen, 33% bullet damage penalty
+  --  boar meat: 25% melee damage reduction
+  --  dog meat: slight bleeding cure, 1%/sec psy regen
+  --  pesudodog: 2%/sec psy regen, 25% psy damage reduction
+  --  krovosos: become invisible until shooting or hitting enemy, moderate bleeding cure
+  --  psysos: become invisible until shooting or hitting enemy, 5%/sec psy regen
+  --  snork: 50% radiation damage reduction, 5%/sec stamina regen, 5msv/sec radiation cure, big satiety decrease
+  --  chimera: 2%/sec health regen, 10%/sec stamina regen, 33% raditation damage reduction
+  --  lurker: 33% chem/fire/electric anomaly damage reduction, including fields
+  --  tushkano: 20% speed increase, 20% melee damage penalty
+
   -- Knot, Perk: Deal with the Devil
   -- Gamechanger Artefact
   -- Moving the artefact to belt will sign the Pact with the Zone
@@ -145,12 +166,12 @@ So far the perks are
   -- Less than 50% the artefact will start to consume your soul to live resulting first in slight loss of stamina
   -- Less than 40% and your health start to disappear, first slow, then increasing with decrease of condition
   -- You can sacrifice mere usual artefacts to partially restore Lucifer's condition
-  -- Tier 1 artefacts restore 4-6%
-  -- Tier 2 artefacts restore 7-9%
+  -- Tier 1 artefacts restore 3-5%
+  -- Tier 2 artefacts restore 6-9%
   -- Tier 3 artefacts restore 10-13%
-  -- Extra Knot artefacts restore 25-35%
+  -- Extra Knot artefacts restore 20-30%
   -- Seraphim can't be sacrificed
-  -- Death Lamp will overcharge artefact, restoring it to 100% and temporarily boosting it even more
+  -- Death Lamp will overcharge artefact, restoring it to 100% and temporarily boosting it even more (WIP)
   -- There is a slight chance that overcharging with Death Lamp will tear you apart
   -- You can not dispose the artefact by any means
   -- Lucifer has unknown influence on other artefacts, enhancing their effects in various ways 
