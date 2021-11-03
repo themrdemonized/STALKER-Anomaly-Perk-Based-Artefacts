@@ -164,12 +164,14 @@ local function table_remove_shift(t, val, mode)
 		for k, v in spairs(t, func_index) do
 			if removed then
 				t[k - 1] = v
-				t[k - 1].index = t[k - 1].index - 1
+				if t[k - 1].index then
+					t[k - 1].index = t[k - 1].index - 1
+				end
 				if t[k - 1].properties_index then
 					t[k - 1].properties_index = t[k - 1].properties_index - 1
 				end
 				t[k] = nil
-			elseif v.index == val then
+			elseif v.index and v.index == val then
 				res = t[k]
 				t[k] = nil
 				removed = true
@@ -199,8 +201,10 @@ local function table_remove_shift(t, val, mode)
 	elseif mode == 3 then
 		for k, v in spairs(t, func_index) do
 			if removed then
-				t[k].index = t[k].index - 1
-			elseif v.index == val then
+				if t[k].index then
+					t[k].index = t[k].index - 1
+				end
+			elseif v.index and v.index == val then
 				res = t[k]
 				t[k] = nil
 				removed = true
