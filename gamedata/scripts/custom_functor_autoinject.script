@@ -5,23 +5,23 @@
 -- To use in your script look at example below
 
 -- ---------------------------------------------------------------------------------------------------------------------
--- local function name_condition_function(obj)
+-- local function name_condition_function(obj, bag, mode)
 -- 	if obj then
 -- 		return true
 -- 	end
 -- end
 
--- local function name_function(obj)
+-- local function name_function(obj, bag, mode)
 -- 	return "st_my_functor_string_in_xml"
 -- end
 
--- local function action_condition_function(obj)
+-- local function action_condition_function(obj, bag, mode)
 -- 	if obj then
 -- 		return true
 -- 	end
 -- end
 
--- local function action_function(obj)
+-- local function action_function(obj, bag, mode)
 -- 	alife_create_item(obj:section(), db.actor)
 -- end
 
@@ -37,6 +37,12 @@
 --                   if set to return nil, the option won't appear
 --    action_condition_function: function, the condition at which the action will be performed
 --    action_function: function, the action itself to perform
+
+-- functions themselves accept obj, bag and mode arguments
+-- obj: current object you right-clicked
+-- bag: current bag, list of possible bags: {"actor_equ","actor_belt","actor_bag","actor_trade_bag","actor_trade","npc_bag","npc_trade","npc_trade_bag"}
+-- mode: current mode, list of possible modes: {"inventory" , "loot" , "trade" , "repair"}
+
 
 -- removal of functor is done by calling this
 
@@ -224,8 +230,8 @@ end
 local NameCustom = ui_inventory.UIInventory.Name_Custom
 function ui_inventory.UIInventory:Name_Custom(obj, bag, temp, i)
     obj = self:CheckItem(obj,"Name_Custom " .. i)
-    if self.custom_functor[i] and self.custom_functor[i].cond_name(obj) then
-        return self.custom_functor[i].func_name(obj)
+    if self.custom_functor[i] and self.custom_functor[i].cond_name(obj, bag, self.mode) then
+        return self.custom_functor[i].func_name(obj, bag, self.mode)
     else
         return NameCustom(self, obj, bag, temp, i)
     end
@@ -234,8 +240,8 @@ end
 local ActionCustom = ui_inventory.UIInventory.Action_Custom
 function ui_inventory.UIInventory:Action_Custom(obj, bag, temp, i)
     obj = self:CheckItem(obj,"Action_Custom " .. i)
-    if self.custom_functor[i] and self.custom_functor[i].cond_action(obj) then
-        return self.custom_functor[i].func_action(obj)
+    if self.custom_functor[i] and self.custom_functor[i].cond_action(obj, bag, self.mode) then
+        return self.custom_functor[i].func_action(obj, bag, self.mode)
     else
         return ActionCustom(self, obj, bag, temp, i)
     end
