@@ -146,6 +146,11 @@ So far the perks are
   --  lurker: 33% chem/fire/electric anomaly damage reduction, including fields
   --  tushkano: 20% speed increase, 20% melee damage penalty
 
+  -- Medallion, Perk: The (Un)lucky charm
+  -- 35% chance that incoming bullet damage will be fully redirected to your companion
+  -- Some companions are smarter than others and they'll smell something fishy before they die
+  -- Stacks with multiple artefacts with diminishing returns
+
   -- Knot, Perk: Deal with the Devil
   -- Gamechanger Artefact
   -- Moving the artefact to belt will sign the Pact with the Zone

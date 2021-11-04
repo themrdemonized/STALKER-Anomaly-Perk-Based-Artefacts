@@ -9,6 +9,7 @@
 
 local AC_ID = AC_ID
 local alife_create_item = alife_create_item
+local alife_object = alife_object
 local alife_release = alife_release
 local alife_release_id = alife_release_id
 local clamp = clamp
@@ -19,6 +20,8 @@ local get_console = get_console
 local give_info = give_info
 local has_alife_info = has_alife_info
 local iempty_table = iempty_table
+local is_empty = is_empty
+local is_not_empty = is_not_empty
 local ini_sys = ini_sys
 local IsAnomaly = IsAnomaly
 local IsArtefact = IsArtefact
@@ -44,6 +47,11 @@ local vector_rotate_y = vector_rotate_y
 local change_psy_health = arszi_psy.change_psy_health
 local manage_psy_health = arszi_psy.manage_psy_health
 local set_psy_health = arszi_psy.set_psy_health
+
+local dismiss_special_squad = axr_companions.dismiss_special_squad
+local release_special_squad = axr_companions.release_special_squad
+local remove_from_actor_squad = axr_companions.remove_from_actor_squad
+local get_nearby_companion = axr_companions.get_nearby_companion
 
 local get_nearby_campfire = bind_campfire.get_nearby_campfire
 
@@ -132,9 +140,60 @@ local last_monster_hit_bone_index
 local debug_mode = true
 
 -- Utils
+local function print_table(table, subs)
+	
+	local sub
+	if subs ~= nil then
+		sub = subs
+	else
+		sub = ""
+	end
+	for k,v in pairs(table) do
+		if type(v) == "table" then
+			print_table(v, sub.."["..k.."]----->")
+		elseif type(v) == "function" then
+			printf(sub.."%s = function",k)
+		elseif type(v) == "userdata" then
+			if (v.x) then
+				printf(sub.."%s = %s",k,utils_data.vector_to_string(v))
+			else
+				printf(sub.."%s = userdata", k)
+			end
+		elseif type(v) == "boolean" then
+					if v == true then
+							if(type(k)~="userdata") then
+									printf(sub.."%s = true",k)
+							else
+									printf(sub.."userdata = true")
+							end
+					else
+							if(type(k)~="userdata") then
+									printf(sub.."%s = false", k)
+							else
+									printf(sub.."userdata = false")
+							end
+					end
+		else
+			if v ~= nil then
+				printf(sub.."%s = %s", k,v)
+			else
+				printf(sub.."%s = nil", k,v)
+			end
+		end
+	end
+	
+end
+
 local function trace(str, ...)
 	if debug_mode then
 		printf("Perk Based Artefacts: " .. str, ...)
+	end
+end
+
+local function trace_table(t)
+	if debug_mode then
+		printf("Perk Based Artefacts: Table Print")
+		print_table(t)
 	end
 end
 
@@ -528,6 +587,42 @@ artefact_props = { -- Special props of artefacts that are used in processing
 				-- Parabolic curve
 				-- Progression is 20 -> 37.5 -> 50 -> 57.5 -> 60
 				t[artefact_count] = (25 - 2.5 * artefact_count) * artefact_count - 2.5
+			end
+			return t
+		end)(),
+		valid_hits = { -- Valid hit types to trigger
+			[hit.fire_wound] = true
+		}
+	},
+	af_medallion = {
+		enemy_squad_member_ids = {},
+		on_enemy_eval = function(obj, enemy, flags)  -- Force former companions to become enemies and shoot
+			if artefact_props.af_medallion.enemy_squad_member_ids[obj:id()] and enemy:id() == AC_ID then
+		        flags.override = true
+				flags.result = true
+			end
+		end,
+		npc_on_death_callback = function(npc, who)
+			artefact_props.af_medallion.enemy_squad_member_ids[npc:id()] = nil
+			if is_empty(artefact_props.af_medallion.enemy_squad_member_ids) then
+				trace("Medallion, former companions are dead")
+				UnregisterScriptCallback("on_enemy_eval", artefact_props.af_medallion.on_enemy_eval)
+			end
+		end,
+		register = function(self)
+			if is_empty(self.enemy_squad_member_ids) then return end
+
+			trace("Medallion, Registering former companions callbacks")
+			trace_table(self.enemy_squad_member_ids)
+			RegisterScriptCallback("on_enemy_eval", artefact_props.af_medallion.on_enemy_eval)
+			RegisterScriptCallback("npc_on_death_callback", artefact_props.af_medallion.npc_on_death_callback)
+		end,
+		reflect_chance = (function() -- LUT with chances to trigger by artefact count
+			local t = {}
+			for artefact_count = 1, 5 do
+				-- Parabolic curve
+				-- Progression is 35 -> 50 -> 62 -> 70 -> 75
+				t[artefact_count] = round((20 - 1.66667 * artefact_count) * artefact_count + 16.6667)
 			end
 			return t
 		end)(),
@@ -1787,6 +1882,91 @@ local artefact_on_before_hit_functions = {
 
 		artefact_props.af_black_angel.dice_roll = random(100)
 		if artefact_props.af_black_angel.dice_roll <= artefact_props.af_black_angel.reflect_chance[artefact_count] then
+			s_hit.power = 0.001
+		end
+	end,
+
+	-- Medallion, Perk: The (Un)lucky charm
+	af_medallion = function(actor, artefact_count, artefact_ids, artefact_names, s_hit, bone_id, flags)
+		if not artefact_props.af_medallion.valid_hits[s_hit.type] then
+			trace("Medallion, not a valid hit type %s", s_hit.type)
+			return
+		end
+
+		local dice_roll = random(100)
+		if dice_roll > artefact_props.af_medallion.reflect_chance[artefact_count] then
+			trace("Medallion, perk not triggered, dice_roll %s, chance %s", dice_roll, artefact_props.af_medallion.reflect_chance[artefact_count])
+			return
+		end
+
+		local companion, squad, squad_member_count, squad_id, squad_member_ids = (function()
+			local companion_squads = axr_companions.companion_squads
+			local non_task_companions = axr_companions.non_task_companions
+			if is_not_empty(non_task_companions) then
+				trace("Medallion, has non_task_companions")
+				return alife_object(get_random_key(non_task_companions))
+			elseif is_not_empty(companion_squads) then
+				trace("Medallion, has companion_squads")
+				for k, squad in pairs(companion_squads) do 
+					if squad then
+						local m
+						local squad_ids = {}
+						for sm in squad:squad_members() do
+							if not m then
+								m = sm
+							end
+							squad_ids[sm.id] = true
+						end
+						return m, squad, squad:npc_count(), k, squad_ids
+					end
+				end
+			else
+				trace("Medallion, doesn't have both companion_squads, non_task_companions")
+				return nil
+			end
+		end)()
+		if not companion then
+			trace("Medallion, no companion found")
+			return
+		end
+
+		trace("Medallion, current companion %s", companion.id)
+
+		local member = get_object_by_id(companion.id)
+		if member and member:alive() then
+			local redirect_hit = hit(s_hit)
+			redirect_hit.power = redirect_hit.power * 0.5
+			member:hit(redirect_hit)
+			trace("Medallion, hitting companion %s, power %s", member:name(), redirect_hit.power)
+			
+			if squad then
+				if random(100) < (10 / squad_member_count) then
+					trace("Medallion, squad %s became enemy", squad_id)
+					squad:set_squad_relation("enemy")
+					dismiss_special_squad(squad)
+					for k, v in pairs(squad_member_ids) do
+						local obj = get_object_by_id(k)
+						if obj and obj:alive() then
+							trace("Medallion, squad companion %s became enemy", k)
+							obj:set_relation(game_object.enemy, actor)
+							artefact_props.af_medallion.enemy_squad_member_ids[k] = true
+						end
+					end
+				end
+			else
+				if random(100) < 10 then
+					trace("Medallion, companion became enemy")
+					remove_from_actor_squad(member)
+
+					if member:alive() then
+						trace("Medallion, member %s became enemy", member:id())
+						member:set_relation(game_object.enemy, actor)
+						artefact_props.af_medallion.enemy_squad_member_ids[member:id()] = true
+					end
+				end
+			end
+			artefact_props.af_medallion:register()
+
 			s_hit.power = 0.001
 		end
 	end,
