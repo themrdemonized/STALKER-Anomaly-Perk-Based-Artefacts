@@ -823,6 +823,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 		targets = nil, -- Table of targets to light up
 		on_item_take = function(item)
 			local _self = artefact_props.af_fonar
+			if _self.targets == false then return end
 			local id = item:id()
 			if _self.targets[id] then
 				_self.targets[id] = nil
@@ -863,11 +864,13 @@ artefact_props = { -- Special props of artefacts that are used in processing
 					end
 				end
 
-				if not has_targets then _self.targets = false end
+				if not has_targets then
+					_self.targets = false
+					trace("Lamp, no active targets on level")
+				end
 			end
 
 			if _self.targets == false then
-				trace("Lamp, no active targets on level")
 				return
 			end
 
@@ -2525,7 +2528,7 @@ local artefact_on_equip_functions = {
 
 	-- Lamp, Perk: Enlightening Kleptomania
 	af_fonar = function(actor, artefact_count, artefact_ids, artefact_names)
-		local rf_targets = item_radio.RF_targets
+		local rf_stashes = item_radio.RF_stashes
 
 		if rf_stashes[actor_level] then
 			for k, v in pairs(rf_stashes[actor_level]) do
