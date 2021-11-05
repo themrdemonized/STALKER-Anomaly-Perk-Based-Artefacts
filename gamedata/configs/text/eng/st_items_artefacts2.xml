@@ -146,7 +146,7 @@
     %c[d_cyan] • %c[ui_gray_2] valuable\n
     %c[d_orange] • %c[ui_gray_2] Perk: The Unorthodox Way Of Travelling\n
       -- Killing anyone will teleport you to the place of your victim's death\n
-      -- Don't try this at crows\n
+      -- Don't try this on crows\n
       -- Does not stack in any way\n</text>
   </string>
   <string id="st_af_fire_loop_name">
@@ -304,7 +304,12 @@
     <text>This light, glassy artifact emits a modest amount of near-ultraviolet light. It does not produce more harmful radiation, but is quite interesting to collectors.\n \n
     %c[ui_gray_2]PROPERTIES:\n
     %c[ui_cyan] • %c[ui_gray_2] inert artifact\n
-    %c[d_cyan] • %c[ui_gray_2] valuable</text>
+    %c[d_cyan] • %c[ui_gray_2] valuable\n
+    %c[d_orange] • %c[ui_gray_2] Perk: Enlightening Kleptomania\n
+      -- The artefact catches frequencies of packages and sends energy to light them up\n
+      -- Lights up stashes and items emitting signal to RF-receiver\n
+      -- The light is very dim and hardly visible at day, so searching at night is advisable\n
+      -- Does not stack in any way</text>
   </string>
   <string id="st_af_tapeworm_name">
     <text>Tapeworm</text>

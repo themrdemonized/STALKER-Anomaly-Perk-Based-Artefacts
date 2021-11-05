@@ -2,7 +2,6 @@ Arts to do:
 Bat
 Monolith Shard (if needed)
 Chain (will be Sin exclusive artefact, not programmed yet)
-Lamp
 Moon (WIP, wanna make effect more interesting than just an opposite of Sun)
 Thistle
 Scar (Crazy stalker artefact)

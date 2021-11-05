@@ -10,7 +10,6 @@
 local AC_ID = AC_ID
 local alife_create_item = alife_create_item
 local alife_object = alife_object
-local alife_release = alife_release
 local alife_release_id = alife_release_id
 local clamp = clamp
 local copy_table = copy_table
@@ -19,7 +18,6 @@ local empty_table = empty_table
 local get_console = get_console
 local give_info = give_info
 local has_alife_info = has_alife_info
-local iempty_table = iempty_table
 local is_empty = is_empty
 local is_not_empty = is_not_empty
 local ini_sys = ini_sys
@@ -27,11 +25,9 @@ local IsAnomaly = IsAnomaly
 local IsArtefact = IsArtefact
 local IsMoveState = IsMoveState
 local normalize = normalize
-local parse_list = parse_list
 local particles_object = particles_object
 local printf = printf
 local random_float = random_float
-local random_number = random_number
 local RegisterScriptCallback = RegisterScriptCallback
 local RemoveTimeEvent = RemoveTimeEvent
 local ResetTimeEvent = ResetTimeEvent
@@ -39,20 +35,18 @@ local round_100 = round_100
 local spairs = spairs
 local str_explode = str_explode
 local SYS_GetParam = SYS_GetParam
-local TeleportObject = TeleportObject
 local time_global = time_global
 local UnregisterScriptCallback = UnregisterScriptCallback
 local VEC_Y = VEC_Y
 local vector_rotate_y = vector_rotate_y
+local script_light = script_light
 
 local change_psy_health = arszi_psy.change_psy_health
 local manage_psy_health = arszi_psy.manage_psy_health
 local set_psy_health = arszi_psy.set_psy_health
 
 local dismiss_special_squad = axr_companions.dismiss_special_squad
-local release_special_squad = axr_companions.release_special_squad
 local remove_from_actor_squad = axr_companions.remove_from_actor_squad
-local get_nearby_companion = axr_companions.get_nearby_companion
 
 local get_nearby_campfire = bind_campfire.get_nearby_campfire
 
@@ -64,9 +58,9 @@ local get_start_time = level.get_start_time
 local get_time_factor = level.get_time_factor
 local get_time_hours = level.get_time_hours
 local get_time_minutes = level.get_time_minutes
+local level_name = level.name
 local level_object_by_id = level.object_by_id
 local remove_pp_effector = level.remove_pp_effector
-local set_time_factor = level.set_time_factor
 
 local get_weather_manager = level_weathers.get_weather_manager
 
@@ -84,13 +78,11 @@ local play_snd = xr_effects.play_snd
 local get_safe_sound_object = xr_sound.get_safe_sound_object
 local set_sound_play = xr_sound.set_sound_play
 
-local abs = math.abs
 local ceil = math.ceil
 local floor = math.floor
 local max = math.max
 local min = math.min
 local random = math.random
-local sqrt = math.sqrt
 
 local function round(amount)
 	return floor(amount + 0.5)
@@ -104,9 +96,7 @@ local load = loadstring
 local unpack = unpack
 local pack = table.pack
 
-local table_concat = table.concat
 local table_insert = table.insert
-local table_remove = table.remove
 local table_sort = table.sort
 
 local tg = 0 --time_global storage used for actor on update limiter
@@ -119,6 +109,8 @@ local time_elapsed = 0 -- Time from game start used for effects and cooldowns
 local time_factor = 6 -- Default time_factor
 
 local actor_is_dying = false
+
+local actor_level -- Current actor level
 
 hud_state = 1
 
@@ -819,6 +811,105 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			if artefact_props.af_lucifer:check_lucifer() and self.dice_roll < lucifer_bonus then
 				for i = 1, 5 do
 					spawn_meat()
+				end
+			end
+		end
+	},
+	af_fonar = {
+		blink_half_interval = 1400,
+		min_radius = 1,
+		max_radius = 4,
+		light_sources = {}, -- Table of light sources
+		targets = nil, -- Table of targets to light up
+		on_item_take = function(item)
+			local _self = artefact_props.af_fonar
+			local id = item:id()
+			if _self.targets[id] then
+				_self.targets[id] = nil
+				local light = _self.light_sources[id].light
+				light.enabled = false
+				light:update()
+				_self.light_sources[id] = nil
+			end
+		end,
+		light_sources_update = function()
+			local _self = artefact_props.af_fonar
+			if _self.targets == nil then
+				local has_targets = false
+
+				local rf_stashes = item_radio.RF_stashes or {}
+				if rf_stashes[actor_level] then
+					for id, freq in pairs(rf_stashes[actor_level]) do
+						if not _self.targets then _self.targets = {} end
+						_self.targets[id] = true
+						has_targets = true
+						trace("Lamp, adding stash %s", id)
+					end
+				else
+					trace("Lamp, no active stashes on a level")
+				end
+
+				local rf_targets = item_radio.RF_targets or {}
+				local sim = alife()
+				local gg = game_graph()
+				for id, v in pairs(rf_targets) do
+					local se_obj = sim:object(id)
+					local lvl = sim:level_name(gg:vertex(se_obj.m_game_vertex_id):level_id())
+					if lvl == actor_level then
+						if not _self.targets then _self.targets = {} end
+						_self.targets[id] = true
+						trace("Lamp, adding target %s", id)
+						has_targets = true
+					end
+				end
+
+				if not has_targets then _self.targets = false end
+			end
+
+			if _self.targets == false then
+				trace("Lamp, no active targets on level")
+				return
+			end
+
+			for id, freq in pairs(_self.targets) do
+				local obj = get_object_by_id(id)
+				if obj then
+					local tg = time_global()
+					local light = _self.light_sources[id] and _self.light_sources[id].light or (function()
+						trace("Lamp, creating light")
+						local light = script_light() -- Create a light source
+						light.type = 1 -- 1 = Point ; 2 = Spot
+						light.range = 5 --1
+						light.lanim = "koster_01_electra"
+						light.lanim_brightness = 0.2
+						light.hud_mode = false
+						light.shadow = true -- Turn on/off
+						light.volumetric = false
+						light.enabled = true
+						light.color = fcolor():set(1, 0.9, 0.2, 0.5)
+						light:set_position(obj:position())
+						light:set_direction(obj:direction())
+						light:update()
+						_self.light_sources[id] = {
+							light = light,
+							type = light.type,
+							range = light.range,
+							lanim = light.lanim,
+							lanim_brightness = light.lanim_brightness,
+							hud_mode = light.hud_mode,
+							shadow = light.shadow,
+							volumetric = light.volumetric,
+							enabled = light.enabled,
+							color = light.color,
+						}
+						return light
+					end)()
+					-- Periodic flashing
+					local z = (tg % _self.blink_half_interval * 2) - _self.blink_half_interval
+					local x = z * z
+					local upper_limit = _self.blink_half_interval * _self.blink_half_interval
+					light.range = normalize(x, 0, upper_limit) * _self.max_radius + _self.min_radius
+					light:update()
 				end
 			end
 		end
@@ -2432,6 +2523,31 @@ local artefact_on_equip_functions = {
 		end
 	end,
 
+	-- Lamp, Perk: Enlightening Kleptomania
+	af_fonar = function(actor, artefact_count, artefact_ids, artefact_names)
+		local rf_targets = item_radio.RF_targets
+
+		if rf_stashes[actor_level] then
+			for k, v in pairs(rf_stashes[actor_level]) do
+				local obj = get_object_by_id(k)
+				local pos = obj:position()
+				trace("stash id %s, freq %s, coords %s %s %s", k, v, pos.x, pos.y, pos.z)
+			end
+		end
+
+		RegisterScriptCallback("actor_on_item_take", artefact_props.af_fonar.on_item_take)
+		register_callback("actor_on_update", artefact_props.af_fonar.light_sources_update, function()
+			for k, v in pairs(artefact_props.af_fonar.light_sources) do
+				local light = v.light
+				light.enabled = false
+				light:update()
+				artefact_props.af_fonar.light_sources[k] = nil
+			end
+			artefact_props.af_fonar.targets = nil
+			UnregisterScriptCallback("actor_on_item_take", artefact_props.af_fonar.on_item_take)
+		end)
+	end,
+
 	-- Knot, Perk: Deal with the Devil
 	af_fire_loop = function(actor, artefact_count, artefact_ids, artefact_names)
 		if not has_alife_info("lucifer_active") then
@@ -2448,7 +2564,7 @@ local artefact_on_equip_functions = {
 				return true
 			end)
 		end
-	end,
+	end
 
 }
 
@@ -2786,6 +2902,8 @@ local function actor_on_first_update()
 	local tg_now = time_global()
 	local tg_add = (tg_now - tg_lag) * 0.001
 	trace("tg_now %s, tg_add %s", tg_now, tg_add)
+
+	actor_level = level_name()
 
 	for key, effect in pairs(timed_effects) do
 		effect.timer = effect.timer + tg_add
