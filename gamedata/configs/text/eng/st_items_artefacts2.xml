@@ -11,13 +11,13 @@
     %c[ui_gray_2]PROPERTIES:\n
     %c[ui_cyan] • %c[ui_gray_2] inert artifact\n
     %c[d_cyan] • %c[ui_gray_2] valuable\n
-    %c[d_orange] • %c[ui_gray_2] Perk: Stone Skin\n 
-    Receiving melee damage grants you Stone skin stack.\n
-        With receiving stack you get 10% melee damage protection but receive 10% speed penalty.\n
-        Each stack grows protection with diminishing returns and penalize speed more.\n
-        Maximum 10 stacks is possible, at which you receive 75% reduction of melee damage but become completely immobilized.\n
-        Effect lasts for 10 seconds, after which all stacks are burned.\n
-        Multiple artefact increase the rate of gaining stacks.</text>
+    %c[d_orange] • %c[d_orange] Perk: Stone Skin\n 
+        -- Receiving melee damage grants you Stone skin stack.\n
+        -- With receiving stack you get 10% melee damage protection but receive 10% speed penalty.\n
+        -- Each stack grows protection with diminishing returns and penalize speed more.\n
+        -- Maximum 10 stacks is possible, at which you receive 75% reduction of melee damage but become completely immobilized.\n
+        -- Effect lasts for 10 seconds, after which all stacks are burned.\n
+        -- Multiple artefact increase the rate of gaining stacks.</text>
   </string>
   <string id="st_af_cell_name">
     <text>Cell</text>
@@ -27,11 +27,11 @@
     %c[ui_gray_2]PROPERTIES:\n
     %c[ui_cyan] • %c[ui_gray_2] inert artifact\n
     %c[d_cyan] • %c[ui_gray_2] valuable\n
-    %c[d_orange] • %c[ui_gray_2] Perk: Disintegrator\n
-    Disintegrates part of the bullet coming to you. Unfortunately in the process a lot of radiation is emitted, making you ill.\n
-        Reduces bullet damage by 15%.\n
-        Reduced amount of damage is converted to radiation.\n
-        Stacks with multiple artefacts.</text>
+    %c[d_orange] • %c[d_orange] Perk: Disintegrator\n
+      -- Disintegrates part of the bullet coming to you. Unfortunately in the process a lot of radiation is emitted, making you ill.\n
+      -- Reduces bullet damage by 15%.\n
+      -- Reduced amount of damage is converted to radiation.\n
+      -- Stacks with multiple artefacts.</text>
   </string>
   <string id="st_af_fountain_name">
     <text>Fountain</text>
@@ -41,9 +41,9 @@
     %c[ui_gray_2]PROPERTIES:\n
     %c[ui_cyan] • %c[ui_gray_2] inert artifact\n
     %c[d_cyan] • %c[ui_gray_2] valuable\n
-    %c[d_orange] • %c[ui_gray_2] Perk: Letyshops Time\n
+    %c[d_orange] • %c[d_orange] Perk: Letyshops Time\n
      -- Receive 2% cashback on each buy.\n
-         -- Stacks with multiple artefacts.</text>
+     -- Stacks with multiple artefacts.</text>
   </string>
   <string id="st_af_spaika_name">
     <text>Spike</text>
@@ -53,7 +53,7 @@
     %c[ui_gray_2]PROPERTIES:\n
     %c[ui_cyan] • %c[ui_gray_2] inert artifact\n
     %c[d_cyan] • %c[ui_gray_2] valuable\n
-    %c[d_orange] • %c[ui_gray_2] Perk: Critical Ascension\n
+    %c[d_orange] • %c[d_orange] Perk: Critical Ascension\n
       -- Consecutive hits give 3% bonus to damage of your next shot.\n
           -- Hitting enemy in the critical place gives 6% bonus.\n
           -- Missing the shot resets the bonus stack and gives psy damage penalty proportional to the stack you had.\n
@@ -69,7 +69,7 @@
     %c[ui_gray_2]PROPERTIES:\n
     %c[ui_cyan] • %c[ui_gray_2] inert artifact\n
     %c[d_cyan] • %c[ui_gray_2] valuable\n
-    %c[d_orange] • %c[ui_gray_2] Perk: Light of Tranquility\n
+    %c[d_orange] • %c[d_orange] Perk: Light of Tranquility\n
       -- Restores health and psy while being near campfire, amplifies psy recovery artefacts near campfire.\n
           -- Effect stacks with each artefact on belt.</text>
   </string>
@@ -99,7 +99,7 @@
     %c[ui_gray_2]PROPERTIES:\n
     %c[ui_cyan] • %c[ui_gray_2] inert artifact\n
     %c[d_cyan] • %c[ui_gray_2] valuable\n
-    %c[d_orange] • %c[ui_gray_2] Perk: Solar Powered\n
+    %c[d_orange] • %c[d_orange] Perk: Solar Powered\n
        -- Gives health and stamina boost at clear weather, little stamina boost at partly clear and stamina penalty at not clear and at night.\n
            -- Effect stacks with each artefact on belt.</text>
   </string>
@@ -111,9 +111,9 @@
     %c[ui_gray_2]PROPERTIES:\n
     %c[ui_cyan] • %c[ui_gray_2] inert artifact\n
     %c[d_cyan] • %c[ui_gray_2] valuable\n
-    %c[d_orange] • %c[ui_gray_2] Perk: Will to Live\name
+    %c[d_orange] • %c[d_orange] Perk: Will to Live\n
       -- Gives stronger health regen the less health you have if you have lower than 25% of health up to that amount.\n
-          -- More artefacts increase the regen and slightly increases the highest health to trigger.</text>
+      -- More artefacts increase the regen and slightly increases the highest health to trigger.</text>
   </string>
   <string id="st_af_chelust_name">
     <text>Chain</text>
@@ -132,7 +132,7 @@
     %c[ui_gray_2]PROPERTIES:\n
     %c[ui_cyan] • %c[ui_gray_2] inert artifact\n
     %c[d_cyan] • %c[ui_gray_2] valuable\n
-    %c[d_orange] • %c[ui_gray_2] Perk: Arszi's Blessing\n
+    %c[d_orange] • %c[d_orange] Perk: Arszi's Blessing\n
           -- Converts radiation illness to stamina boost and gives light radiation cure.\n
           -- More artefacts make boost bigger but less continuous.</text>
   </string>
@@ -144,10 +144,10 @@
     %c[ui_gray_2]PROPERTIES:\n
     %c[ui_cyan] • %c[ui_gray_2] inert artifact\n
     %c[d_cyan] • %c[ui_gray_2] valuable\n
-    %c[d_orange] • %c[ui_gray_2] Perk: The Unorthodox Way Of Travelling\n
-      -- Killing anyone will teleport you to the place of your victim's death\n
-      -- Don't try this on crows\n
-      -- Does not stack in any way\n</text>
+    %c[d_orange] • %c[d_orange] Perk: The Unorthodox Way Of Travelling\n
+      -- Killing anyone will teleport you to the place of your victim's death.\n
+      -- Don't try this on crows.\n
+      -- Does not stack in any way.</text>
   </string>
   <string id="st_af_fire_loop_name">
     <text>Knot</text>
@@ -157,7 +157,7 @@
     %c[ui_gray_2]PROPERTIES:\n
     %c[ui_cyan] • %c[ui_gray_2] inert artifact\n
     %c[d_cyan] • %c[ui_gray_2] valuable\n
-    %c[d_orange] • %c[ui_gray_2] Perk: Deal with the Devil\n
+    %c[d_orange] • %c[d_orange] Perk: Deal with the Devil\n
        -- Gamechanger Artefact.\n
            -- Moving the artefact to belt will sign the Pact with the Zone.\n
            -- The Zone empowers your Knot and it becomes the mysterious artefact also known as Lucifer.</text>
@@ -179,7 +179,7 @@
     %c[ui_gray_2]PROPERTIES:\n
     %c[ui_cyan] • %c[ui_gray_2] inert artifact\n
     %c[d_cyan] • %c[ui_gray_2] valuable\n
-    %c[d_orange] • %c[ui_gray_2] Perk: Zone Infusion\n
+    %c[d_orange] • %c[d_orange]Perk: Zone Infusion\n
       -- Stepping into anomaly of various types infuse your active weapon.\n
           -- Infused weapon loses 30% of its raw power but gains 50% of elemental damage power according to the anomaly type.\n
           -- Only electric, thermal and chemical anomalies are valid for infusion, including fields.\n
@@ -194,7 +194,7 @@
     %c[ui_gray_2]PROPERTIES:\n
     %c[ui_cyan] • %c[ui_gray_2] inert artifact\n
     %c[d_cyan] • %c[ui_gray_2] valuable\n
-    %c[d_orange] • %c[ui_gray_2] Perk: What Colour Is Your Blood?\n
+    %c[d_orange] • %c[d_orange] Perk: What Colour Is Your Blood?\n
       -- Drains satiety to cure bleeding.\n
           -- Multiple artefacts increase the cure but also increase the drain.</text>
   </string>
@@ -206,7 +206,7 @@
     %c[ui_gray_2]PROPERTIES:\n
     %c[ui_cyan] • %c[ui_gray_2] inert artifact\n
     %c[d_cyan] • %c[ui_gray_2] valuable\n
-    %c[d_orange] • %c[ui_gray_2] Perk: Dodge This\n
+    %c[d_orange] • %c[d_orange] Perk: Dodge This\n
      -- Has 20% chance to reflect 35% of bullet damage back.\n
          -- Nullify the damage of hit on reflection.\n
          -- More artefacts increase the chance to reflect with diminishing returns.</text>
@@ -219,9 +219,9 @@
     %c[ui_gray_2]PROPERTIES:\n
     %c[ui_cyan] • %c[ui_gray_2] inert artifact\n
     %c[d_cyan] • %c[ui_gray_2] valuable\n
-    %c[d_orange] • %c[ui_gray_2] Perk: Necessary Gluttony\n
+    %c[d_orange] • %c[d_orange] Perk: Necessary Gluttony\n
        -- Provides health bonus on food consume based on its callories.\n
-           -- Effect prolongs with each artefact on belt.</text>
+       -- Effect prolongs with each artefact on belt.</text>
   </string>
   <string id="st_af_skull_miser_name">
     <text>Miser's skull</text>
@@ -240,7 +240,7 @@
     %c[ui_gray_2]PROPERTIES:\n
     %c[ui_cyan] • %c[ui_gray_2] inert artifact\n
     %c[d_cyan] • %c[ui_gray_2] valuable\n
-    %c[d_orange] • %c[ui_gray_2] Perk: Phantom Pacifist\n
+    %c[d_orange] • %c[d_orange] Perk: Phantom Pacifist\n
        -- Become invisible to anybody.\n
            -- You can't draw a weapon, talk to anybody or interact with anything.\n
            -- Does not stack in any way.</text>
@@ -253,10 +253,10 @@
     %c[ui_gray_2]PROPERTIES:\n
     %c[ui_cyan] • %c[ui_gray_2] inert artifact\n
     %c[d_cyan] • %c[ui_gray_2] valuable\n
-    %c[d_orange] • %c[ui_gray_2] Perk: The (Un)lucky charm\n
-      -- 35% chance that incoming bullet damage will be fully redirected to your companion\n
-      -- Some companions are smarter than others and they'll smell something fishy before they die\n
-      -- Stacks with multiple artefacts with diminishing returns</text>
+    %c[d_orange] • %c[d_orange] Perk: The (Un)lucky charm\n
+      -- 35% chance that incoming bullet damage will be fully redirected to your companion.\n
+      -- Some companions are smarter than others and they'll smell something fishy before they die.\n
+      -- Stacks with multiple artefacts with diminishing returns.</text>
   </string>
   <string id="st_af_peas_name">
     <text>Moon</text>
@@ -266,9 +266,9 @@
     %c[ui_gray_2]PROPERTIES:\n
     %c[ui_cyan] • %c[ui_gray_2] inert artifact\n
     %c[d_cyan] • %c[ui_gray_2] valuable\n
-    %c[d_orange] • %c[ui_gray_2] Perk: Friend of the Night\n
+    %c[d_orange] • %c[d_orange] Perk: Friend of the Night\n
        -- Increases stats after midnight until dawn, gives penalties at day time (WIP).\n
-           -- Effect stacks with each artefact on belt.</text>
+       -- Effect stacks with each artefact on belt.</text>
   </string>
   <string id="st_af_generator_name">
     <text>Generator</text>
@@ -278,10 +278,10 @@
     %c[ui_gray_2]PROPERTIES:\n
     %c[ui_cyan] • %c[ui_gray_2] inert artifact\n
     %c[d_cyan] • %c[ui_gray_2] valuable\n
-    %c[d_orange] • %c[ui_gray_2] Perk: Godzilla is Approaching\n
+    %c[d_orange] • %c[d_orange] Perk: Godzilla is Approaching\n
        -- Restores batteries charge of items while sprinting.\n
-           -- Won't revive completely dead batteries or devices with no batteries.\n
-           -- More artefacts gives more recharge rate and slight increase in sprint speed.</text>
+       -- Won't revive completely dead batteries or devices with no batteries.\n
+       -- More artefacts gives more recharge rate and slight increase in sprint speed.</text>
   </string>
   <string id="st_af_ball_name">
     <text>Ball</text>
@@ -291,7 +291,7 @@
     %c[ui_gray_2]PROPERTIES:\n
     %c[ui_cyan] • %c[ui_gray_2] inert artifact\n
     %c[d_cyan] • %c[ui_gray_2] valuable\n
-    %c[d_orange] • %c[ui_gray_2] Perk: Kick Deez Nutz\n
+    %c[d_orange] • %c[d_orange] Perk: Kick Deez Nutz\n
        -- Tier Based Artefact.\n
            -- Amplifies players mighty foot and allows him to kick more mutants, resulting in instant death.\n
            -- Each artefact on the belt allows to kick more monsters.\n
@@ -305,11 +305,11 @@
     %c[ui_gray_2]PROPERTIES:\n
     %c[ui_cyan] • %c[ui_gray_2] inert artifact\n
     %c[d_cyan] • %c[ui_gray_2] valuable\n
-    %c[d_orange] • %c[ui_gray_2] Perk: Enlightening Kleptomania\n
-      -- The artefact catches frequencies of packages and sends energy to light them up\n
-      -- Lights up stashes and items emitting signal to RF-receiver\n
-      -- The light is very dim and hardly visible at day, so searching at night is advisable\n
-      -- Does not stack in any way</text>
+    %c[d_orange] • %c[d_orange] Perk: Enlightening Kleptomania\n
+      -- The artefact catches frequencies of packages and sends energy to light them up.\n
+      -- Lights up stashes and items emitting signal to RF-receiver.\n
+      -- The light is very dim and hardly visible at day, so searching at night is advisable.\n
+      -- Does not stack in any way.</text>
   </string>
   <string id="st_af_tapeworm_name">
     <text>Tapeworm</text>
@@ -319,7 +319,7 @@
     %c[ui_gray_2]PROPERTIES:\n
     %c[ui_cyan] • %c[ui_gray_2] inert artifact\n
     %c[d_cyan] • %c[ui_gray_2] valuable\n
-    %c[d_orange] • %c[ui_gray_2] Perk: Stunner\n
+    %c[d_orange] • %c[d_orange] Perk: Stunner\n
        -- Upon receiving melee damage the enemy would be stunned for 2.5 seconds.\n
            -- While being stunned the enemy is disabled in fight and won't attack.\n
            -- Has a cooldown of 2 seconds between uses.\n
@@ -333,12 +333,12 @@
     %c[ui_gray_2]PROPERTIES:\n
     %c[ui_cyan] • %c[ui_gray_2] inert artifact\n
     %c[d_cyan] • %c[ui_gray_2] valuable\n
-    %c[d_orange] • %c[ui_gray_2] Perk: Culinary Hyperversity\n
+    %c[d_orange] • %c[d_orange] Perk: Culinary Hyperversity\n
     -- Convert energy of raw mutant meat to special abilities.\n
     -- Extra artefacts or eating same meat multiple times does not stack the effect.\n
     -- Last for 1 minute, eating different mutant meat overrides previous time and resets.\n
     --  %c[d_orange]Table of effects: \n
-        --  %c[d_cyan]Flesh meat: %c[ui_gray_2] 1%/sec health regen, 33% bullet damage penalty.\n
+%c[d_cyan]-- Flesh meat: %c[ui_gray_2] 1%/sec health regen, 33% bullet damage penalty.\n
         --  %c[d_cyan]Boar meat: %c[ui_gray_2] 25% melee damage reduction.\n
         --  %c[d_cyan]Dog meat: %c[ui_gray_2] slight bleeding cure, 1%/sec psy regen.\n
         --  %c[d_cyan]Pseudodog: %c[ui_gray_2] 2%/sec psy regen, 25% psy damage reduction.\n
@@ -372,7 +372,7 @@
     %c[ui_gray_2]PROPERTIES:\n
     %c[ui_cyan] • %c[ui_gray_2] inert artifact\n
     %c[d_cyan] • %c[ui_gray_2] valuable\n
-    %c[d_orange] • %c[ui_gray_2] Perk: Crank High Voltage\n
+    %c[d_orange] • %c[d_orange] Perk: Crank High Voltage\n
       -- Stepping on Electra will fully recharge player's batteries of active devices.\n
           -- Recharges random amount of devices and batteries combined in the inventory.\n
           -- Gives infinite sprint for some time.\n
@@ -387,7 +387,7 @@
     %c[ui_gray_2]PROPERTIES:\n
     %c[ui_cyan] • %c[ui_gray_2] inert artifact\n
     %c[d_cyan] • %c[ui_gray_2] valuable\n
-    %c[d_orange] • %c[ui_gray_2] Perk: Bloodlust\n
+    %c[d_orange] • %c[d_orange] Perk: Bloodlust\n
       -- 10% Increase of melee damage.\n
           -- Vampire effect: 3.5% of new melee damage is converted to player's health.\n
           -- Upon killing certain mutants spawns raw chunk of meat near him.\n
@@ -428,7 +428,7 @@
     %c[ui_gray_2]PROPERTIES:\n
     %c[ui_cyan] • %c[ui_gray_2] inert artifact\n
     %c[d_cyan] • %c[ui_gray_2] valuable\n
-    %c[d_orange] • %c[ui_gray_2] Perk: Good ol' Ultra-Violence\n
+    %c[d_orange] • %c[d_orange] Perk: Good ol' Ultra-Violence\n
       -- 5% chance that the shot would be explosive.\n
           -- Upon killing an npc or mutant with explosive shot it will explode violently.\n
           -- Explosion spawn meaty gibs and hurts everyone in the radius.\n
