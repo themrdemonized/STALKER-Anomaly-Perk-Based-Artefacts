@@ -1,4 +1,4 @@
-Perk Based Artefacts, 0.12
+Perk Based Artefacts, 0.13
 A unique twist on overhauling old junk artefacts beyond the boundaries of simple stat changers
 Junk artefacts are no longer junk and received unique special abilities or Perks. The degree of perks vary from simple boosters to marvellous staff like recharging batteries by stepping in Electra, receiving Money on Headshots or Even Evading Death itself when all hope is lost.
 Multiple artefacts might or might not stack the effects and penalties of Perks in various ways, and effects are triggered on very various conditions
@@ -150,6 +150,11 @@ So far the perks are
   -- 35% chance that incoming bullet damage will be fully redirected to your companion
   -- Some companions are smarter than others and they'll smell something fishy before they die
   -- Stacks with multiple artefacts with diminishing returns
+
+  -- Beacon, Perk: The Unorthodox Way Of Travelling
+  -- Killing anyone will teleport you to the place of your victim's death
+  -- Don't try this at crows
+  -- Does not stack in any way
 
   -- Knot, Perk: Deal with the Devil
   -- Gamechanger Artefact

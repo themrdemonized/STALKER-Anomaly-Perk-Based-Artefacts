@@ -143,7 +143,11 @@
     <text>A clotted mass of superdense ferrous metals. Not radioactive, and contains rare minerals that are used in industrial production, so there is a high demand for this artifact outside the Zone. Has no other useful properties to stalkers in the field.\n \n
     %c[ui_gray_2]PROPERTIES:\n
     %c[ui_cyan] • %c[ui_gray_2] inert artifact\n
-    %c[d_cyan] • %c[ui_gray_2] valuable</text>
+    %c[d_cyan] • %c[ui_gray_2] valuable\n
+    %c[d_orange] • %c[ui_gray_2] Perk: The Unorthodox Way Of Travelling\n
+      -- Killing anyone will teleport you to the place of your victim's death\n
+      -- Don't try this at crows\n
+      -- Does not stack in any way\n</text>
   </string>
   <string id="st_af_fire_loop_name">
     <text>Knot</text>

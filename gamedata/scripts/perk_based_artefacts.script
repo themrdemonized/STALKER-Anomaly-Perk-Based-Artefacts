@@ -39,6 +39,7 @@ local round_100 = round_100
 local spairs = spairs
 local str_explode = str_explode
 local SYS_GetParam = SYS_GetParam
+local TeleportObject = TeleportObject
 local time_global = time_global
 local UnregisterScriptCallback = UnregisterScriptCallback
 local VEC_Y = VEC_Y
@@ -607,6 +608,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			if is_empty(artefact_props.af_medallion.enemy_squad_member_ids) then
 				trace("Medallion, former companions are dead")
 				UnregisterScriptCallback("on_enemy_eval", artefact_props.af_medallion.on_enemy_eval)
+				UnregisterScriptCallback("npc_on_death_callback", artefact_props.af_medallion.npc_on_death_callback)
 			end
 		end,
 		register = function(self)
@@ -629,6 +631,23 @@ artefact_props = { -- Special props of artefacts that are used in processing
 		valid_hits = { -- Valid hit types to trigger
 			[hit.fire_wound] = true
 		}
+	},
+	af_lighthouse = {
+		sounds = {
+			"perk_based_artefacts\\TELEPRT1",
+			"perk_based_artefacts\\TELEPRT2",
+			"perk_based_artefacts\\TELEPRT3"
+		},
+		on_death = function(self, actor, artefact_count, artefact_ids, artefact_names, npc, who, last_npc_hit, last_npc_hit_bone_index)
+			trace("Teleporting actor")
+
+			add_pp_effector("black_infinite.ppe", c_id_ppe_black_infinite, true)
+			CreateTimeEvent("af_lighthouse", "af_lighthouse", 0.5, function()
+				remove_pp_effector(c_id_ppe_black_infinite)
+			end)
+			actor:set_actor_position(npc:position())
+			play_sound_on_actor(get_random_array_element(self.sounds), 0.7, random_float(0.95, 1.05))
+		end
 	},
 	af_cell = {
 		valid_hits = { -- Valid hit types to trigger
@@ -2280,7 +2299,12 @@ local artefact_on_npc_death_functions = {
 	-- Dragon's Eye, Perk: Good ol' Ultra-Violence
 	af_dragon_eye = function(actor, artefact_count, artefact_ids, artefact_names, npc, who, last_npc_hit, last_npc_hit_bone_index)
 		artefact_props.af_dragon_eye:on_death(actor, artefact_count, artefact_ids, artefact_names, npc, who, last_npc_hit, last_npc_hit_bone_index)
-	end
+	end,
+
+	-- Beacon, Perk: The Unorthodox Way of Travelling
+	af_lighthouse = function(actor, artefact_count, artefact_ids, artefact_names, npc, who, last_npc_hit, last_npc_hit_bone_index)
+		artefact_props.af_lighthouse:on_death(actor, artefact_count, artefact_ids, artefact_names, npc, who, last_npc_hit, last_npc_hit_bone_index)
+	end,
 
 }
 
@@ -2320,7 +2344,12 @@ local artefact_on_monster_death_functions = {
 	-- Dragon's Eye, Perk: Good ol' Ultra-Violence
 	af_dragon_eye = function(actor, artefact_count, artefact_ids, artefact_names, monster, who, last_monster_hit, last_monster_hit_bone_index)
 		artefact_props.af_dragon_eye:on_death(actor, artefact_count, artefact_ids, artefact_names, monster, who, last_monster_hit, last_monster_hit_bone_index)
-	end
+	end,
+
+	-- Beacon, Perk: The Unorthodox Way of Travelling
+	af_lighthouse = function(actor, artefact_count, artefact_ids, artefact_names, monster, who, last_monster_hit, last_monster_hit_bone_index)
+		artefact_props.af_lighthouse:on_death(actor, artefact_count, artefact_ids, artefact_names, monster, who, last_monster_hit, last_monster_hit_bone_index)
+	end,
 
 }
 
