@@ -267,8 +267,8 @@
     %c[ui_cyan] • %c[ui_gray_2] inert artifact\n
     %c[d_cyan] • %c[ui_gray_2] valuable\n
     %c[d_orange] • %c[d_orange] Perk: Friend of the Night\n
-       -- Increases stats after midnight until dawn, gives penalties at day time (WIP).\n
-       -- Effect stacks with each artefact on belt.</text>
+      -- Gives bleeding cure and speed increase from dusk till dawn at any weather\n
+      -- Effect stacks with each artefact on belt</text>
   </string>
   <string id="st_af_generator_name">
     <text>Generator</text>
