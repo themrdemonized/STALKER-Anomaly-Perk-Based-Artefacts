@@ -16,7 +16,7 @@ So far the perks are
   -- More artefacts increase the regen and slightly increases the highest health to trigger
 
   -- Moon, Perk: Friend of the Night
-  -- Increases stats after midnight until dawn, gives penalties at day time (WIP)
+  -- Gives bleeding cure and speed increase from dusk till dawn at any weather
   -- Effect stacks with each artefact on belt
 
   -- Signet, Perk: Light of Tranquility

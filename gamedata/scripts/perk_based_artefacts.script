@@ -552,13 +552,17 @@ local function process_timed_effects()
 end
 
 local speed_boosts = { -- Table of speed boosts for different artefacts
+	af_peas = {
+		name = "af_peas_boost",
+		boost = 0.085
+	},
 	af_generator = {
 		name = "af_generator_boost",
 		boost = 0.135
 	},
 	af_lucifer = {
 		name = "af_lucifer_boost",
-		boost = 0.3
+		boost = 0.24
 	}
 }
 
@@ -823,7 +827,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 		targets = nil, -- Table of targets to light up
 		on_item_take = function(item)
 			local _self = artefact_props.af_fonar
-			if _self.targets == false then return end
+			if not _self.targets then return end
 			local id = item:id()
 			if _self.targets[id] then
 				_self.targets[id] = nil
@@ -1614,7 +1618,7 @@ local artefact_on_update_functions = {
 		local power_partly_boost = 0.001
 		local power_not_clear_penalty = -0.001
 
-		if hours >= 21 or hours < 5 then
+		if hours >= 21 or hours <= 5 then
 			actor:change_power(power_not_clear_penalty * artefact_count)
 		else
 			if current_weather == "clear" then
@@ -1642,10 +1646,14 @@ local artefact_on_update_functions = {
 	end,
 
 	-- Moon, Perk: Friend of the Night
-	af_moon = function(actor, artefact_count, artefact_ids, artefact_names)
+	af_peas = function(actor, artefact_count, artefact_ids, artefact_names)
 		local hours = get_time_hours()
-		if hours >= 5 then return end
-		actor:change_power(0.001 * artefact_count)
+		if hours <= 21 or hours >= 5 then return end
+
+		local bleeding_cure_boost = 0.0009 * artefact_count
+		actor.bleeding = bleeding_cure_boost
+
+		add_speed(speed_boosts.af_peas.name, 1 + speed_boosts.af_peas.boost * artefact_count, false, true)
 	end,
 
 	-- Signet, Perk: Light of Tranquility

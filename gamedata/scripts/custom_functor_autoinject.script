@@ -342,12 +342,57 @@ ui_inventory.UIInventory.remove_custom_functor = function(self, name)
 	end
 end
 
+ui_inventory.UIInventory.override_functor = function(self, slot, cond_name, func_name, cond_action, func_action)
+	self.custom_functor[slot] = {
+		cond_name = cond_name,
+		func_name = func_name,
+		cond_action = cond_action,
+		func_action = func_action
+	}
+end
+
+ui_inventory.UIInventory.remove_override = function(self, slot)
+	self.custom_functor[slot] = nil
+end
+
 -- Adding
-function add_functor(name, cond_name, func_name, cond_action, func_action)
-	if not name then return end
+local first_update_pending = true
+local functor_queue = {}
+
+local function add_to_queue(type, ...)
+	functor_queue[#functor_queue + 1] = {
+		type = type,
+		data = {...}
+	}
+end
+
+local function process_queue()
 
 	if not ui_inventory.GUI then
 		ui_inventory.GUI = ui_inventory.UIInventory()
+	end
+
+	printf("Custom functors, processing queue")
+
+	for i, v in ipairs(functor_queue) do
+		printf("Custom functors, type %s", v.type)
+		ui_inventory.GUI[v.type](ui_inventory.GUI, unpack(v.data))
+	end
+
+	functor_queue = {}
+	first_update_pending = false
+end
+
+local function actor_on_first_update()
+	process_queue()
+end
+
+function add_functor(name, cond_name, func_name, cond_action, func_action)
+	if not name then return end
+
+	if first_update_pending then 
+		add_to_queue("add_custom_functor", name, cond_name, func_name, cond_action, func_action)
+		return
 	end
 
 	ui_inventory.GUI:add_custom_functor(name, cond_name, func_name, cond_action, func_action)
@@ -355,6 +400,11 @@ end
 
 function remove_functor(name)
 	if not name then return end
+
+	if first_update_pending then 
+		add_to_queue("remove_custom_functor", name)
+		return
+	end
 
 	ui_inventory.GUI:remove_custom_functor(name)
 end
@@ -365,16 +415,12 @@ function override_functor(slot, cond_name, func_name, cond_action, func_action)
 		return
 	end
 
-	if not ui_inventory.GUI then
-		ui_inventory.GUI = ui_inventory.UIInventory()
+	if first_update_pending then 
+		add_to_queue("override_functor", slot, cond_name, func_name, cond_action, func_action)
+		return
 	end
 
-	ui_inventory.GUI.custom_functor[slot] = {
-		cond_name = cond_name,
-		func_name = func_name,
-		cond_action = cond_action,
-		func_action = func_action
-	}
+	ui_inventory.GUI:override_functor(slot, cond_name, func_name, cond_action, func_action)
 end
 
 function remove_override(slot)
@@ -383,7 +429,12 @@ function remove_override(slot)
 		return
 	end
 
-	ui_inventory.GUI.custom_functor[slot] = nil
+	if first_update_pending then 
+		add_to_queue("remove_override", slot)
+		return
+	end
+
+	ui_inventory.GUI:remove_override(slot)
 end
 
 function print_properties()
@@ -411,4 +462,8 @@ function print_custom_functor_names()
 	end
 
 	print_r(ui_inventory.GUI.custom_functor_names)
+end
+
+function on_game_start()
+	RegisterScriptCallback("actor_on_first_update", actor_on_first_update)
 end
