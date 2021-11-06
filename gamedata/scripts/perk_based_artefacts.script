@@ -41,6 +41,8 @@ local VEC_Y = VEC_Y
 local vector_rotate_y = vector_rotate_y
 local script_light = script_light
 
+local change_sleep = actor_status_sleep.actor_on_item_use
+
 local change_psy_health = arszi_psy.change_psy_health
 local manage_psy_health = arszi_psy.manage_psy_health
 local set_psy_health = arszi_psy.set_psy_health
@@ -716,6 +718,20 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			-- 	"SM_VENDIGO",
 			-- 	131, -- Bibliotekar
 			-- }
+		}
+	},
+	af_peas = {
+		moon_sleep_decrease = { -- Mock item to send to actor_status_sleep to decrease sleep
+			sec = "moon_sleep_decrease",
+			section = function(self)
+				return self.sec
+			end
+		},
+		moon_sleep_increase = { -- Mock item to send to actor_status_sleep to increase sleep
+			sec = "moon_sleep_increase",
+			section = function(self)
+				return self.sec
+			end
 		}
 	},
 	af_kogot = {
@@ -1648,12 +1664,20 @@ local artefact_on_update_functions = {
 	-- Moon, Perk: Friend of the Night
 	af_peas = function(actor, artefact_count, artefact_ids, artefact_names)
 		local hours = get_time_hours()
-		if hours <= 21 or hours >= 5 then return end
+		if hours <= 21 or hours >= 5 then
+			for i = 1, artefact_count do
+				change_sleep(artefact_props.af_peas.moon_sleep_increase)
+			end
+			return
+		end
 
 		local bleeding_cure_boost = 0.0009 * artefact_count
 		actor.bleeding = bleeding_cure_boost
 
 		add_speed(speed_boosts.af_peas.name, 1 + speed_boosts.af_peas.boost * artefact_count, false, true)
+		for i = 1, artefact_count do
+			change_sleep(artefact_props.af_peas.moon_sleep_decrease)
+		end
 	end,
 
 	-- Signet, Perk: Light of Tranquility

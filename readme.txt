@@ -17,6 +17,7 @@ So far the perks are
 
   -- Moon, Perk: Friend of the Night
   -- Gives bleeding cure and speed increase from dusk till dawn at any weather
+  -- Decreases sleepiness at night, increases sleepiness at day
   -- Effect stacks with each artefact on belt
 
   -- Signet, Perk: Light of Tranquility
