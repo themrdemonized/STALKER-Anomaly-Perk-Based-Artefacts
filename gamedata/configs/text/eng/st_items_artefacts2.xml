@@ -425,7 +425,7 @@
     <text>Dragon's eye</text>
   </string>
   <string id="st_af_dragon_eye_descr">
-    <text>This artifact is sometimes formed in thermal anomalies, and has the appearance of a reptile's eye. Has no useful properties to stalkers, and is not radioactive.\n \n
+    <text>This artefact is sometimes formed in thermal anomalies and has the appearance of a reptile's eye. It has a very dangerous and volatile property associated with it. In some peculiar way, when the user of this artefact secures a kill, there's a small chance for a violent explosion to happen within the victim's body, killing or hurting anyone and anything nearby. The more superstitious say that it's the Zone ripping out violently the souls of fallen beings. Most just prefer to avoid using the artefact altogether because of the stories of people getting caught in such explosion at an unfortunate distance.\n \n
     %c[ui_gray_2]PROPERTIES:\n
     %c[ui_cyan] • %c[ui_gray_2] inert artifact\n
     %c[d_cyan] • %c[ui_gray_2] valuable\n

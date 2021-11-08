@@ -166,7 +166,6 @@ So far the perks are
   -- Thistle, Perk: Minor Laceration
   -- Your weapon loses 50% of raw power but gains the ability to deal bleeding damage
   -- With each hit the enemy will receive a bleeding stack and start to slowly loose health proportionally to weapon raw power
-  -- Each stack lasts 5 seconds, maximum 5 stacks possible
   -- NPCs will have more chance to fall in wounded state, where they beg for mercy and might give you valuable information, if you reach them before they die
   -- Multiple artefacts increase the efficiency of bleeding stacks
 

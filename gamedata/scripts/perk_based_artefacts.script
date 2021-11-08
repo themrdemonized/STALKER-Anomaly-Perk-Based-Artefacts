@@ -1221,21 +1221,28 @@ artefact_props = { -- Special props of artefacts that are used in processing
 		end
 	},
 	af_repei = {
+		effect_time = 7,
 		on_before_hit = function(self, actor, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
 			local hit_k = 0.5
-			local bleeding_hit = s_hit.power * -0.003 * artefact_count
+			local bleeding_hit = s_hit.power * -0.002 * artefact_count
 			s_hit.power = s_hit.power * hit_k
 			
-			add_simple_timed_effect(5, function()
+			add_simple_timed_effect(self.effect_time, function()
 				if not npc:alive() then return end
 				npc:change_health(bleeding_hit)
 				trace("Thistle, npc health %s", npc.health)
-				CreateTimeEvent("af_thistle_hud", "af_thistle_hud", 0, function()
-					ui_enemy_health.on_hit(npc, -bleeding_hit, s_hit.direction, s_hit.draftsman, bone_id)
-					return true
-				end)
-				-- ui_enemy_health.on_hit(npc, -bleeding_hit, s_hit.direction, s_hit.draftsman, bone_id)
 			end)
+		end,
+		on_hit = function(self, actor, artefact_count, artefact_ids, artefact_names, npc, amount, local_direction, who, bone_index, last_npc_hit)
+			add_simple_timed_effect(self.effect_time, function()
+				if not npc:alive() then return end
+				if npc.health > 0 then
+					CreateTimeEvent("af_thistle_hud", "af_thistle_hud", 0, function()
+						ui_enemy_health.on_hit(npc, nil, local_direction, who, bone_index)
+						return true
+					end)
+				end
+			end, nil, "af_thistle_hud")
 		end
 	},
 	af_cocoon = {
@@ -1660,7 +1667,7 @@ local artefact_on_update_functions = {
 
 		if hours >= 21 or hours <= 5 or indoor_levels[actor_level] then
 			actor:change_power(power_not_clear_penalty * artefact_count)
-			trace("Dark time penalty, time %s, current_weather %s, health %s, power %s", hours, current_weather, actor.health, actor.power)
+			trace("Dark time penalty, time %s, level %s, health %s, power %s", hours, actor_level, actor.health, actor.power)
 		else
 			local current_weather = get_current_weather()
 			if not current_weather then
@@ -2411,6 +2418,16 @@ local artefact_on_npc_before_hit_functions = {
 
 }
 
+-- Functions for artefacts which provide perk bonuses on npc hit
+local artefact_on_npc_hit_functions = {
+
+	-- Thistle, perk: Minor Laceration
+	af_repei = function(actor, artefact_count, artefact_ids, artefact_names, npc, amount, local_direction, who, bone_index, last_npc_hit)
+		artefact_props.af_repei:on_hit(actor, artefact_count, artefact_ids, artefact_names, npc, amount, local_direction, who, bone_index, last_npc_hit)
+	end,
+
+}
+
 -- Functions for artefacts which provide perk bonuses on npc death
 local artefact_on_npc_death_functions = {
 
@@ -2500,6 +2517,16 @@ local artefact_on_monster_before_hit_functions = {
 	-- Thistle, perk: Minor Laceration
 	af_repei = function(actor, artefact_count, artefact_ids, artefact_names, monster, s_hit, bone_id, flags)
 		artefact_props.af_repei:on_before_hit(actor, artefact_count, artefact_ids, artefact_names, monster, s_hit, bone_id, flags)
+	end,
+
+}
+
+-- Functions for artefacts which provide perk bonuses on monster hit
+local artefact_on_monster_hit_functions = {
+
+	-- Thistle, perk: Minor Laceration
+	af_repei = function(actor, artefact_count, artefact_ids, artefact_names, monster, amount, local_direction, who, bone_index, last_monster_hit)
+		artefact_props.af_repei:on_hit(actor, artefact_count, artefact_ids, artefact_names, monster, amount, local_direction, who, bone_index, last_monster_hit)
 	end,
 
 }
@@ -2938,7 +2965,7 @@ local function npc_on_hit_callback(npc, amount, local_direction, who, bone_index
 		return
 	end
 
-	--process_artefacts(artefact_on_npc_hit_functions, npc, amount, who, last_npc_hit)
+	process_artefacts(artefact_on_npc_hit_functions, npc, amount, local_direction, who, bone_index, last_npc_hit)
 end
 
 local function npc_on_death_callback(npc, who)
@@ -2965,6 +2992,20 @@ local function monster_on_before_hit(monster, s_hit, bone_id, flags)
 	last_monster_hit_bone_index = bone_id
 
 	process_artefacts(artefact_on_monster_before_hit_functions, monster, s_hit, bone_id, flags)
+end
+
+local function monster_on_hit_callback(monster, amount, local_direction, who, bone_index)
+	if who:id() ~= AC_ID then
+		trace("monster_on_hit_callback not triggered %s, %s, %s", monster:section(), amount, who:section())
+		return
+	end
+
+	if not monster:alive() then
+		trace("monster_on_hit not triggered, monster %s not alive anymore", monster:section())
+		return
+	end
+
+	process_artefacts(artefact_on_monster_hit_functions, monster, amount, local_direction, who, bone_index, last_monster_hit)
 end
 
 local function monster_on_death_callback(monster, who)
@@ -3010,6 +3051,7 @@ local function actor_on_first_update()
 	RegisterScriptCallback("npc_on_hit_callback", npc_on_hit_callback)
 	RegisterScriptCallback("npc_on_death_callback", npc_on_death_callback)
 	RegisterScriptCallback("monster_on_before_hit", monster_on_before_hit)
+	RegisterScriptCallback("monster_on_hit_callback", monster_on_hit_callback)
 	RegisterScriptCallback("monster_on_death_callback", monster_on_death_callback)
 end
 
