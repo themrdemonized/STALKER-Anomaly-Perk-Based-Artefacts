@@ -292,7 +292,7 @@
     %c[ui_gray_2]PROPERTIES:\n
     %c[ui_cyan] • %c[ui_gray_2] inert artifact\n
     %c[d_cyan] • %c[ui_gray_2] valuable\n
-    %c[d_orange] • %c[d_orange] Perk: Kick Deez Nutz\n
+    %c[d_orange] • %c[d_orange] Perk: The Nutcracker\n
        -- Tier Based Artefact.\n
            -- Amplifies players mighty foot and allows him to kick more mutants, resulting in instant death.\n
            -- Each artefact on the belt allows to kick more monsters.\n
@@ -321,7 +321,7 @@
     %c[ui_cyan] • %c[ui_gray_2] inert artifact\n
     %c[d_cyan] • %c[ui_gray_2] valuable\n
     %c[d_orange] • %c[d_orange] Perk: Stunner\n
-       -- Upon receiving melee damage the enemy would be stunned for 2.5 seconds.\n
+       -- Getting melee hit by enemies will make them stunned for 2.5 seconds.\n
            -- While being stunned the enemy is disabled in fight and won't attack.\n
            -- Has a cooldown of 2 seconds between uses.\n
            -- Each extra artefact adds additional 2 seconds to effect.</text>

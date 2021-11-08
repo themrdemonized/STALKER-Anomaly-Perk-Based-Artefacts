@@ -132,6 +132,18 @@ local last_npc_hit_bone_index
 local last_monster_hit
 local last_monster_hit_bone_index
 
+local indoor_levels = {
+	jupiter_underground 	= true,
+	l03u_agr_underground 	= true,
+	l04u_labx18 			= true,
+	l08u_brainlab 			= true,
+	l10u_bunker 			= true,
+	l12u_control_monolith 	= true,
+	l12u_sarcofag 			= true,
+	l13u_warlab 			= true,
+	labx8				 	= true
+}
+
 local debug_mode = true
 
 -- Utils
@@ -1208,6 +1220,24 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			end
 		end
 	},
+	af_repei = {
+		on_before_hit = function(self, actor, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
+			local hit_k = 0.5
+			local bleeding_hit = s_hit.power * -0.003 * artefact_count
+			s_hit.power = s_hit.power * hit_k
+			
+			add_simple_timed_effect(5, function()
+				if not npc:alive() then return end
+				npc:change_health(bleeding_hit)
+				trace("Thistle, npc health %s", npc.health)
+				CreateTimeEvent("af_thistle_hud", "af_thistle_hud", 0, function()
+					ui_enemy_health.on_hit(npc, -bleeding_hit, s_hit.direction, s_hit.draftsman, bone_id)
+					return true
+				end)
+				-- ui_enemy_health.on_hit(npc, -bleeding_hit, s_hit.direction, s_hit.draftsman, bone_id)
+			end)
+		end
+	},
 	af_cocoon = {
 		valid_hits = { -- Valid hit types to trigger
 			[hit.wound] = true,
@@ -1621,12 +1651,6 @@ local artefact_on_update_functions = {
 
 	-- Sun, Perk: Solar Powered
 	af_sun = function(actor, artefact_count, artefact_ids, artefact_names)
-		local current_weather = get_current_weather()
-		if not current_weather then
-			trace("Sun: Weather not defined")
-			return
-		end
-
 		local hours = get_time_hours()
 
 		local health_boost = 0.00035
@@ -1634,19 +1658,29 @@ local artefact_on_update_functions = {
 		local power_partly_boost = 0.001
 		local power_not_clear_penalty = -0.001
 
-		if hours >= 21 or hours <= 5 then
+		if hours >= 21 or hours <= 5 or indoor_levels[actor_level] then
 			actor:change_power(power_not_clear_penalty * artefact_count)
+			trace("Dark time penalty, time %s, current_weather %s, health %s, power %s", hours, current_weather, actor.health, actor.power)
 		else
+			local current_weather = get_current_weather()
+			if not current_weather then
+				trace("Sun: Weather not defined")
+				return
+			end
+
 			if current_weather == "clear" then
 				actor:change_health(health_boost * artefact_count)
 				actor:change_power(power_clear_boost * artefact_count)
+				trace("Clear boost, time %s, current_weather %s, health %s, power %s", hours, current_weather, actor.health, actor.power)
 			elseif current_weather == "partly" then
 				actor:change_power(power_partly_boost * artefact_count)
+				trace("Partly boost, time %s, current_weather %s, health %s, power %s", hours, current_weather, actor.health, actor.power)
 			else
 				actor:change_power(power_not_clear_penalty * artefact_count)
+				trace("Not clear penalty, time %s, current_weather %s, health %s, power %s", hours, current_weather, actor.health, actor.power)
 			end
+
 		end
-		trace("health %s, power %s", actor.health, actor.power)
 	end,
 
 	-- Heart, Perk: Will to Live
@@ -1667,6 +1701,7 @@ local artefact_on_update_functions = {
 		if hours <= 21 or hours >= 5 then
 			for i = 1, artefact_count do
 				change_sleep(artefact_props.af_peas.moon_sleep_increase)
+				remove_speed(speed_boosts.af_peas.name)
 			end
 			return
 		end
@@ -2262,7 +2297,7 @@ local artefact_on_hit_functions = {
 		RegisterScriptCallback("on_enemy_eval", ignore_enemy_function)
 
 		if IsStalker(who) then
-			s_hit.power = s_hit.power * 0.05
+			s_hit.power = s_hit.power * 0.5
 
 			local function hit_enemy(time)
 				who_position = who:position()
@@ -2369,6 +2404,11 @@ local artefact_on_npc_before_hit_functions = {
 		artefact_props.af_sandstone:on_before_hit(actor, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
 	end,
 
+	-- Thistle, perk: Minor Laceration
+	af_repei = function(actor, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
+		artefact_props.af_repei:on_before_hit(actor, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
+	end,
+
 }
 
 -- Functions for artefacts which provide perk bonuses on npc death
@@ -2455,6 +2495,11 @@ local artefact_on_monster_before_hit_functions = {
 	-- Sandstone, perk: Zone Infusion
 	af_sandstone = function(actor, artefact_count, artefact_ids, artefact_names, monster, s_hit, bone_id, flags)
 		artefact_props.af_sandstone:on_before_hit(actor, artefact_count, artefact_ids, artefact_names, monster, s_hit, bone_id, flags)
+	end,
+
+	-- Thistle, perk: Minor Laceration
+	af_repei = function(actor, artefact_count, artefact_ids, artefact_names, monster, s_hit, bone_id, flags)
+		artefact_props.af_repei:on_before_hit(actor, artefact_count, artefact_ids, artefact_names, monster, s_hit, bone_id, flags)
 	end,
 
 }

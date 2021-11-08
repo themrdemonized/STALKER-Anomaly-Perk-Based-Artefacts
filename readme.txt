@@ -1,4 +1,4 @@
-Perk Based Artefacts, 0.14
+Perk Based Artefacts, 0.15
 A unique twist on overhauling old junk artefacts beyond the boundaries of simple stat changers
 Junk artefacts are no longer junk and received unique special abilities or Perks. The degree of perks vary from simple boosters to marvellous staff like recharging batteries by stepping in Electra, receiving Money on Headshots or Even Evading Death itself when all hope is lost.
 Multiple artefacts might or might not stack the effects and penalties of Perks in various ways, and effects are triggered on very various conditions
@@ -85,7 +85,7 @@ So far the perks are
   -- Receive 2% cashback on each buy
   -- Stacks with multiple artefacts
 
-  -- Ball, Perk: Kick Deez Nutz
+  -- Ball, Perk: The Nutcracker
   -- Tier Based Artefact
   -- Amplifies players mighty foot and allows him to kick more mutants, resulting in instant death
   -- Each artefact on the belt allows to kick more monsters
@@ -98,7 +98,7 @@ So far the perks are
   -- Stacks with multiple artefacts
   
   -- Tapeworm, Perk: Stunner
-  -- Upon receiving melee damage the enemy would be stunned for 2.5 seconds
+  -- Getting melee hit by enemies will make them stunned for 2.5 seconds 
   -- While being stunned the enemy is disabled in fight and won't attack
   -- Has a cooldown of 2 seconds between uses
   -- Each extra artefact adds additional 2 seconds to effect
@@ -162,6 +162,13 @@ So far the perks are
   -- Lights up stashes and items emitting signal to RF-receiver
   -- The light is very dim and hardly visible at day, so searching at night is advisable
   -- Does not stack in any way
+
+  -- Thistle, Perk: Minor Laceration
+  -- Your weapon loses 50% of raw power but gains the ability to deal bleeding damage
+  -- With each hit the enemy will receive a bleeding stack and start to slowly loose health proportionally to weapon raw power
+  -- Each stack lasts 5 seconds, maximum 5 stacks possible
+  -- NPCs will have more chance to fall in wounded state, where they beg for mercy and might give you valuable information, if you reach them before they die
+  -- Multiple artefacts increase the efficiency of bleeding stacks
 
   -- Knot, Perk: Deal with the Devil
   -- Gamechanger Artefact
