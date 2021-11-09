@@ -16,11 +16,9 @@ local copy_table = copy_table
 local CreateTimeEvent = CreateTimeEvent
 local empty_table = empty_table
 local get_console = get_console
-local give_info = give_info
 local has_alife_info = has_alife_info
 local is_empty = is_empty
 local is_not_empty = is_not_empty
-local ini_sys = ini_sys
 local IsAnomaly = IsAnomaly
 local IsArtefact = IsArtefact
 local IsMoveState = IsMoveState
@@ -32,7 +30,6 @@ local RegisterScriptCallback = RegisterScriptCallback
 local RemoveTimeEvent = RemoveTimeEvent
 local ResetTimeEvent = ResetTimeEvent
 local round_100 = round_100
-local spairs = spairs
 local str_explode = str_explode
 local SYS_GetParam = SYS_GetParam
 local time_global = time_global
@@ -312,7 +309,7 @@ end
 local function ema(key, value)
 	smoothed_values[key] = smoothed_values[key] and smoothed_values[key] + smoothing_alpha * (value - smoothed_values[key]) or value
 	--trace("EMA fired, key %s, target %s, current %s, going %s", key, value, smoothed_values[key], (value > smoothed_values[key] and "up" or "down"))
-	return smoothed_values[key] 
+	return smoothed_values[key]
 end
 
 local function look_at_nearest_npc(npc, actor)
@@ -1141,7 +1138,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 		monsters = {} -- Generated table to check if current monster is allowed to be kick
 	},
 	af_spaika = {
-		weapon_shot = false, 
+		weapon_shot = false,
 		damage_multiplier = 1,
 		event_reset = function(self)
 			--trace("Spike: event reset")
@@ -1629,7 +1626,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			if tier_level > 1 then
 				tier_level = tier_level - 1 -- Lower tier level by 1 of all tier 2+ artefacts
 			end
-			local tier = self.sacrifice_tiers[section] or self.sacrifice_tiers[clamp(tier_level, 0, 3)] 
+			local tier = self.sacrifice_tiers[section] or self.sacrifice_tiers[clamp(tier_level, 0, 3)]
 			if tier then
 				alife_release_id(obj:id())
 				CreateTimeEvent("refresh_artefacts", "refresh_artefacts", 0.15, refresh_artefacts_time_event_func, true)
@@ -2126,7 +2123,7 @@ local artefact_on_before_hit_functions = {
 				return alife_object(get_random_key(non_task_companions))
 			elseif is_not_empty(companion_squads) then
 				trace("Medallion, has companion_squads")
-				for k, squad in pairs(companion_squads) do 
+				for k, squad in pairs(companion_squads) do
 					if squad then
 						local m
 						local squad_ids = {}
