@@ -73,6 +73,8 @@ local get_game_factor = game_difficulties.get_game_factor
 
 local is_critical_bone = perk_based_artefacts_bone_mapper.is_critical_bone
 
+local refresh_health_bar = ui_enemy_health.on_hit
+
 local get_nearest_stalker = utils_obj.get_nearest_stalker
 
 local play_snd = xr_effects.play_snd
@@ -461,6 +463,7 @@ local status_effects = {} -- Table of status effects of artefacts (["artefact"] 
 local function add_status_effect(timer, effect, key)
 	local t = {
 		timer = time_elapsed + (timer or 0),
+		time_applied = time_elapsed,
 		effect = effect
 	}
 	if key then
@@ -472,13 +475,27 @@ local function add_status_effect(timer, effect, key)
 end
 
 local function check_status_effect(key)
-	if not status_effects[key] then return false end
+	if not status_effects[key] then
+		-- trace("status_effect %s not exist", key)
+		return false
+	end
 	if time_elapsed >= status_effects[key].timer then
+		-- trace("status_effect %s expired", key)
 		status_effects[key] = nil
 		return false
 	end
 	trace("status_effect active, key %s, time %s, current_time %s", key, status_effects[key].timer, time_elapsed)
 	return true
+end
+
+local function get_status_effect_remaining_time(key, normalized)
+	if not check_status_effect(key) then
+		-- trace("status_effect %s not exist, return time 0", key)
+		return 0
+	end
+
+	local res = normalized and (1 - normalize(time_elapsed, status_effects[key].time_applied, status_effects[key].timer)) or (status_effects[key].timer - time_elapsed)
+	return res > 0 and res or 0
 end
 
 -- Table of current active effects, contains tables of these {
@@ -1238,7 +1255,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 				if not npc:alive() then return end
 				if npc.health > 0 then
 					CreateTimeEvent("af_thistle_hud", "af_thistle_hud", 0, function()
-						ui_enemy_health.on_hit(npc, nil, local_direction, who, bone_index)
+						refresh_health_bar(npc, nil, local_direction, who, bone_index)
 						return true
 					end)
 				end
@@ -1596,6 +1613,15 @@ artefact_props = { -- Special props of artefacts that are used in processing
 		change_condition = function(self, amount, id)
 			return self:set_condition(self.condition + amount, id)
 		end,
+		add_overcharge = function(self)
+			add_status_effect(1800, "af_lucifer_overcharge", "af_lucifer_overcharge")
+		end,
+		check_overcharge = function(self)
+			return check_status_effect("af_lucifer_overcharge")
+		end,
+		get_overcharge = function(self)
+			return get_status_effect_remaining_time("af_lucifer_overcharge", true)
+		end,
 		sacrifice_artefact = function(self, obj, id)
 			local section = obj:section()
 			if self.ignore_tiers[section] then return end
@@ -1609,7 +1635,12 @@ artefact_props = { -- Special props of artefacts that are used in processing
 				CreateTimeEvent("refresh_artefacts", "refresh_artefacts", 0.15, refresh_artefacts_time_event_func, true)
 				local snd = play_sound_on_actor(get_random_array_element(tier.sound), 1, random_float(0.93, 1))
 				if section == "af_death_lamp" then
-					-- Put Overcharge Bonus There
+					self:add_overcharge()
+					CreateTimeEvent("af_lucifer_overcharge", "af_lucifer_overcharge", 0.15, function()
+						ui_inventory.GUI:UpdateWeight()
+						return true
+					end)
+
 					if random(100) < 50 then
 
 						local function die()
@@ -1806,13 +1837,14 @@ local artefact_on_update_functions = {
 		af_lucifer:set_condition(condition) -- Double set to set initial condition after loading state
 
 		if condition > 0.5 then
+			local overcharge = artefact_props.af_lucifer:get_overcharge()
 			local normal_condition = normalize(condition, 0.5, 1)
-			actor:change_health(health_boost * normal_condition)
-			actor:change_power(power_boost * normal_condition)
-			actor.bleeding = bleeding_cure_boost * normal_condition
-			change_psy_health(psy_boost * normal_condition)
+			actor:change_health(health_boost * normal_condition + health_boost * 0.5 * overcharge)
+			actor:change_power(power_boost * normal_condition + power_boost * overcharge)
+			actor.bleeding = bleeding_cure_boost * normal_condition + bleeding_cure_boost * overcharge
+			change_psy_health(psy_boost * normal_condition + psy_boost * overcharge)
 			speed_boost = speed_boosts.af_lucifer.boost * normal_condition
-			local cw = (get_game_factor("weight") or 20) + 50 * normal_condition
+			local cw = (get_game_factor("weight") or 20) + 50 * normal_condition + 20 * overcharge
 			local mww = cw + (ceil(cw * 0.2) * 2)
 			actor:set_actor_max_weight(cw)
 			actor:set_actor_max_walk_weight(mww)
@@ -2228,7 +2260,8 @@ local artefact_on_before_hit_functions = {
 
 	-- Lucifer, Perk: The Lucifer Effect
 	af_lucifer = function(actor, artefact_count, artefact_ids, artefact_names, s_hit, bone_id, flags)
-		s_hit.power = s_hit.power * (1 - normalize(artefact_props.af_lucifer.condition, 0.5, 1.5)) -- 50% reduction at 100% condition
+		local overcharge = artefact_props.af_lucifer:get_overcharge()
+		s_hit.power = s_hit.power * (1 - normalize(artefact_props.af_lucifer.condition, 0.5, 1.5) - overcharge * 0.1) -- 50% reduction at 100% condition
 	end
 
 }
@@ -3041,12 +3074,12 @@ local function actor_on_first_update()
 	RegisterScriptCallback("actor_item_to_slot", refresh_state)
 	RegisterScriptCallback("actor_item_to_belt", refresh_state)
 	RegisterScriptCallback("actor_item_to_ruck", refresh_state)
+	RegisterScriptCallback("actor_on_update", actor_on_update)
 	RegisterScriptCallback("actor_on_weapon_fired", actor_on_weapon_fired)
-	RegisterScriptCallback("actor_on_hit_callback", actor_on_hit_callback)
 	RegisterScriptCallback("actor_on_before_hit", actor_on_before_hit)
+	RegisterScriptCallback("actor_on_hit_callback", actor_on_hit_callback)
 	RegisterScriptCallback("actor_on_before_death", actor_on_before_death)
 	RegisterScriptCallback("actor_on_item_use", actor_on_item_use)
-	RegisterScriptCallback("actor_on_update", actor_on_update)
 	RegisterScriptCallback("npc_on_before_hit", npc_on_before_hit)
 	RegisterScriptCallback("npc_on_hit_callback", npc_on_hit_callback)
 	RegisterScriptCallback("npc_on_death_callback", npc_on_death_callback)
