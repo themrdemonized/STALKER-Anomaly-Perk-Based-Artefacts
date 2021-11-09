@@ -80,7 +80,13 @@
     <text>A common artifact spawned in gravitational anomalies. Despite their prickly appearances, Thistles seem incapable of penetrating flesh or damaging the body in any way. These artifacts are light, non-radioactive, and highly valued by jewelers and collectors.\n \n
     %c[ui_gray_2]PROPERTIES:\n
     %c[ui_cyan] • %c[ui_gray_2] inert artifact\n
-    %c[d_cyan] • %c[ui_gray_2] valuable</text>
+    %c[d_cyan] • %c[ui_gray_2] valuable
+    %c[d_orange] • %c[d_orange] Perk: Minor Laceration\n
+      -- Your weapon loses 50% of raw power but gains the ability to deal bleeding damage\n
+      -- With each hit the enemy will receive a bleeding stack and start to slowly loose health proportionally to weapon raw power\n
+      -- NPCs will have more chance to fall in wounded state, where they beg for mercy and might give you valuable information, if you reach them before they die\n
+      -- Multiple artefacts increase the efficiency of bleeding stacks\n
+  </text>
   </string>
   <string id="st_af_bat_name">
     <text>Bat</text>
