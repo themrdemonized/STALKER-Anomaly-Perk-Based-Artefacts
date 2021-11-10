@@ -7,10 +7,8 @@
     <text>Cocoon</text>
   </string>
   <string id="st_af_cocoon_descr">
-    <text>A small, irregularly-shaped artifact formed in gravitational anomalies. Its exterior structure resembles caterpillar silk. Cocoons are not radioactive and have little value to stalkers, but can fetch a good price with artifact collectors.\n \n
+    <text>A small, irregularly-shaped artefact formed in gravitational anomalies. It owes its name to two different factors. For one, the exterior structure of the artefact resembles caterpillar silk. But the more interesting part lies within its utility. When close to the body, the artefact reacts every time the owner is being hit by blunt or cutting trauma, spreading a cocoon-like substance over them that protects from further damage. The protection comes at a price however, limiting the movement of the user each time Cocoon activates and the protective layer thickens.\n \n
     %c[ui_gray_2]PROPERTIES:\n
-    %c[ui_cyan] • %c[ui_gray_2] inert artifact\n
-    %c[d_cyan] • %c[ui_gray_2] valuable\n
     %c[d_orange] • %c[d_orange] Perk: Stone Skin\n 
         -- Receiving melee damage grants you Stone skin stack.\n
         -- With receiving stack you get 10% melee damage protection but receive 10% speed penalty.\n
@@ -23,10 +21,8 @@
     <text>Cell</text>
   </string>
   <string id="st_af_cell_descr">
-    <text>An artifact formed in gravitational anomalies, likely due to intense localized magnetic fields. Its interior structure spins perpetually on its axis as long as it is not disturbed. A useless trinket to stalkers, it is highly valued by collectors and scientists. Not radioactive.\n \n
+    <text>An artefact formed in gravitational anomalies, likely due to intense localized magnetic fields. Its interior structure spins perpetually on its axis as long as it is not disturbed. Cell has one truly noteworthy to an average person property. Any very fast moving objects getting within its close proximity get partially disintegrated, releasing a hefty amount of radioactive particles in the process. Some stalkers use the artefact to their advantage, claiming that dealing with radiation sickness later beats getting hit with a bullet in the present.\n \n
     %c[ui_gray_2]PROPERTIES:\n
-    %c[ui_cyan] • %c[ui_gray_2] inert artifact\n
-    %c[d_cyan] • %c[ui_gray_2] valuable\n
     %c[d_orange] • %c[d_orange] Perk: Disintegrator\n
       -- Disintegrates part of the bullet coming to you. Unfortunately in the process a lot of radiation is emitted, making you ill.\n
       -- Reduces bullet damage by 15%.\n
@@ -37,10 +33,8 @@
     <text>Fountain</text>
   </string>
   <string id="st_af_fountain_descr">
-    <text>A common artifact formed in gravitational anomalies. It does not have any useful properties to stalkers, but because of its bizarre shape it is very valued by collectors. Not radioactive.\n \n
+    <text>A common artefact formed in gravitational anomalies. Its bizarre shape makes it is very valued by collectors. Interestingly enough, there's not an insignificant amount of stalkers claiming that being in possession of this artefact helps them strike a better deal with the Zone's traders. Whether it's true or not remains to be confirmed, however the mentioned merchants would rather not speak of it. \n \n
     %c[ui_gray_2]PROPERTIES:\n
-    %c[ui_cyan] • %c[ui_gray_2] inert artifact\n
-    %c[d_cyan] • %c[ui_gray_2] valuable\n
     %c[d_orange] • %c[d_orange] Perk: Letyshops Time\n
      -- Receive 2% cashback on each buy.\n
      -- Stacks with multiple artefacts.</text>
@@ -49,10 +43,8 @@
     <text>Spike</text>
   </string>
   <string id="st_af_spaika_descr">
-    <text>A common artifact formed in gravitational anomalies, that resembles petrified wood or bone. Has no useful properties to stalkers and is not radioactive, but can be sold as a trinket outside the Zone.\n \n
+    <text>A common artefact formed in gravitational anomalies, that resembles petrified wood or bone. Stalkers that dared to use it on their belts say that the artefact calms them down and helps them focus in stressful combat situations, letting them hit their enemies in vital spots. Strangely enough, they also claim that the artefact gets 'angry at them' for missing their shots, which makes most folks avoid using it, fearing a permanent Zone-induced schizophrenia. \n \n
     %c[ui_gray_2]PROPERTIES:\n
-    %c[ui_cyan] • %c[ui_gray_2] inert artifact\n
-    %c[d_cyan] • %c[ui_gray_2] valuable\n
     %c[d_orange] • %c[d_orange] Perk: Critical Ascension\n
       -- Consecutive hits give 3% bonus to damage of your next shot.\n
           -- Hitting enemy in the critical place gives 6% bonus.\n
@@ -65,22 +57,18 @@
     <text>Signet</text>
   </string>
   <string id="st_af_signet_descr">
-    <text>An artifact that appears to be a warped metal nut. Occasionally also called an "Amulet". Quite useless, though some stalkers believe that wearing one of these brings good luck. Not radioactive.\n \n
+    <text>An artefact that appears to be a warped metal nut. Occasionally also called an "Amulet". The latter comes for the fact that some stalkers tend to keep their Signets instead of selling them, saying that its presence helps them relax and regenerate after a dangerous raid into the Zone.\n \n
     %c[ui_gray_2]PROPERTIES:\n
-    %c[ui_cyan] • %c[ui_gray_2] inert artifact\n
-    %c[d_cyan] • %c[ui_gray_2] valuable\n
     %c[d_orange] • %c[d_orange] Perk: Light of Tranquility\n
       -- Restores health and psy while being near campfire, amplifies psy recovery artefacts near campfire.\n
-          -- Effect stacks with each artefact on belt.</text>
+      -- Effect stacks with each artefact on belt.</text>
   </string>
   <string id="st_af_repei_name">
     <text>Thistle</text>
   </string>
   <string id="st_af_repei_descr">
-    <text>A common artifact spawned in gravitational anomalies. Despite their prickly appearances, Thistles seem incapable of penetrating flesh or damaging the body in any way. These artifacts are light, non-radioactive, and highly valued by jewelers and collectors.\n \n
+    <text>A common artefact spawned in gravitational anomalies. Despite their prickly appearances, Thistles seem incapable of penetrating flesh or damaging the body in any way. Recent experiments and observations confirmed them reacting with various heavy metals - property especially visible with lead. Various medical reports of wounded stalkers and soldiers show that the bullets shot by the user of this artefact shave some of the outer material to become serrated and sharp upon entering the body, creating smaller but much heavier bleeding wounds. To make matters worse, any bullet that was recently within vicinity of a Thistle will start twitching around upon contact with iron contained in human blood, causing the wound to be painful and hard to close up for a period of time.\n \n
     %c[ui_gray_2]PROPERTIES:\n
-    %c[ui_cyan] • %c[ui_gray_2] inert artifact\n
-    %c[d_cyan] • %c[ui_gray_2] valuable
     %c[d_orange] • %c[d_orange] Perk: Minor Laceration\n
       -- Your weapon loses 50% of raw power but gains the ability to deal bleeding damage\n
       -- With each hit the enemy will receive a bleeding stack and start to slowly loose health proportionally to weapon raw power\n
@@ -92,19 +80,17 @@
     <text>Bat</text>
   </string>
   <string id="st_af_bat_descr">
-    <text>A rare and beautiful artifact, consisting of two irregularly-shaped "wings" protecting a lustrous spherical core. Does not emit radiation, but has no useful properties to stalkers, and is quite heavy. Highly valued by collectors.\n \n
+    <text>A rare and beautiful artefact, consisting of two irregularly-shaped "wings" protecting a lustrous spherical core. Does not emit radiation, but has no useful properties to stalkers, and is quite heavy. Highly valued by collectors.\n \n
     %c[ui_gray_2]PROPERTIES:\n
-    %c[ui_cyan] • %c[ui_gray_2] inert artifact\n
+    %c[ui_cyan] • %c[ui_gray_2] inert artefact\n
     %c[d_cyan] • %c[ui_gray_2] valuable</text>
   </string>
   <string id="st_af_sun_name">
     <text>Sun</text>
   </string>
   <string id="st_af_sun_descr">
-    <text>A rare artifact that is very much appreciated by collectors. Its exterior shell is unremarkable, but if cracked like a geode, reveals a swirling luminous core that emits a constant source of warm yellow light. These specimens are not otherwise radioactive.\n \n
+    <text>A rare artefact that is very much appreciated by collectors. Its exterior shell is unremarkable, but if cracked like a geode, reveals a swirling luminous core that emits a constant source of warm yellow light. Suns enjoy the company of actual sunrays, giving users of this artefact a source of energy when exposed to them. In the same way, when kept away from a direct source of natural light, they grab energy from nearby living things, draining them down slowly.\n \n
     %c[ui_gray_2]PROPERTIES:\n
-    %c[ui_cyan] • %c[ui_gray_2] inert artifact\n
-    %c[d_cyan] • %c[ui_gray_2] valuable\n
     %c[d_orange] • %c[d_orange] Perk: Solar Powered\n
        -- Gives health and stamina boost at clear weather, little stamina boost at partly clear and stamina penalty at not clear and at night.\n
            -- Effect stacks with each artefact on belt.</text>
@@ -113,10 +99,8 @@
     <text>Heart</text>
   </string>
   <string id="st_af_ear_descr">
-    <text>A bizarrely-shaped artifact, whose crystalline core resembles a miniature human circulatory system. Has no useful properties to stalkers and is not radioactive, but is valuable to collectors outside of the Zone.\n \n
+    <text>A bizarrely-shaped artefact, whose crystalline core resembles a miniature human circulatory system. Ever since the rumours spread that the artefact is able to heal dying creatures and people, the interest in obtaining these skyrocketed, both for sale to the outside world and for ensuring your own survival inside the Zone.\n \n
     %c[ui_gray_2]PROPERTIES:\n
-    %c[ui_cyan] • %c[ui_gray_2] inert artifact\n
-    %c[d_cyan] • %c[ui_gray_2] valuable\n
     %c[d_orange] • %c[d_orange] Perk: Will to Live\n
       -- Gives stronger health regen the less health you have if you have lower than 25% of health up to that amount.\n
       -- More artefacts increase the regen and slightly increases the highest health to trigger.</text>
@@ -125,19 +109,17 @@
     <text>Chain</text>
   </string>
   <string id="st_af_chelust_descr">
-    <text>An unusual circular artifact, not to be confused with a Ring. Generates a strong gravitational field while nothing touches it. Has no useful properties to stalkers and is suprisingly heavy. Valuable to artifact collectors outside of the Zone.\n \n
+    <text>An unusual circular artefact, not to be confused with a Ring. Generates a strong gravitational field while nothing touches it. Has no useful properties to stalkers and is suprisingly heavy. Valuable to artefact collectors outside of the Zone.\n \n
     %c[ui_gray_2]PROPERTIES:\n
-    %c[ui_cyan] • %c[ui_gray_2] inert artifact\n
+    %c[ui_cyan] • %c[ui_gray_2] inert artefact\n
     %c[d_cyan] • %c[ui_gray_2] valuable</text>
   </string>
   <string id="st_af_atom_name">
     <text>Atom</text>
   </string>
   <string id="st_af_atom_descr">
-    <text>A rare and unusual artifact that resembles the old Bohr model of an atom. Not radioactive, but does produce a small amount of heat. Has no useful properties to stalkers, but is very valuable to collectors and scientists.\n \n
+    <text>A rare and unusual artefact that resembles the old Bohr model of an atom. Not radioactive, but does produce a small amount of heat. It is very valuable to collectors and scientists both due to its shape and its properties. Stalkers suffering from being heavily irradiated due to an unfortunate exposure, when using this artefact, suddenly seem as if they regained their youth in terms of vitality. Over time the effect diminishes, but so does the radiation residing in their bodies.\n \n
     %c[ui_gray_2]PROPERTIES:\n
-    %c[ui_cyan] • %c[ui_gray_2] inert artifact\n
-    %c[d_cyan] • %c[ui_gray_2] valuable\n
     %c[d_orange] • %c[d_orange] Perk: Arszi's Blessing\n
           -- Converts radiation illness to stamina boost and gives light radiation cure.\n
           -- More artefacts make boost bigger but less continuous.</text>
@@ -146,10 +128,8 @@
     <text>Beacon</text>
   </string>
   <string id="st_af_lighthouse_descr">
-    <text>A clotted mass of superdense ferrous metals. Not radioactive, and contains rare minerals that are used in industrial production, so there is a high demand for this artifact outside the Zone. Has no other useful properties to stalkers in the field.\n \n
+    <text>A clotted mass of superdense ferrous metals. It is one of the most mysterious artefacts in the Zone as its inner workings still baffle the greatest minds in modern science. Beacon in its active state is able to detect whenever one living thing kills another, no matter the distance between the two, as long as the intent on murder and causality are very clear. The resulting reaction is no less mysterious - the murderer is almost instantly 'teleported' towards the place where the victim drew their last breath.\n \n
     %c[ui_gray_2]PROPERTIES:\n
-    %c[ui_cyan] • %c[ui_gray_2] inert artifact\n
-    %c[d_cyan] • %c[ui_gray_2] valuable\n
     %c[d_orange] • %c[d_orange] Perk: The Unorthodox Way Of Travelling\n
       -- Killing anyone will teleport you to the place of your victim's death.\n
       -- Don't try this on crows.\n
@@ -159,10 +139,8 @@
     <text>Knot</text>
   </string>
   <string id="st_af_fire_loop_descr">
-    <text>This artifact is occasionally formed in the extreme heat of thermal anomalies. It has an odd, lustrous appearance and is therefore appreciated by collectors. Not radioactive, and has no useful properties to stalkers.\n \n
+    <text>This artefact is occasionally formed in the extreme heat of thermal anomalies. Various legends surround it, most of them scary enough to make some stalkers avoid ever picking it up. It is known however that whoever had dared to activate a Knot was never able to get rid of it, as the artefact would always come back to them. Other, less reliable sources talk about superhuman abilities, hearing of voices, reckless behaviour and weird disappearances. \n \n
     %c[ui_gray_2]PROPERTIES:\n
-    %c[ui_cyan] • %c[ui_gray_2] inert artifact\n
-    %c[d_cyan] • %c[ui_gray_2] valuable\n
     %c[d_orange] • %c[d_orange] Perk: Deal with the Devil\n
        -- Gamechanger Artefact.\n
            -- Moving the artefact to belt will sign the Pact with the Zone.\n
@@ -172,21 +150,19 @@
     <text>Scar</text>
   </string>
   <string id="st_af_zhelch_descr">
-    <text>This artifact allegedly has a calming effect on the human nervous system when held close to the body. It also generates a very weak gravitational and electrostatic field. Despite this, Scars are of little use to professional stalkers. Not radioactive.\n \n
+    <text>This artefact allegedly has a calming effect on the human nervous system when held close to the body. It also generates a very weak gravitational and electrostatic field. Despite this, Scars are of little use to professional stalkers. Not radioactive.\n \n
     %c[ui_gray_2]PROPERTIES:\n
-    %c[ui_cyan] • %c[ui_gray_2] inert artifact\n
+    %c[ui_cyan] • %c[ui_gray_2] inert artefact\n
     %c[d_cyan] • %c[ui_gray_2] valuable</text>
   </string>
   <string id="st_af_sandstone_name">
     <text>Sandstone</text>
   </string>
   <string id="st_af_sandstone_descr">
-    <text>An artifact sometimes formed in extreme temperature anomalies. Has no useful properties to stalkers and is not radioactive. However, this artifact's core usually contains a small quantity of gold, so it has some value to traders outside the Zone.\n \n
+    <text>An artefact sometimes formed in extreme temperature anomalies. To this day no one knows how it's possible, but Sandstone seems to possess some sort of intelligence that allows it to identify a user's weapon. Upon linking itself to it, the artefact will seek out an anomaly to interact with, infusing the most lethal elements with corresponding anomalous properties, making them much more damaging.\n \n
     %c[ui_gray_2]PROPERTIES:\n
-    %c[ui_cyan] • %c[ui_gray_2] inert artifact\n
-    %c[d_cyan] • %c[ui_gray_2] valuable\n
     %c[d_orange] • %c[d_orange]Perk: Zone Infusion\n
-      -- Stepping into anomaly of various types infuse your active weapon.\n
+      -- Stepping into anomaly of various types infuses your active weapon.\n
           -- Infused weapon loses 30% of its raw power but gains 50% of elemental damage power according to the anomaly type.\n
           -- Only electric, thermal and chemical anomalies are valid for infusion, including fields.\n
           -- Effect lasts for 3 minutes, the artefact must be equipped for the effect to work.\n
@@ -196,10 +172,8 @@
     <text>Sourpuss</text>
   </string>
   <string id="st_af_kislushka_descr">
-    <text>A hollow spherical artifact resembling a transparent parchment of some sorts. Covered with a layer of film, it is pleasant to the touch. Has no useful properties, and is not radioactive. Valued by collectors.\n \n
+    <text>A hollow spherical artefact resembling a transparent parchment of some sorts. Covered with a layer of film, it is pleasant to the touch. Sourpuss activates whenever it gets covered in warm blood, and utilising the user's energy produced from burning calories it starts excreting a stimulant that helps any bleeding wound to clot up and close much faster. This ability gained it a lot of popularity in the medical world, hence the nice price it fetches.\n \n
     %c[ui_gray_2]PROPERTIES:\n
-    %c[ui_cyan] • %c[ui_gray_2] inert artifact\n
-    %c[d_cyan] • %c[ui_gray_2] valuable\n
     %c[d_orange] • %c[d_orange] Perk: What Colour Is Your Blood?\n
       -- Drains satiety to cure bleeding.\n
           -- Multiple artefacts increase the cure but also increase the drain.</text>
@@ -208,10 +182,8 @@
     <text>Black Angel</text>
   </string>
   <string id="st_af_black_angel_descr">
-    <text>An artifact of anomalous minerals that has been twisted into an ominous semi-symmetrical formation. Despite emitting no heat or radiation, it can condense water vapor in nearby air into steam. Very valued by collectors, but has no useful properties to stalkers. \n \n
+    <text>An artefact of anomalous minerals that has been twisted into an ominous semi-symmetrical formation. Despite emitting no heat or radiation, it can condense water vapor in nearby air into steam. The artefact seems to have some sort of defense system. When hit by an incoming bullet, it is able to detect where the shot came from and redirect the potential damage back to the person shooting. \n \n
     %c[ui_gray_2]PROPERTIES:\n
-    %c[ui_cyan] • %c[ui_gray_2] inert artifact\n
-    %c[d_cyan] • %c[ui_gray_2] valuable\n
     %c[d_orange] • %c[d_orange] Perk: Dodge This\n
      -- Has 20% chance to reflect 35% of bullet damage back.\n
          -- Nullify the damage of hit on reflection.\n
@@ -221,31 +193,28 @@
     <text>Grapes</text>
   </string>
   <string id="st_af_grapes_descr">
-    <text>A heavy artifact sometimes found in gravitational anomalies, it resembles drops of green-tinted amber twisted together. Can be valuable to outside collectors, but is otherwise useless. Not radioactive.\n \n
+    <text>A heavy artefact sometimes found in gravitational anomalies, it resembles drops of green-tinted amber twisted together. Very recently scientists were able to confirm what was previously considered to be just another one of the Zone's hearsays - when Grapes find themselves nearby an ongoing digestion process of a living organism, they activate, stimulating one's metabolism to heal more effectively. \n \n
     %c[ui_gray_2]PROPERTIES:\n
-    %c[ui_cyan] • %c[ui_gray_2] inert artifact\n
-    %c[d_cyan] • %c[ui_gray_2] valuable\n
     %c[d_orange] • %c[d_orange] Perk: Necessary Gluttony\n
        -- Provides health bonus on food consume based on its callories.\n
        -- Effect prolongs with each artefact on belt.</text>
   </string>
   <string id="st_af_skull_miser_name">
-    <text>Miser's skull</text>
+    <text>Miser's Skull</text>
   </string>
   <string id="st_af_skull_miser_descr">
-    <text>A light and fragile artifact consisting of interlinked strands of anomalous plant fibers. A curiosity for outside collectors, but has no usefulness to stalkers. Not radioactive.\n \n
+    <text>A light and fragile artefact consisting of interlinked strands of anomalous plant fibers. The artefact is a favourite among various scum that took residence in the Zone and is sometimes referred to as a "small Wish Granter" by them. When the user of this artefact kills someone by damaging their brain, the Zone rewards them by dropping currency around the victim. Some say it's the Zone wanting the stalkers to murder each other so it gets left in peace. Others say that the Zone wouldn't be full of riches like that if it didn't want people around. \n \n
     %c[ui_gray_2]PROPERTIES:\n
-    %c[ui_cyan] • %c[ui_gray_2] inert artifact\n
-    %c[d_cyan] • %c[ui_gray_2] valuable</text>
+    %c[d_orange] • %c[d_orange] Perk: Crack the Jackpot\n
+		-- Upon killing an npc in the head spawn extra money in a fashionable way\n
+		-- More artefacts will spawn more money items</text>
   </string>
   <string id="st_af_star_phantom_name">
-    <text>Phantom star</text>
+    <text>Phantom Star</text>
   </string>
   <string id="st_af_star_phantom_descr">
-    <text>This artifcat appears to be a plasma-like substance suspended within a striated transparent shell. Generates a weak gravitational field, making it difficult to hold still or balance. Not radioactive, but of limited usefulness in the Zone.\n \n
+    <text>This artefact appears to be a plasma-like substance suspended within a striated transparent shell. Generates a weak gravitational field, making it difficult to hold still or balance. Phantom Star when active seems to be affecting minds of nearby living beings - its user suddenly stops being noticed until some sort of forceful interaction happens. The artefact manipulates the owner as well, preventing them from being able to engage in any sort of hostility.\n \n
     %c[ui_gray_2]PROPERTIES:\n
-    %c[ui_cyan] • %c[ui_gray_2] inert artifact\n
-    %c[d_cyan] • %c[ui_gray_2] valuable\n
     %c[d_orange] • %c[d_orange] Perk: Phantom Pacifist\n
        -- Become invisible to anybody.\n
            -- You can't draw a weapon, talk to anybody or interact with anything.\n
@@ -255,10 +224,8 @@
     <text>Medal</text>
   </string>
   <string id="st_af_medallion_descr">
-    <text>An artifact consisting of a small hoop embedded with four triangular shapes, with a small central sphere embedded in the middle. Pairs of the triangular shapes opposite each other will occasionally 'flip' and trade positions on the outer ring. Valued by collectors and not radioactive, but has no useful properties in the field. \n \n
+    <text>An artefact consisting of a small hoop embedded with four triangular shapes, with a small central sphere embedded in the middle. Medal has successfully dodged any attempts at logically explaining its inner workings. Not only is this artefact able to tell whether the user is a part of a group, it possesses another, much more mysterious ability. Whether it manipulates objects or bodies themselves still remains to be determined, however it is a known fact that when a person using this artefact is about to get hurt, there is a non-insignificant chance that they remain unscathed, as an identical type of damage gets inflicted on someone else from that person's company instead. While such an effect might be desirable in a selfish way, it is not unheard of among stalkers and many of them might not take kindly to the fact that they are being exposed to it. \n \n
     %c[ui_gray_2]PROPERTIES:\n
-    %c[ui_cyan] • %c[ui_gray_2] inert artifact\n
-    %c[d_cyan] • %c[ui_gray_2] valuable\n
     %c[d_orange] • %c[d_orange] Perk: The (Un)lucky charm\n
       -- 35% chance that incoming bullet damage will be fully redirected to your companion.\n
       -- Some companions are smarter than others and they'll smell something fishy before they die.\n
@@ -268,10 +235,8 @@
     <text>Moon</text>
   </string>
   <string id="st_af_peas_descr">
-    <text>An artifact shaped like a lunar crescent. The exterior shell continuously generates a very dim light. Has no useful properties, not radioactive, but has some value to collectors and jewellers.\n \n
+    <text>An artefact shaped like a lunar crescent. The exterior shell continuously generates a very dim light that seems to be stimulating the user. At night, it will make you feel rested and energetic, but reverse effect will happen during daylight.\n \n
     %c[ui_gray_2]PROPERTIES:\n
-    %c[ui_cyan] • %c[ui_gray_2] inert artifact\n
-    %c[d_cyan] • %c[ui_gray_2] valuable\n
     %c[d_orange] • %c[d_orange] Perk: Friend of the Night\n
       -- Gives bleeding cure and speed increase from dusk till dawn at any weather\n
       -- Decreases sleepiness at night, increases sleepiness at day\n
@@ -281,10 +246,8 @@
     <text>Generator</text>
   </string>
   <string id="st_af_generator_descr">
-    <text>This anomalous disk is not radioactive, but generates a strong, small electromagnetic field. It can easily be made to 'spin' perpetually on its axis, and is therefore very much valued outside the Zone by those researching new sources of energy. Currently has no useful properties to stalkers within the Zone. \n \n
+    <text>This anomalous disk is not radioactive, but generates a strong, small electromagnetic field. It can easily be made to 'spin' perpetually on its axis, especially when the user is moving fast. When that happens, the energy from the artefact connects itself to nearby drained batteries and devices and, provided they still had some electric charge left in them, restores their power slowly. \n \n
     %c[ui_gray_2]PROPERTIES:\n
-    %c[ui_cyan] • %c[ui_gray_2] inert artifact\n
-    %c[d_cyan] • %c[ui_gray_2] valuable\n
     %c[d_orange] • %c[d_orange] Perk: Godzilla is Approaching\n
        -- Restores batteries charge of items while sprinting.\n
        -- Won't revive completely dead batteries or devices with no batteries.\n
@@ -294,24 +257,20 @@
     <text>Ball</text>
   </string>
   <string id="st_af_ball_descr">
-    <text>Despite appearing as a mottled ball of dirt and rock, this artifact is unusually light and bouncy, hence its name. It is believed to be a product of electrical anomalies. Not radioactive, but also not particularly useful to those within the Zone.\n \n
+    <text>Despite appearing as a mottled ball of dirt and rock, this artefact is unusually light and bouncy, hence its name. It is believed to be a product of electrical anomalies. When worn on the belt the artefact generates a force that can be activated to repel living creatures, for some reason excluding humans. To release said force a fast and strong movement needs to happen between the user and the target, hence why most stalkers using it resort to simply kicking various mutants. Obviously, the practice of getting this close to a Zone inhabitant is not advised. But is that going to stop you? \n \n
     %c[ui_gray_2]PROPERTIES:\n
-    %c[ui_cyan] • %c[ui_gray_2] inert artifact\n
-    %c[d_cyan] • %c[ui_gray_2] valuable\n
     %c[d_orange] • %c[d_orange] Perk: The Nutcracker\n
        -- Tier Based Artefact.\n
-           -- Amplifies players mighty foot and allows him to kick more mutants, resulting in instant death.\n
-           -- Each artefact on the belt allows to kick more monsters.\n
+           -- Amplifies player's mighty foot and allows him to kick more mutants, resulting in instant death.\n
+           -- Each artefact on the belt allows kicking more monsters.\n
            -- Has a cooldown of 2 seconds with 1 artefact, increases with more artefacts on belt by 1 second each.</text>
   </string>
   <string id="st_af_fonar_name">
     <text>Lamp</text>
   </string>
   <string id="st_af_fonar_descr">
-    <text>This light, glassy artifact emits a modest amount of near-ultraviolet light. It does not produce more harmful radiation, but is quite interesting to collectors.\n \n
+    <text>This light, glassy artefact emits a modest amount of near-ultraviolet light. It reacts weirdly with certain radio waves, making sources of various transmissions glow. Stalkers tend to use this property to search for hidden stashes at night. \n \n
     %c[ui_gray_2]PROPERTIES:\n
-    %c[ui_cyan] • %c[ui_gray_2] inert artifact\n
-    %c[d_cyan] • %c[ui_gray_2] valuable\n
     %c[d_orange] • %c[d_orange] Perk: Enlightening Kleptomania\n
       -- The artefact catches frequencies of packages and sends energy to light them up.\n
       -- Lights up stashes and items emitting signal to RF-receiver.\n
@@ -322,10 +281,8 @@
     <text>Tapeworm</text>
   </string>
   <string id="st_af_tapeworm_descr">
-    <text>This artifact is pure silicon dioxide, twisted into an unusual shape and color by gravitational anomalies. It would be otherwise unremarkable, except for its ability to 'bend' or visually distort objects it comes into contact with. Not particularly useful to stalkers, and not radioactive.\n \n
+    <text>This artefact is pure silicon dioxide, twisted into an unusual shape and color by gravitational anomalies. It would be otherwise unremarkable, except for one fact. When activated, it will send strong electric shock towards any living creature that attacks the user via direct contact, effectively stunning them for a short duration of time. Very valued by stalkers that hunt mutants for a living.\n \n
     %c[ui_gray_2]PROPERTIES:\n
-    %c[ui_cyan] • %c[ui_gray_2] inert artifact\n
-    %c[d_cyan] • %c[ui_gray_2] valuable\n
     %c[d_orange] • %c[d_orange] Perk: Stunner\n
        -- Getting melee hit by enemies will make them stunned for 2.5 seconds.\n
            -- While being stunned the enemy is disabled in fight and won't attack.\n
@@ -336,21 +293,19 @@
     <text>Moss</text>
   </string>
   <string id="st_af_moh_descr">
-    <text>An artifact formed in electrial anomalies. It has a sharp, jagged appearance but is actually quite soft and pleasing to the touch. Not radioactive, but not useful aside from as a trinket for collectors.\n \n
+    <text>An artefact formed in electric anomalies. It has a sharp, jagged appearance but is actually quite soft and pleasing to the touch. Attached to the belt it is able to detect contents of the user's stomach. Once it recognizes any raw meat of the Zone origin within the digestive system, it will activate, using the flesh's energetic value to fuel all sorts of stimulating effects, depending on the type of creature consumed.\n \n
     %c[ui_gray_2]PROPERTIES:\n
-    %c[ui_cyan] • %c[ui_gray_2] inert artifact\n
-    %c[d_cyan] • %c[ui_gray_2] valuable\n
     %c[d_orange] • %c[d_orange] Perk: Culinary Hyperversity\n
     -- Convert energy of raw mutant meat to special abilities.\n
     -- Extra artefacts or eating same meat multiple times does not stack the effect.\n
     -- Last for 1 minute, eating different mutant meat overrides previous time and resets.\n
     --  %c[d_orange]Table of effects: \n
-%c[d_cyan]-- Flesh meat: %c[ui_gray_2] 1%/sec health regen, 33% bullet damage penalty.\n
+		%c[ui_gray_2]--  %c[d_cyan]Flesh meat: %c[ui_gray_2] 1%/sec health regen, 33% bullet damage penalty.\n
         --  %c[d_cyan]Boar meat: %c[ui_gray_2] 25% melee damage reduction.\n
         --  %c[d_cyan]Dog meat: %c[ui_gray_2] slight bleeding cure, 1%/sec psy regen.\n
         --  %c[d_cyan]Pseudodog: %c[ui_gray_2] 2%/sec psy regen, 25% psy damage reduction.\n
-        --  %c[d_cyan]Krovosos: %c[ui_gray_2] become invisible until shooting or hitting enemy, moderate bleeding cure.\n
-        --  %c[d_cyan]Psysos: %c[ui_gray_2] become invisible until shooting or hitting enemy, 5%/sec psy regen.\n
+        --  %c[d_cyan]Bloodsucker: %c[ui_gray_2] become invisible until shooting or hitting enemy, moderate bleeding cure.\n
+        --  %c[d_cyan]Psysucker: %c[ui_gray_2] become invisible until shooting or hitting enemy, 5%/sec psy regen.\n
         --  %c[d_cyan]Snork: %c[ui_gray_2] 50% radiation damage reduction, 5%/sec stamina regen, 5msv/sec radiation cure, big satiety decrease.\n
         --  %c[d_cyan]Chimera: %c[ui_gray_2] 2%/sec health regen, 10%/sec stamina regen, 33% raditation damage reduction.\n
         --  %c[d_cyan]Lurker: %c[ui_gray_2] 33% chem/fire/electric anomaly damage reduction, including fields.\n
@@ -360,24 +315,22 @@
     <text>Seraphim</text>
   </string>
   <string id="st_af_serofim_descr">
-    <text>An artifact sometimes found in electrical anomalies, consisting of several concentric spheres bound together. Periodically emits weak gravitational waves at unpredictable intervals. Not otherwise radioactive, but not useful enough for a stalker in a fight.\n \n
+    <text>Seraphim was for the longest time considered to be nothing but a pretty bauble to be sold. That was until one veteran group of stalkers came back from a deep excursion and shared their story. According to them, at some point during their trip they got ambushed by a sniper. Their leader was taken out instantly and dropped dead with his skull split in half. While sending suppressive fire they noticed his belt lighting up and as he stood up with no sign of scratch on him, with his helmet still having obvious entry and exit holes from the sniper's bullet. They managed to retreat and find out that the Seraphim artefact the leader kept as his lucky charm was gone and left behind only some glowing dust. Ever since then people that heard of this story hold their Seraphims dear, believing that the artefact will bring them back from the dead, should the worst happen. Of course, no one so far was brave enough to test if any of it was indeed true. \n \n
     %c[ui_gray_2]PROPERTIES:\n
-    %c[ui_cyan] • %c[ui_gray_2] inert artifact\n
-    %c[d_cyan] • %c[ui_gray_2] valuable\n
     %c[d_orange] • %c[d_orange]Perk: Rain of Revival. \n
     
      -- Upon receiving a fatal blow, the artefact is destroyed and player is revived.\n
-         -- 50% of health is restored all debuffs are healed and 5 seconds of immunity are granted.\n
-         -- Upon reviving current weapon is dropped and vision is fucked.\n
+         -- 50% of health is restored, all debuffs are healed and 5 seconds of immunity are granted.\n
+         -- Upon reviving current weapon is dropped and vision is screwed up.\n
          -- Does not stack in any way.</text>
   </string>
   <string id="st_af_elektron_name">
     <text>Electron</text>
   </string>
   <string id="st_af_elektron_descr">
-    <text>This artifact is a product of electrical anomalies. It is extremely heavy despite its small size. Not radioactive or valued by stalkers, but is reported to be very valued by scientists outside the Zone.\n \n
+    <text>This artefact is a product of electrical anomalies. It is extremely heavy despite its small size. It has one interesting property. It is able to combine the common electro anomalies with other electric charges it finds nearby, using the anomaly as a power source. The most fascinating part of it is that the artefact considers human body to be a battery too, converting the energy into one that can be used by human cells during physical activity. As such, despite being a painful experience, one can enjoy being tireless for a short period of time. Side effects? Well, someone has yet to report them...\n \n
     %c[ui_gray_2]PROPERTIES:\n
-    %c[ui_cyan] • %c[ui_gray_2] inert artifact\n
+    %c[ui_cyan] • %c[ui_gray_2] inert artefact\n
     %c[d_cyan] • %c[ui_gray_2] valuable\n
     %c[d_orange] • %c[d_orange] Perk: Crank High Voltage\n
       -- Stepping on Electra will fully recharge player's batteries of active devices.\n
@@ -390,10 +343,8 @@
     <text>Claw</text>
   </string>
   <string id="st_af_kogot_descr">
-    <text>A beautiful glass-like artifact occasionally fished out of electrostatic anomalies. It emits no radiation, but fetches a high price with collectors and traders.\n \n
+    <text>A beautiful glass-like artefact occasionally fished out of electrostatic anomalies. When used, it seems to fill its user with a weird combination of rage and desire to attack enemies directly, reinvigorating them for doing so. There's a pretty common story associated with this artefact - of a rookie that found a Claw together with his friend, only for them both to get chased by a pack of hungry dogs moments after. The 'friend' shot the rookie and took off, leaving him to certain death. To everyone's surprise the betrayed stalker came back to his camp, perfectly healthy, despite his clothes being completely torn from dog bites, with only a knife to his side and the artefact hanging by his belt. What happened to the backstabber is better off not being mentioned though.\n \n
     %c[ui_gray_2]PROPERTIES:\n
-    %c[ui_cyan] • %c[ui_gray_2] inert artifact\n
-    %c[d_cyan] • %c[ui_gray_2] valuable\n
     %c[d_orange] • %c[d_orange] Perk: Bloodlust\n
       -- 10% Increase of melee damage.\n
           -- Vampire effect: 3.5% of new melee damage is converted to player's health.\n
@@ -404,9 +355,9 @@
     <text>Basilisk</text>
   </string>
   <string id="st_af_vaselisk_descr">
-    <text>One of the few artifacts in the Zone which copes well with all kinds of physical influences on its owner.\n \n
+    <text>One of the few artefacts in the Zone which copes well with all kinds of physical influences on its owner.\n \n
     %c[ui_gray_2]PROPERTIES:\n
-    %c[ui_cyan] • %c[ui_gray_2] inert artifact\n
+    %c[ui_cyan] • %c[ui_gray_2] inert artefact\n
     %c[d_cyan] • %c[ui_gray_2] valuable</text>
   </string>
   <string id="st_af_geliy_name">
@@ -415,16 +366,16 @@
   <string id="st_af_geliy_descr">
     <text>A bright (literally) representative of the family of electrostatic artefacts. It gives off a gaseous substance that has a beneficial effect on the body. Due to its high efficiency, it is in large demand.\n \n
     %c[ui_gray_2]PROPERTIES:\n
-    %c[ui_cyan] • %c[ui_gray_2] inert artifact\n
+    %c[ui_cyan] • %c[ui_gray_2] inert artefact\n
     %c[d_cyan] • %c[ui_gray_2] valuable</text>
   </string>
   <string id="st_af_gimlet_name">
     <text>Gimlet </text>
   </string>
   <string id="st_af_gimlet_descr">
-    <text>The bowl-shaped petals of this artifact can release a powerful stimulant vapor which can alter the balance of human hormones. Of little use to stalkers, it is very much sought after for medical research. \n \n
+    <text>The bowl-shaped petals of this artefact can release a powerful stimulant vapor which can alter the balance of human hormones. Of little use to stalkers, it is very much sought after for medical research. \n \n
     %c[ui_gray_2]PROPERTIES:\n
-    %c[ui_cyan] • %c[ui_gray_2] inert artifact\n
+    %c[ui_cyan] • %c[ui_gray_2] inert artefact\n
     %c[d_cyan] • %c[ui_gray_2] valuable</text>
   </string>
   <string id="st_af_dragon_eye_name">
@@ -433,7 +384,7 @@
   <string id="st_af_dragon_eye_descr">
     <text>This artefact is sometimes formed in thermal anomalies and has the appearance of a reptile's eye. It has a very dangerous and volatile property associated with it. In some peculiar way, when the user of this artefact secures a kill, there's a small chance for a violent explosion to happen within the victim's body, killing or hurting anyone and anything nearby. The more superstitious say that it's the Zone ripping out violently the souls of fallen beings. Most just prefer to avoid using the artefact altogether because of the stories of people getting caught in such explosion at an unfortunate distance.\n \n
     %c[ui_gray_2]PROPERTIES:\n
-    %c[ui_cyan] • %c[ui_gray_2] inert artifact\n
+    %c[ui_cyan] • %c[ui_gray_2] inert artefact\n
     %c[d_cyan] • %c[ui_gray_2] valuable\n
     %c[d_orange] • %c[d_orange] Perk: Good ol' Ultra-Violence\n
       -- 5% chance that the shot would be explosive.\n

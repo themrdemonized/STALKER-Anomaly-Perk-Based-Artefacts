@@ -250,7 +250,7 @@ end
 
 local function get_time_elapsed()
 	--trace(time_factor)
-	return floor(tonumber(get_game_time():diffSec(get_start_time())) / time_factor * 10) * 0.1
+	return floor(get_game_time():diffSec(get_start_time()) / time_factor * 10) * 0.1
 end
 
 local function get_object_by_id(id) -- same as _g.script one but without spamming in console
@@ -1630,13 +1630,13 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			if tier then
 				alife_release_id(obj:id())
 				CreateTimeEvent("refresh_artefacts", "refresh_artefacts", 0.15, refresh_artefacts_time_event_func, true)
+				CreateTimeEvent("af_lucifer_UpdateWeight", "af_lucifer_UpdateWeight", 0.15, function()
+					ui_inventory.GUI:UpdateWeight()
+					return true
+				end)
 				local snd = play_sound_on_actor(get_random_array_element(tier.sound), 1, random_float(0.93, 1))
 				if section == "af_death_lamp" then
 					self:add_overcharge()
-					CreateTimeEvent("af_lucifer_overcharge", "af_lucifer_overcharge", 0.15, function()
-						ui_inventory.GUI:UpdateWeight()
-						return true
-					end)
 
 					if random(100) < 50 then
 
