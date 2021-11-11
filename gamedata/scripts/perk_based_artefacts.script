@@ -1757,6 +1757,7 @@ local artefact_on_update_functions = {
 			for i = 1, artefact_count do
 				actor:change_health(health_boost)
 				manage_psy_health()
+				manage_psy_health()
 			end
 			trace("firing Signet, health %s", actor.health)
 		end
