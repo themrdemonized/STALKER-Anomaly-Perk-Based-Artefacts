@@ -192,6 +192,14 @@ local function trace(str, ...)
 	if debug_mode then
 		printf("Perk Based Artefacts: " .. str, ...)
 	end
+	-- printf("-
+	-- зеленый
+
+	-- printf("!
+	-- красный
+
+	-- printf("~
+	-- желтый
 end
 
 local function trace_table(t)
@@ -200,6 +208,8 @@ local function trace_table(t)
 		print_table(t)
 	end
 end
+
+
 
 local function compare_arrays(t1, t2)
 	if #t1 ~= #t2 then return false end
@@ -1526,6 +1536,14 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			end
 		end
 	},
+	af_chelust = {
+		valid_communities = { -- Valid communities to trigger
+			actor_greh = true
+		},
+		valid_companion_communities = { -- Valid communities to trigger
+			greh = true,
+		}
+	},
 	af_lucifer = {
 		ignore_tiers = (function()  -- Artefacts ignore list
 			local t = {}
@@ -1806,12 +1824,77 @@ local artefact_on_update_functions = {
 
 	-- Сhain, Perk: The Weight Of Devotion
 	af_chelust = function(actor, artefact_count, artefact_ids, artefact_names)
-		local health_boost = 0.0002
-		local power_boost = 0.0025
+		local actor_community = actor:character_community()
+		trace("Chain, actor community %s", actor_community)
+		local af_chelust = artefact_props.af_chelust
 
-		actor:change_health(health_boost)
-		actor:change_power(power_boost)
+		if af_chelust.valid_communities[actor_community] then
+			trace("Chain, actor is greh %s", actor_community)
+			local health_boost = 0.0008
+			local power_boost = 0.0075
+			actor:change_health(health_boost)
+			actor:change_power(power_boost)
 
+			--heal nearby companions
+			local non_task_companions = axr_companions.non_task_companions
+			if is_empty(non_task_companions) then
+				trace("Chain, no companions alive")
+				return
+			end
+
+			local heal_companion
+			local heal_companion_min_health = 1
+			for id, v in pairs(non_task_companions) do
+				local obj = get_object_by_id(id)
+				local obj_community = obj:character_community()
+				if af_chelust.valid_companion_communities[obj_community] and obj.health < heal_companion_min_health then
+					heal_companion_min_health = obj.health
+					heal_companion = obj
+					trace("found companion %s, community %s, health %s", id, obj_community, heal_companion_min_health)
+				end
+			end
+
+			if not heal_companion then
+				trace("Chain, no companions need healing")
+				return
+			end
+
+			trace("Chain, healing companion %s", heal_companion:id())
+			heal_companion:change_health(0.0015)
+
+			-- local companion, squad, squad_member_count, squad_id, squad_member_ids = (function()
+			-- 	local companion_squads = axr_companions.companion_squads
+			-- 	local non_task_companions = axr_companions.non_task_companions
+			-- 	if is_not_empty(non_task_companions) then
+			-- 		trace("Medallion, has non_task_companions")
+			-- 		return alife_object(get_random_key(non_task_companions))
+			-- 	elseif is_not_empty(companion_squads) then
+			-- 		trace("Medallion, has companion_squads")
+			-- 		for k, squad in pairs(companion_squads) do
+			-- 			if squad then
+			-- 				local m
+			-- 				local squad_ids = {}
+			-- 				for sm in squad:squad_members() do
+			-- 					if not m then
+			-- 						m = sm
+			-- 					end
+			-- 					squad_ids[sm.id] = true
+			-- 				end
+			-- 				return m, squad, squad:npc_count(), k, squad_ids
+			-- 			end
+			-- 		end
+			-- 	else
+			-- 		trace("Medallion, doesn't have both companion_squads, non_task_companions")
+			-- 		return nil
+			-- 	end
+			-- end)()
+		else
+			local health_boost = 0.0002
+			local power_boost = 0.0025
+
+			actor:change_health(health_boost)
+			actor:change_power(power_boost)
+		end
 	end,
 
 	-- Lucifer, Perk: The Lucifer Effect
