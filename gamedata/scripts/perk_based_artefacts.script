@@ -12,7 +12,6 @@ local alife_create_item = alife_create_item
 local alife_object = alife_object
 local alife_release_id = alife_release_id
 local clamp = clamp
-local copy_table = copy_table
 local CreateTimeEvent = CreateTimeEvent
 local empty_table = empty_table
 local get_console = get_console
@@ -95,7 +94,6 @@ local string_gsub = string.gsub
 local dump = string.dump
 local load = loadstring
 local unpack = unpack
-local pack = table.pack
 
 local table_insert = table.insert
 local table_sort = table.sort
@@ -1759,8 +1757,6 @@ local artefact_on_update_functions = {
 			for i = 1, artefact_count do
 				actor:change_health(health_boost)
 				manage_psy_health()
-				manage_psy_health()
-				manage_psy_health()
 			end
 			trace("firing Signet, health %s", actor.health)
 		end
@@ -1963,7 +1959,7 @@ local artefact_on_item_use_functions = {
 			return
 		end
 
-		local health_boost = 0.015
+		local health_boost = 0.01
 
 		local sec = obj:section()
 		local satiety_increase = SYS_GetParam(2, sec, "eat_satiety", 0) * health_boost
