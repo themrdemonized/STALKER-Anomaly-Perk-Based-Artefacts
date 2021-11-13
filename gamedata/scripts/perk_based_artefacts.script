@@ -608,6 +608,9 @@ local function remove_speed_boosts()
 	end
 end
 
+local add_weight = weight.add_weight
+local remove_weight = weight.remove_weight
+
 local artefact_props
 artefact_props = { -- Special props of artefacts that are used in processing
 	af_black_angel = {
@@ -646,11 +649,10 @@ artefact_props = { -- Special props of artefacts that are used in processing
 		register = function(self)
 			if is_empty(self.enemy_squad_member_ids) then return end
 
-			local _self = artefact_props.af_medallion
 			trace("Medallion, Registering former companions callbacks")
 			trace_table(self.enemy_squad_member_ids)
-			RegisterScriptCallback("on_enemy_eval", _self.on_enemy_eval)
-			RegisterScriptCallback("npc_on_death_callback", _self.npc_on_death_callback)
+			RegisterScriptCallback("on_enemy_eval", self.on_enemy_eval)
+			RegisterScriptCallback("npc_on_death_callback", self.npc_on_death_callback)
 		end,
 		reflect_chance = (function() -- LUT with chances to trigger by artefact count
 			local t = {}
@@ -1834,7 +1836,6 @@ local artefact_on_update_functions = {
 		local af_chelust = artefact_props.af_chelust
 
 		if af_chelust.valid_communities[actor_community] then
-			trace("Chain, actor is greh %s", actor_community)
 			local health_boost = 0.0008
 			local power_boost = 0.0075
 			actor:change_health(health_boost)
@@ -1927,10 +1928,7 @@ local artefact_on_update_functions = {
 			actor.bleeding = bleeding_cure_boost * normal_condition + bleeding_cure_boost * overcharge
 			change_psy_health(psy_boost * normal_condition + psy_boost * overcharge)
 			speed_boost = speed_boosts.af_lucifer.boost * normal_condition
-			local cw = (get_game_factor("weight") or 20) + 50 * normal_condition + 20 * overcharge
-			local mww = cw + (ceil(cw * 0.2) * 2)
-			actor:set_actor_max_weight(cw)
-			actor:set_actor_max_walk_weight(mww)
+			add_weight("af_lucifer_weight", 50 * normal_condition + 20 * overcharge, true)
 		else
 			local normal_condition = normalize(condition, 0, 0.5) - 1
 			actor:change_power(power_boost * normal_condition * 0.5)
