@@ -1836,8 +1836,8 @@ local artefact_on_update_functions = {
 		local af_chelust = artefact_props.af_chelust
 
 		if af_chelust.valid_communities[actor_community] then
-			local health_boost = 0.0008
-			local power_boost = 0.0075
+			local health_boost = 0.0006
+			local power_boost = 0.006
 			actor:change_health(health_boost)
 			actor:change_power(power_boost)
 

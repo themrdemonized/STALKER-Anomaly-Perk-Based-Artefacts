@@ -1,4 +1,4 @@
-Perk Based Artefacts, 0.21
+Perk Based Artefacts, 0.3
 A unique twist on overhauling old junk artefacts beyond the boundaries of simple stat changers
 Junk artefacts are no longer junk and received unique special abilities or Perks. The degree of perks vary from simple boosters to marvellous staff like recharging batteries by stepping in Electra, receiving Money on Headshots or Even Evading Death itself when all hope is lost.
 Multiple artefacts might or might not stack the effects and penalties of Perks in various ways, and effects are triggered on very various conditions
@@ -168,6 +168,13 @@ So far the perks are
   -- With each hit the enemy will receive a bleeding stack and start to slowly loose health proportionally to weapon raw power
   -- NPCs will have more chance to fall in wounded state, where they beg for mercy and might give you valuable information, if you reach them before they die
   -- Multiple artefacts increase the efficiency of bleeding stacks
+
+  -- Сhain, Perk: The Weight Of Devotion
+  -- At first glance its heavy and provide small health and stamina regen
+  -- But only those ones who devoted their lives to Vyraj and The Masters can truly realise the potential of the artefact
+  -- Members of Sin triple the effect of the artefact
+  -- Sin companions receive health regen one by one, starting from the one with the lowest health
+  -- Does not stack in any way 
 
   -- Knot, Perk: Deal with the Devil
   -- Gamechanger Artefact
