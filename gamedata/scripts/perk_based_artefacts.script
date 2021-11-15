@@ -1840,6 +1840,8 @@ local artefact_on_update_functions = {
 			local power_boost = 0.006
 			actor:change_health(health_boost)
 			actor:change_power(power_boost)
+			manage_psy_health()
+			manage_psy_health()
 
 			--heal nearby companions
 			local non_task_companions = axr_companions.non_task_companions

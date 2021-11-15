@@ -115,7 +115,7 @@
     %c[d_cyan] • %c[ui_gray_2] valuable\n
     \n%c[d_orange] • %c[d_orange] Perk: The Weight Of Devotion\n
       -- Provides small health and stamina regen\n
-      -- Members of Sin triple the effect of the artefact\n
+      -- Members of Sin triple the effect of the artefact and add psy regen\n
       -- Sin companions receive health regen one by one, starting from the one with the lowest health\n
       -- Does not stack in any way\n
   </text>
