@@ -767,7 +767,14 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			section = function(self)
 				return self.sec
 			end
-		}
+		},
+		change_sleep = function(self, increase)
+			local change = increase and self.moon_sleep_increase or self.moon_sleep_decrease
+			if check_cooldown("af_peas_moon_sleep") then
+				change_sleep(change)
+				add_cooldown(10, "af_peas_moon_sleep")
+			end
+		end
 	},
 	af_kogot = {
 		monster_to_meat = { -- Associations of meat chunk to its monster (clsid or kind)
@@ -1334,6 +1341,11 @@ artefact_props = { -- Special props of artefacts that are used in processing
 		unregister = function(self)
 			unregister_callback("af_moh")
 		end,
+		reset = function(self)
+			self:remove_effect()
+			self:remove_speed()
+			self:unregister()
+		end,
 		mutant_part_flesh_meat = function(self, actor)
 			local valid_hits = { -- Valid hit types to trigger
 				[hit.fire_wound] = true
@@ -1526,15 +1538,10 @@ artefact_props = { -- Special props of artefacts that are used in processing
 				trace("actor satiety %s", satiety)
 				actor:change_satiety(required_satiety > satiety_increase and satiety_increase * -0.8 or required_satiety * -0.8)
 
-				self:remove_effect()
-				self:remove_speed()
-				self:unregister()
-
+				self:reset()
 				self[food_section](self, actor)
 				add_simple_timed_effect(60, nil, function()
-					self:remove_effect()
-					self:remove_speed()
-					self:unregister()
+					self:reset()
 				end, "af_moh")
 			end
 		end
@@ -1756,7 +1763,7 @@ local artefact_on_update_functions = {
 		local hours = get_time_hours()
 		if hours <= 21 or hours >= 5 then
 			for i = 1, artefact_count do
-				change_sleep(af_peas.moon_sleep_increase)
+				af_peas:change_sleep(true)
 				remove_speed(speed_boosts.af_peas.name)
 			end
 			return
@@ -1767,7 +1774,7 @@ local artefact_on_update_functions = {
 
 		add_speed(speed_boosts.af_peas.name, 1 + speed_boosts.af_peas.boost * artefact_count, false, true)
 		for i = 1, artefact_count do
-			change_sleep(af_peas.moon_sleep_decrease)
+			af_peas:change_sleep(false)
 		end
 	end,
 
@@ -1868,33 +1875,6 @@ local artefact_on_update_functions = {
 
 			trace("Chain, healing companion %s", heal_companion:id())
 			heal_companion:change_health(0.0015)
-
-			-- local companion, squad, squad_member_count, squad_id, squad_member_ids = (function()
-			-- 	local companion_squads = axr_companions.companion_squads
-			-- 	local non_task_companions = axr_companions.non_task_companions
-			-- 	if is_not_empty(non_task_companions) then
-			-- 		trace("Medallion, has non_task_companions")
-			-- 		return alife_object(get_random_key(non_task_companions))
-			-- 	elseif is_not_empty(companion_squads) then
-			-- 		trace("Medallion, has companion_squads")
-			-- 		for k, squad in pairs(companion_squads) do
-			-- 			if squad then
-			-- 				local m
-			-- 				local squad_ids = {}
-			-- 				for sm in squad:squad_members() do
-			-- 					if not m then
-			-- 						m = sm
-			-- 					end
-			-- 					squad_ids[sm.id] = true
-			-- 				end
-			-- 				return m, squad, squad:npc_count(), k, squad_ids
-			-- 			end
-			-- 		end
-			-- 	else
-			-- 		trace("Medallion, doesn't have both companion_squads, non_task_companions")
-			-- 		return nil
-			-- 	end
-			-- end)()
 		else
 			local health_boost = 0.0002
 			local power_boost = 0.0025
@@ -1902,6 +1882,11 @@ local artefact_on_update_functions = {
 			actor:change_health(health_boost)
 			actor:change_power(power_boost)
 		end
+	end,
+
+	-- Scar, Perk: That Insane Stalker from the Freedom Faction
+	af_scar = function(actor, artefact_count, artefact_ids, artefact_names)
+		--
 	end,
 
 	-- Lucifer, Perk: The Lucifer Effect
