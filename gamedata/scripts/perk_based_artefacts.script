@@ -3153,7 +3153,7 @@ end
 
 local function actor_on_first_update()
 	time_factor = get_time_factor()
-	refresh_state()
+	force_refresh_state()
 	local tg_now = time_global()
 	local tg_add = (tg_now - tg_lag) * 0.001
 	trace("tg_now %s, tg_add %s", tg_now, tg_add)
