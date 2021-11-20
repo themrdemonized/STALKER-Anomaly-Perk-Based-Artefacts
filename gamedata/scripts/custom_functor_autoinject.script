@@ -28,7 +28,7 @@ local function action_function(obj, bag, mode)
 end
 
 local add_functor = custom_functor_autoinject.add_functor
-add_functor("my_name_of_functor", name_condition_function, name_function, action_condition_function, action_function)
+add_functor("my_name_of_functor", name_condition_function, name_function, action_condition_function, action_function, override_bags<true, false>)
 ---------------------------------------------------------------------------------------------------------------------
 
 to add your functor you use add_functor function which requires these arguments in order:
@@ -37,13 +37,16 @@ to add your functor you use add_functor function which requires these arguments 
    name_condition_function: function, the condition at which you will get your right-click option for item
    name_function: function, the name itself, must return string ID defined in XML files for your option.
                   if set to return nil, the option won't appear
-   action_condition_function: function, the condition at which the action will be performed
+   action_condition_function: function, the condition at which the action will be performed, usually its the same as name_condition_function
+   							  you can put nil into argument to use the same function as name_condition_function
    action_function: function, the action itself to perform
+   override_bags: boolean. If its true, then you can override bags and modes to check for condition, otherwise it will use defaults (mode == "inventory" and bag == "actor_bag" or bag == "actor_equ" or bag == "actor_belt")
 
 functions themselves accept obj, bag and mode arguments
 obj: current object you right-clicked
 bag: current bag, list of possible bags: {"actor_equ","actor_belt","actor_bag","actor_trade_bag","actor_trade","npc_bag","npc_trade","npc_trade_bag"}
 mode: current mode, list of possible modes: {"inventory" , "loot" , "trade" , "repair"}
+bag and mode is not enabled unless you set override_bags flag to true
 
 
 removal of functor is done by calling this
@@ -270,7 +273,32 @@ ui_inventory.UIInventory.get_max_custom_functor = function(self)
 	return max, max_custom, max_index
 end
 
-ui_inventory.UIInventory.add_custom_functor = function(self, name, cond_name, func_name, cond_action, func_action)
+local modes = {
+	["inventory"] = true,
+	["loot"] = true,
+	["trade"] = true,
+	["repair"] = true
+}
+local bags = {
+	["actor_equ"] = true,
+	["actor_belt"] = true,
+	["actor_bag"] = true,
+	["actor_trade_bag"] = true,
+	["actor_trade"] = true,
+	["npc_bag"] = true,
+	["npc_trade"] = true,
+	["npc_trade_bag"] = true
+}
+
+ui_inventory.UIInventory.Mode_Custom_Functor = function(self, obj, bag, temp, i)
+	return modes[self.mode]
+end
+
+ui_inventory.UIInventory.Cont_Custom_Functor = function(self, obj, bag, temp, i)
+	return bags[bag]
+end
+
+ui_inventory.UIInventory.add_custom_functor = function(self, name, cond_name, func_name, cond_action, func_action, override_bags)
 	local custom_functor_slot
 
 	if self.custom_functor_names[name] then
@@ -279,6 +307,8 @@ ui_inventory.UIInventory.add_custom_functor = function(self, name, cond_name, fu
 		self.custom_functor[custom_functor_slot].func_name = func_name
 		self.custom_functor[custom_functor_slot].cond_action = cond_action
 		self.custom_functor[custom_functor_slot].func_action = func_action
+		self.properties["custom_" .. custom_functor_slot].mode_func[1] = override_bags and "Mode_Custom_Functor" or "Mode_Custom"
+		self.properties["custom_" .. custom_functor_slot].cont_func[1] = override_bags and "Cont_Custom_Functor" or "Cont_Custom"
 	else
 		local max, max_custom, max_index = self:get_max_custom_functor()
 		local custom_num = max + 1
@@ -295,8 +325,8 @@ ui_inventory.UIInventory.add_custom_functor = function(self, name, cond_name, fu
 		self.properties["custom_" .. custom_num] = {
 		    index = properties_num,
 		    name_func = {"Name_Custom", max_custom["name_func"][2] + 1},
-		    mode_func = {"Mode_Custom", max_custom["mode_func"][2] + 1},
-		    cont_func = {"Cont_Custom", max_custom["cont_func"][2] + 1},
+		    mode_func = {override_bags and "Mode_Custom_Functor" or "Mode_Custom", max_custom["mode_func"][2] + 1},
+		    cont_func = {override_bags and "Cont_Custom_Functor" or "Cont_Custom", max_custom["cont_func"][2] + 1},
 		    precondition1 = {"Name_Custom", max_custom["precondition1"][2] + 1},
 		    action = {"Action_Custom", max_custom["action"][2] + 1}
 		}
@@ -346,17 +376,21 @@ ui_inventory.UIInventory.remove_custom_functor = function(self, name)
 	end
 end
 
-ui_inventory.UIInventory.override_functor = function(self, slot, cond_name, func_name, cond_action, func_action)
+ui_inventory.UIInventory.override_functor = function(self, slot, cond_name, func_name, cond_action, func_action, override_bags)
 	self.custom_functor[slot] = {
 		cond_name = cond_name,
 		func_name = func_name,
 		cond_action = cond_action,
 		func_action = func_action
 	}
+	self.properties["custom_" .. slot].mode_func[1] = override_bags and "Mode_Custom_Functor" or "Mode_Custom"
+	self.properties["custom_" .. slot].cont_func[1] = override_bags and "Cont_Custom_Functor" or "Cont_Custom"
 end
 
 ui_inventory.UIInventory.remove_override = function(self, slot)
 	self.custom_functor[slot] = nil
+	self.properties["custom_" .. slot].mode_func[1] = "Mode_Custom"
+	self.properties["custom_" .. slot].cont_func[1] = "Cont_Custom"
 end
 
 -- Adding
@@ -391,15 +425,16 @@ local function actor_on_first_update()
 	process_queue()
 end
 
-function add_functor(name, cond_name, func_name, cond_action, func_action)
+function add_functor(name, cond_name, func_name, cond_action, func_action, override_bags)
 	if not name then return end
 
+	local cond_action = cond_action or cond_name
 	if first_update_pending then 
-		add_to_queue("add_custom_functor", name, cond_name, func_name, cond_action, func_action)
+		add_to_queue("add_custom_functor", name, cond_name, func_name, cond_action, func_action, override_bags)
 		return
 	end
 
-	ui_inventory.GUI:add_custom_functor(name, cond_name, func_name, cond_action, func_action)
+	ui_inventory.GUI:add_custom_functor(name, cond_name, func_name, cond_action, func_action, override_bags)
 end
 
 function remove_functor(name)
@@ -413,18 +448,19 @@ function remove_functor(name)
 	ui_inventory.GUI:remove_custom_functor(name)
 end
 
-function override_functor(slot, cond_name, func_name, cond_action, func_action)
+function override_functor(slot, cond_name, func_name, cond_action, func_action, override_bags)
 	if slot < 1 or slot > 10 then
 		printf("functor slot is not valid, min 1, max 10, your slot: %s", slot)
 		return
 	end
 
+	local cond_action = cond_action or cond_name
 	if first_update_pending then 
-		add_to_queue("override_functor", slot, cond_name, func_name, cond_action, func_action)
+		add_to_queue("override_functor", slot, cond_name, func_name, cond_action, func_action, override_bags)
 		return
 	end
 
-	ui_inventory.GUI:override_functor(slot, cond_name, func_name, cond_action, func_action)
+	ui_inventory.GUI:override_functor(slot, cond_name, func_name, cond_action, func_action, override_bags)
 end
 
 function remove_override(slot)
