@@ -6,6 +6,10 @@
 		<text>пожертвовать</text>
 	</string>
 
+	<string id="st_pba_transmutate">
+		<text>трансмутировать</text>
+	</string>
+
 	<string id="st_af_lucifer_name">
 		<text>Люцифер</text>
 	</string>

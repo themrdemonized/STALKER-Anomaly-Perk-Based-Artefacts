@@ -1,4 +1,4 @@
-Perk Based Artefacts, 0.5
+Perk Based Artefacts, 0.7
 A unique twist on overhauling old junk artefacts beyond the boundaries of simple stat changers
 Junk artefacts are no longer junk and received unique special abilities or Perks. The degree of perks vary from simple boosters to marvellous staff like recharging batteries by stepping in Electra, receiving Money on Headshots or Even Evading Death itself when all hope is lost.
 Multiple artefacts might or might not stack the effects and penalties of Perks in various ways, and effects are triggered on very various conditions
@@ -184,6 +184,14 @@ So far the perks are
   -- The lower the psy health, the higher the chance and severity of action
   -- Does not stack in any way
 
+  -- Bat, Perk: Zone Alchemy
+  -- With Bat in the backpack you have the ability to transmutate your artefacts
+  -- Artefacts can be "upgraded" i.e. changed to a better tier (Night Star -> Gravi -> Gold Fish), or can be "mutated" i.e. changed to different type retaining same tier (Night Star -> Stone Blood -> Jellyfish)
+  -- Top tier artefacts can only be mutated
+  -- Perk artefacts can only be mutated
+  -- Unique artefacts, including Bat itself, can't be transmutated
+  -- Each transmutation will cost you one Bat artefact
+
   -- Knot, Perk: Deal with the Devil
   -- Gamechanger Artefact
   -- Moving the artefact to belt will sign the Pact with the Zone
@@ -223,4 +231,8 @@ So far the perks are
   --     The effect increases with decreasing of Lucifer condition, to the point of dealing double damage at the lowest condition
   --     In the act of everlasting increase of desperation and agony, Lucifer itself might utterly obliterate in melee your enemy, spawning lots of gibs and meat chunks
   --     When this happens, 1% of condition is restored
+  --   Sun:
+  --     Recieves the ability to convert 50% of incoming bullet and rupture damage into fire damage, stacks with diminishing returns
+  --   Scar:
+  --     Psy drain increases with decrease of Lucifer condition
 

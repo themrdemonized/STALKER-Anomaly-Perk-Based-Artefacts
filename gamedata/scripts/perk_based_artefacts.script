@@ -12,6 +12,7 @@ local alife_create_item = alife_create_item
 local alife_object = alife_object
 local alife_release_id = alife_release_id
 local clamp = clamp
+local CloseAll_UI = CloseAll_UI
 local CreateTimeEvent = CreateTimeEvent
 local empty_table = empty_table
 local get_console = get_console
@@ -29,13 +30,13 @@ local RegisterScriptCallback = RegisterScriptCallback
 local RemoveTimeEvent = RemoveTimeEvent
 local ResetTimeEvent = ResetTimeEvent
 local round_100 = round_100
+local script_light = script_light
 local str_explode = str_explode
 local SYS_GetParam = SYS_GetParam
 local time_global = time_global
 local UnregisterScriptCallback = UnregisterScriptCallback
 local VEC_Y = VEC_Y
 local vector_rotate_y = vector_rotate_y
-local script_light = script_light
 
 local change_sleep = actor_status_sleep.actor_on_item_use
 
@@ -758,6 +759,22 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			-- 	131, -- Bibliotekar
 			-- }
 		}
+	},
+	af_sun = {
+		valid_hits = { -- Valid hit types to trigger
+			[hit.fire_wound] = true,
+			[hit.wound] = true,
+			[hit.strike] = true
+		},
+		fire_damage = (function() -- LUT with chances to trigger by artefact count
+			local t = {}
+			for artefact_count = 1, 5 do
+				-- Parabolic curve
+				-- Progression is 50 -> 70 -> 85 -> 95 -> 100
+				t[artefact_count] = ((27.5 - 2.5 * artefact_count) * artefact_count + 25) * 0.01
+			end
+			return t
+		end)(),
 	},
 	af_peas = {
 		moon_sleep_decrease = { -- Mock item to send to actor_status_sleep to decrease sleep
@@ -1568,12 +1585,20 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			hide_weapon = function(self, actor, sound_num) -- Hide actor's weapon with sound, restore after some time
 				actor:hide_weapon()
 				play_sound_on_actor("perk_based_artefacts\\dropweapon_" .. sound_num or 1)
+
 				add_simple_timed_effect(5, nil, function()
 					actor:restore_weapon()
 				end, "af_zhelch_restore_weapon")
 			end,
-			look_at_npc = function(self, actor) -- Look at nearest npc
-				look_at_nearest_npc(nil, actor)
+			look_at_npc = function(self, actor, time) -- Look at nearest npc
+				register_callback("actor_on_update", function()
+					look_at_nearest_npc(nil, actor)
+				end, nil, "af_zhelch_look_at_npc")
+
+				CreateTimeEvent("af_zhelch_look_at_npc", "af_zhelch_look_at_npc", time, function()
+					unregister_callback("af_zhelch_look_at_npc")
+					return true
+				end)
 			end,
 
 			-- Actions list, chooses one of the below
@@ -1608,18 +1633,204 @@ artefact_props = { -- Special props of artefacts that are used in processing
 				end
 			end,
 			function(self, actor)
-				register_callback("actor_on_update", function()
-					self:look_at_npc(actor)
-				end, nil, "af_zhelch_look_at_npc")
-				CreateTimeEvent("af_zhelch_look_at_npc", "af_zhelch_look_at_npc", 7, function()
-					unregister_callback("af_zhelch_look_at_npc")
-					return true
-				end)
+				self:look_at_npc(actor, 7)
+			end,
+			function(self, actor)
+				--
+				self:look_at_npc(actor, 4)
 			end,
 		},
 		perform_action = function(self, actor)
 			local actions = self.actions
 			actions[random(#actions)](actions, actor)
+		end
+	},
+	af_bat = {
+		ignore_artefacts = (function()
+			local t = {}
+			t["af_bat"] = true -- Can't mutate itself
+			t["af_lucifer"] = true -- Can't mutate Lucifer
+
+			-- Can't mutate unique artefacts
+			t["af_base_mlr"] = true
+			t["af_black"] = true
+			t["af_compass"] = true
+			t["af_control"] = true
+			t["af_death_lamp"] = true
+			t["af_geliy"] = true
+			t["af_gimlet"] = true
+			t["af_misery_bread"] = true
+			t["af_monolith"] = true
+			t["af_oasis_heart"] = true
+			t["af_quest_b14_twisted"] = true
+			t["af_vaselisk"] = true
+			t["jup_b1_half_artifact"] = true
+			t["marker"] = true
+			ini_sys:section_for_each(function(sec)
+				if SYS_GetParam(0, sec, "kind", "") == "i_arty_cont" then -- Exclude artefacts in containers
+					t[sec] = true
+				elseif SYS_GetParam(0, sec, "kind", "") == "i_attach" then -- Exclude attachments
+					t[sec] = true
+				elseif SYS_GetParam(1, sec, "quest_item", false) then -- Exclude quest items
+					t[sec] = true
+				end
+			end)
+			return t
+		end)(),
+		tier_artefacts = (function()
+			local t = {}
+			ini_sys:section_for_each(function(sec)
+				if SYS_GetParam(0, sec, "kind", "") == "i_arty" then -- If item is artefact, get its tier
+					local tier = SYS_GetParam(2, sec, "tier", 1)
+					if not t[tier] then t[tier] = {} end 
+					t[tier][sec] = true
+				end
+			end)
+			return t
+		end)(),
+		upgrade_artefacts =(function()
+			local t = {
+				artefact_tiers = { -- Tiers by resistance
+					burn = {
+						"af_itcher",
+						"af_pin",
+						"af_cristall",
+						"af_fireball",
+					},
+					chem = {
+						"af_blood",
+						"af_mincer_meat",
+						"af_bracelet",
+						"af_baloon",
+					},
+					shock = {
+						"af_electra_sparkler",
+						"af_sponge",
+						"af_ring",
+						"af_electra_flash",
+					},
+					telepatic = {
+						"af_cristall_flower",
+						"af_lobster_eyes",
+						"af_electra_moonlight",
+						"af_black_spray",
+					},
+					physical = {
+						"af_medusa",
+						"af_vyvert",
+						"af_empty",
+						"af_full_empty",
+					},
+					weight = {
+						"af_night_star",
+						"af_gravi",
+						"af_gold_fish",
+					},
+					bleeding = {
+						"af_dummy_glassbeads",
+						"af_eye",
+						"af_fire",
+					},
+					stamina = {
+						"af_dummy_battery",
+						"af_dummy_dummy",
+						"af_ice",
+					},
+					health = {
+						"af_soul",
+						"af_fuzz_kolobok",
+						"af_glass",
+					}
+				},
+			}
+
+			t.artefact_to_tier = (function()
+				local x = {}
+				for k, v in pairs(t.artefact_tiers) do 
+					for _, art in ipairs(v) do
+						x[art] = k
+					end
+				end
+				return x
+			end)()
+
+			return t
+		end)(),
+		perk_artefacts = (function()
+			local t = {}
+			ini_sys:section_for_each(function(sec)
+				if SYS_GetParam(0, sec, "kind", "") == "i_arty_junk" then -- Perk artefacts have this kind
+					t[sec] = true
+				end
+			end)
+			return t
+		end)(),
+		check_bat = function(self)
+			return db.actor:object("af_bat")
+		end,
+		get_random_artefact = function(self, sec, arts_table)
+			local arts_table = arts_table or self.tier_artefacts[2]
+			local new_sec = get_random_key(arts_table)
+			while new_sec == sec or self.ignore_artefacts[new_sec] do
+				new_sec = get_random_key(arts_table)
+			end
+
+			return new_sec
+		end,
+		get_upgrade_artefact = function(self, sec)
+			local tier = SYS_GetParam(2, sec, "tier", 1)
+			local art = self.upgrade_artefacts
+			local art_table = art.artefact_tiers[art.artefact_to_tier[sec]]
+			if not art_table then
+				trace("Bat, upgrade artefact table not found for %s", sec)
+				return self:get_random_artefact(sec, self.tier_artefacts[tier])
+			end
+
+			local new_sec
+			for i, v in ipairs(art_table) do
+				if v == sec then
+					new_sec = art_table[i + 1]
+					break
+				end
+			end
+
+			if not new_sec then
+				trace("Bat, upgrade artefact not found for %s", sec)
+				return self:get_random_artefact(sec, self.tier_artefacts[tier])
+			end
+
+			return new_sec
+		end,
+		transmutate = function(self, obj, new_artefact)
+			local actor = db.actor
+			local af_bat = actor:object("af_bat")
+			play_sound_on_actor("perk_based_artefacts\\transmute")
+			CloseAll_UI()
+			add_pp_effector("teleport.ppe", 69420, false)
+			
+			alife_release_id(obj:id())
+			alife_release_id(af_bat:id())
+			alife_create_item(new_artefact, actor)
+			CreateTimeEvent("refresh_artefacts", "refresh_artefacts", 0.15, refresh_artefacts_time_event_func, true)
+		end,
+		transmutate_artefact = function(self, obj)
+			local sec = obj:section()
+			local new_sec
+			if self.perk_artefacts[sec] then
+				trace("Bat, transforming perk artefact %s", sec)
+				new_sec = self:get_random_artefact(sec, self.perk_artefacts)
+			else
+				local tier = SYS_GetParam(2, sec, "tier", 1)
+				if random(100) <= 35 then
+					trace("Bat, transforming artefact %s to different kind", sec)
+					new_sec = self:get_random_artefact(sec, self.tier_artefacts[tier])
+				else
+					trace("Bat, upgrading artefact %s", sec)
+					new_sec = self:get_upgrade_artefact(sec)
+				end
+			end
+			trace("Bat, resulting artefact %s", new_sec)
+			self:transmutate(obj, new_sec)
 		end
 	},
 	af_lucifer = {
@@ -1954,8 +2165,9 @@ local artefact_on_update_functions = {
 
 	-- Scar, Perk: That Insane Stalker from the Freedom Faction
 	af_zhelch = function(actor, artefact_count, artefact_ids, artefact_names)
+		local af_lucifer = artefact_props.af_lucifer
 		local health_boost = 0.003
-		local psy_drain = -0.0025
+		local psy_drain = -0.0025 * (2 - af_lucifer.condition)
 		local psy_boost = 0.0035
 
 		if actor.health < 0.99 then
@@ -2436,6 +2648,30 @@ local artefact_on_before_hit_functions = {
 		s_hit.power = s_hit.power * 0.66
 	end,
 
+	-- Sun, Perk: Solar Powered
+	af_sun = function(actor, artefact_count, artefact_ids, artefact_names, s_hit, bone_id, flags)
+		if not check_lucifer() then
+			trace("Sun, not under Lucifer effect")
+			return
+		end
+
+		local af_sun = artefact_props.af_sun
+		if not af_sun.valid_hits[s_hit.type] then
+			trace("Sun, not a valid hit type %s", s_hit.type)
+			return
+		end
+		
+		local fire_damage = af_sun.fire_damage[artefact_count]
+		local fire_hit = hit(s_hit)
+		fire_hit.type = hit.burn
+		fire_hit.power = fire_hit.power * fire_damage
+		play_sound_on_actor("perk_based_artefacts\\fire" .. random(3), 0.8, random_float(0.6, 1))
+
+		trace("Sun, Lucifer effect active, hitting with fire coeff %s, damage %s", fire_damage, fire_hit.power)
+		actor:hit(fire_hit)
+		s_hit.power = s_hit.power * (1 - fire_damage)
+	end,
+
 	-- Lucifer, Perk: The Lucifer Effect
 	af_lucifer = function(actor, artefact_count, artefact_ids, artefact_names, s_hit, bone_id, flags)
 		local af_lucifer = artefact_props.af_lucifer
@@ -2897,24 +3133,44 @@ local artefact_on_equip_functions = {
 }
 
 -- Special monkey patches for some artefacts to make their effects work
--- Custom Dynamic Functors for Lucifer
-local function check_lucifer_condition(obj)
-	return IsArtefact(obj) and check_lucifer()
-end
-
-local function check_sacrifice(obj)
-	if not artefact_props.af_lucifer.ignore_tiers[obj:section()] then
-		trace("%s is valid", obj:section())
-		return "st_pba_sacrifice"
-	end
-end
-
-local function lucifer_sacrifice(obj)
-	return artefact_props.af_lucifer:sacrifice_artefact(obj)
-end
-
+-- Functors for Bat, Perk: Zone Alchemy
 local add_functor = custom_functor_autoinject.add_functor
-add_functor("lucifer", check_lucifer_condition, check_sacrifice, check_lucifer_condition, lucifer_sacrifice)
+local bat_transmutate_func = {
+	check_transmutate = function(obj, bag, mode)
+		local modes = {
+			["inventory"] = true,
+			["loot"] = true,
+		}
+		local af_bat = artefact_props.af_bat
+		return IsArtefact(obj) and af_bat:check_bat() and not af_bat.ignore_artefacts[obj:section()] and modes[mode]
+	end,
+	transmutate_string = function(obj, bag, mode)
+		return "st_pba_transmutate"
+	end,
+	transmutate_func = function(obj, bag, mode)
+		return artefact_props.af_bat:transmutate_artefact(obj)
+	end
+}
+add_functor("pba_bat", bat_transmutate_func.check_transmutate, bat_transmutate_func.transmutate_string, nil, bat_transmutate_func.transmutate_func, true)
+
+-- Functors for Lucifer
+local lucifer_sacrifice_func = {
+	check_lucifer_condition = function(obj, bag, mode)
+		local modes = {
+			["inventory"] = true,
+			["loot"] = true,
+		}
+		local af_lucifer = artefact_props.af_lucifer
+		return IsArtefact(obj) and af_lucifer:check_lucifer() and not af_lucifer.ignore_tiers[obj:section()] and modes[mode]
+	end,
+	check_sacrifice = function(obj, bag, mode)
+		return "st_pba_sacrifice"
+	end,
+	lucifer_sacrifice = function(obj, bag, mode)
+		return artefact_props.af_lucifer:sacrifice_artefact(obj)
+	end,
+}
+add_functor("pba_lucifer", lucifer_sacrifice_func.check_lucifer_condition, lucifer_sacrifice_func.check_sacrifice, nil, lucifer_sacrifice_func.lucifer_sacrifice, true)
 
 -- Patch for Ball for kicking monsters
 local use_kick = bind_monster.generic_object_binder.use_kick

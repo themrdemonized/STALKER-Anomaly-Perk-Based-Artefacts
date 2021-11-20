@@ -6,6 +6,10 @@
 		<text>sacrifice</text>
 	</string>
 
+	<string id="st_pba_transmutate">
+		<text>transmutate</text>
+	</string>
+
 	<string id="st_af_lucifer_name">
 		<text>Lucifer</text>
 	</string>
