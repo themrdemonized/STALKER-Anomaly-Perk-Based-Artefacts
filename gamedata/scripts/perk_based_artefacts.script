@@ -41,6 +41,7 @@ local change_sleep = actor_status_sleep.actor_on_item_use
 
 local change_psy_health = arszi_psy.change_psy_health
 local manage_psy_health = arszi_psy.manage_psy_health
+local get_psy_health = arszi_psy.get_psy_health
 local set_psy_health = arszi_psy.set_psy_health
 
 local dismiss_special_squad = axr_companions.dismiss_special_squad
@@ -242,10 +243,8 @@ local function get_first_key(t)
 	end
 end
 
--- Based on an assumption that key order is undetermined and pseudorandom
 local function get_random_key(t)
-	return get_first_key(t)
-	-- return get_random_array_element(array_keys(t))
+	return get_random_array_element(array_keys(t))
 end
 
 local function get_random_element(t)
@@ -302,7 +301,7 @@ end
 local smoothed_values = {}
 
 --EMA smoothing for changing values
-local default_smoothing = 25
+local default_smoothing = 300
 local smoothing_alpha = 2.0 / (default_smoothing + 1)
 
 local function set_smoothing(n)
@@ -310,8 +309,8 @@ local function set_smoothing(n)
 	smoothing_alpha = 2.0 / (n + 1)
 end
 
-local function ema(key, value)
-	smoothed_values[key] = smoothed_values[key] and smoothed_values[key] + smoothing_alpha * (value - smoothed_values[key]) or value
+local function ema(key, value, def)
+	smoothed_values[key] = smoothed_values[key] and smoothed_values[key] + smoothing_alpha * (value - smoothed_values[key]) or def or value
 	--trace("EMA fired, key %s, target %s, current %s, going %s", key, value, smoothed_values[key], (value > smoothed_values[key] and "up" or "down"))
 	return smoothed_values[key]
 end
@@ -321,12 +320,17 @@ local function look_at_nearest_npc(npc, actor)
 	local npc = npc or get_nearest_stalker(actor)
 	if npc then
 		local npc_position = npc:bone_position("bip01_head")
-		local actor_position = actor:position()
-		npc_position.x = ema("look_x", npc_position.x)
-		npc_position.y = ema("look_y", npc_position.y)
-		npc_position.z = ema("look_z", npc_position.z)
-		-- npc_position.y = npc_position.y + 1
-		actor:actor_look_at_point(npc_position)
+		local actor_position = device().cam_pos
+		local actor_direction = device().cam_dir
+
+		local look_distance = actor_position:distance_to(npc_position)
+		local look_position = vector():set(actor_position):add(actor_direction:mul(look_distance))
+
+		look_position.x = ema("look_x", npc_position.x, look_position.x)
+		look_position.y = ema("look_y", npc_position.y, look_position.y)
+		look_position.z = ema("look_z", npc_position.z, look_position.z)
+
+		actor:actor_look_at_point(look_position)
 	end
 end
 
@@ -1554,6 +1558,70 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			greh = true,
 		}
 	},
+	af_zhelch = {
+		valid_hits = { -- Valid hit types to trigger
+			[hit.telepatic] = true,
+		},
+		actions = {  -- Actions to perform
+
+			-- Action types
+			hide_weapon = function(self, actor, sound_num) -- Hide actor's weapon with sound, restore after some time
+				actor:hide_weapon()
+				play_sound_on_actor("perk_based_artefacts\\dropweapon_" .. sound_num or 1)
+				add_simple_timed_effect(5, nil, function()
+					actor:restore_weapon()
+				end, "af_zhelch_restore_weapon")
+			end,
+			look_at_npc = function(self, actor) -- Look at nearest npc
+				look_at_nearest_npc(nil, actor)
+			end,
+
+			-- Actions list, chooses one of the below
+			function(self, actor)
+				self:hide_weapon(actor, random(1, 4))
+			end,
+			function(self, actor)
+				self:hide_weapon(actor, random(2, 5))
+			end,
+			function(self, actor)
+				for i = 0, 2 do
+					CreateTimeEvent("af_zhelch_hide_weapon" .. i, "af_zhelch_hide_weapon" .. i, i * 10, function()
+						self:hide_weapon(actor, i + 1)
+						return true
+					end)
+				end
+			end,
+			function(self, actor)
+				play_sound_on_actor("perk_based_artefacts\\dsc")
+			end,
+			function(self, actor)
+				local function dsc()
+					play_sound_on_actor("perk_based_artefacts\\dsc")
+					return true
+				end
+
+				dsc()
+				local x = random() * 4
+				for i = 1, random(10) do
+					CreateTimeEvent("af_zhelch_dsc" .. i, "af_zhelch_dsc" .. i, x, dsc)
+					x = x + random() * 4
+				end
+			end,
+			function(self, actor)
+				register_callback("actor_on_update", function()
+					self:look_at_npc(actor)
+				end, nil, "af_zhelch_look_at_npc")
+				CreateTimeEvent("af_zhelch_look_at_npc", "af_zhelch_look_at_npc", 7, function()
+					unregister_callback("af_zhelch_look_at_npc")
+					return true
+				end)
+			end,
+		},
+		perform_action = function(self, actor)
+			local actions = self.actions
+			actions[random(#actions)](actions, actor)
+		end
+	},
 	af_lucifer = {
 		ignore_tiers = (function()  -- Artefacts ignore list
 			local t = {}
@@ -1885,8 +1953,33 @@ local artefact_on_update_functions = {
 	end,
 
 	-- Scar, Perk: That Insane Stalker from the Freedom Faction
-	af_scar = function(actor, artefact_count, artefact_ids, artefact_names)
-		--
+	af_zhelch = function(actor, artefact_count, artefact_ids, artefact_names)
+		local health_boost = 0.003
+		local psy_drain = -0.0025
+		local psy_boost = 0.0035
+
+		if actor.health < 0.99 then
+			actor:change_health(health_boost)
+			change_psy_health(psy_drain)
+		else
+			change_psy_health(psy_boost)
+		end
+
+		if not check_cooldown("af_zhelch_action") then
+			-- trace("Scar, action is in cooldown")
+			return
+		end
+
+		local dice_roll = random() * 100
+		local chance = 0.5 + 5 * (1 - get_psy_health())
+		if dice_roll > chance then
+			trace("Scar, action not triggered, dice roll %s, chance %s", dice_roll, chance)
+			return
+		end
+
+		local af_zhelch = artefact_props.af_zhelch
+		af_zhelch:perform_action(actor)
+		add_cooldown(60, "af_zhelch_action")
 	end,
 
 	-- Lucifer, Perk: The Lucifer Effect
@@ -2332,6 +2425,17 @@ local artefact_on_before_hit_functions = {
 		af_cocoon:on_before_hit(actor, artefact_count, artefact_ids, artefact_names, s_hit, bone_id, flags)
 	end,
 
+	-- Scar, Perk: That Insane Stalker from the Freedom Faction
+	af_zhelch = function(actor, artefact_count, artefact_ids, artefact_names, s_hit, bone_id, flags)
+		local af_zhelch = artefact_props.af_zhelch
+		if not af_zhelch.valid_hits[s_hit.type] then
+			trace("Scar, not a valid hit type %s", s_hit.type)
+			return
+		end
+
+		s_hit.power = s_hit.power * 0.66
+	end,
+
 	-- Lucifer, Perk: The Lucifer Effect
 	af_lucifer = function(actor, artefact_count, artefact_ids, artefact_names, s_hit, bone_id, flags)
 		local af_lucifer = artefact_props.af_lucifer
@@ -2495,7 +2599,7 @@ local artefact_on_hit_functions = {
 			weapon_name = actor_weapon:name(),
 			hit_type = last_hit.type
 		}, "af_sandstone" .. actor_weapon:name())
-	end
+	end,
 
 }
 
