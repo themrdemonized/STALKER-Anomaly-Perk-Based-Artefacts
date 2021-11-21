@@ -1674,6 +1674,8 @@ artefact_props = { -- Special props of artefacts that are used in processing
 					t[sec] = true
 				elseif SYS_GetParam(0, sec, "kind", "") == "i_attach" then -- Exclude attachments
 					t[sec] = true
+				elseif SYS_GetParam(0, sec, "kind", "") == "i_quest" then -- Exclude quest items
+					t[sec] = true
 				elseif SYS_GetParam(1, sec, "quest_item", false) then -- Exclude quest items
 					t[sec] = true
 				end
@@ -1845,6 +1847,8 @@ artefact_props = { -- Special props of artefacts that are used in processing
 				if SYS_GetParam(0, sec, "kind", "") == "i_arty_cont" then -- Exclude artefacts in containers
 					t[sec] = true
 				elseif SYS_GetParam(0, sec, "kind", "") == "i_attach" then -- Exclude attachments
+					t[sec] = true
+				elseif SYS_GetParam(0, sec, "kind", "") == "i_quest" then -- Exclude quest items
 					t[sec] = true
 				elseif SYS_GetParam(1, sec, "quest_item", false) then -- Exclude quest items
 					t[sec] = true
