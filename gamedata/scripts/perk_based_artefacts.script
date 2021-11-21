@@ -117,11 +117,14 @@ hud_state = 1
 
 local actor_last_money = 0
 
-local c_id_ppe_blur = 5600
-local c_id_ppe_black_infinite = 5606
-local c_id_ppe_snd_shock = 5607
-local c_id_ppe_actor_death = 445
-local c_id_ppe_rcom_actor_death_quick = 446
+local c_id_ppe = {
+	actor_death = 445,
+	black_infinite = 5606,
+	blur = 5600,
+	rcom_actor_death_quick = 446,
+	snd_shock = 5607,
+	transmutate = 69420
+}
 
 local last_hit
 local last_npc_hit
@@ -679,9 +682,9 @@ artefact_props = { -- Special props of artefacts that are used in processing
 		on_death = function(self, actor, artefact_count, artefact_ids, artefact_names, npc, who, last_npc_hit, last_npc_hit_bone_index)
 			trace("Teleporting actor")
 
-			add_pp_effector("black_infinite.ppe", c_id_ppe_black_infinite, true)
+			add_pp_effector("black_infinite.ppe", c_id_ppe.black_infinite, true)
 			CreateTimeEvent("af_lighthouse", "af_lighthouse", 0.5, function()
-				remove_pp_effector(c_id_ppe_black_infinite)
+				remove_pp_effector(c_id_ppe.black_infinite)
 			end)
 			actor:set_actor_position(npc:position())
 			play_sound_on_actor(get_random_array_element(self.sounds), 0.7, random_float(0.95, 1.05))
@@ -1806,7 +1809,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			local af_bat = actor:object("af_bat")
 			play_sound_on_actor("perk_based_artefacts\\transmute")
 			CloseAll_UI()
-			add_pp_effector("teleport.ppe", 69420, false)
+			add_pp_effector("teleport.ppe", c_id_ppe.transmutate, false)
 			
 			alife_release_id(obj:id())
 			alife_release_id(af_bat:id())
@@ -2410,8 +2413,8 @@ local artefact_on_before_death_functions = {
 		end
 
 		add_cam_effector("camera_effects\\surge_02.anm", 444, false, "perk_based_artefacts.af_serofim_cheat_death")
-		add_pp_effector("actor_death.ppe", c_id_ppe_actor_death, true)
-		add_pp_effector("rcom_actor_death_quick.ppe", c_id_ppe_rcom_actor_death_quick, true)
+		add_pp_effector("actor_death.ppe", c_id_ppe.actor_death, true)
+		add_pp_effector("rcom_actor_death_quick.ppe", c_id_ppe.rcom_actor_death_quick, true)
 
 		local amb_vol_coeff = 1
 		_G.mus_vol = get_console():get_float("snd_volume_music")
@@ -2446,10 +2449,10 @@ local artefact_on_before_death_functions = {
 			trace("unregistering callback")
 			UnregisterScriptCallback("on_enemy_eval", af_serofim.ignore_enemy_on_down_function)
 			add_simple_timed_effect(5, revive, function()
-				remove_pp_effector(c_id_ppe_blur)
-				remove_pp_effector(c_id_ppe_snd_shock)
-				remove_pp_effector(c_id_ppe_actor_death)
-				remove_pp_effector(c_id_ppe_rcom_actor_death_quick)
+				remove_pp_effector(c_id_ppe.blur)
+				remove_pp_effector(c_id_ppe.snd_shock)
+				remove_pp_effector(c_id_ppe.actor_death)
+				remove_pp_effector(c_id_ppe.rcom_actor_death_quick)
 				UnregisterScriptCallback("actor_on_before_hit", af_serofim.ignore_all_damage_function)
 				actor_is_dying = false
 			end)
