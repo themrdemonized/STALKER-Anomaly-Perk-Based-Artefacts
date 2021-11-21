@@ -60,7 +60,7 @@ you can also override existing functors defined in item's ltx by using this
 
 ---------------------------------------------------------------------------------------------------------------------
 local override_functor = custom_functor_autoinject.override_functor
-override_functor(slot, name_condition_function, name_function, action_condition_function, action_function)
+override_functor(slot, name_condition_function, name_function, action_condition_function, action_function, override_bags<true, false>)
 ---------------------------------------------------------------------------------------------------------------------
 
 arguments are same, except you have to provide the slot (first argument) for your override. The slots are 1-10
@@ -97,6 +97,7 @@ local string_find = string.find
 local string_gsub = string.gsub
 local table_remove = table.remove
 local tonumber = tonumber
+local unpack = unpack
 
 --Recursive print of tables similar to PHP print_r function
 local function print_r(t) 

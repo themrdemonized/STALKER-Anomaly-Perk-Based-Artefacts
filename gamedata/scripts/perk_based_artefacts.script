@@ -1606,10 +1606,10 @@ artefact_props = { -- Special props of artefacts that are used in processing
 
 			-- Actions list, chooses one of the below
 			function(self, actor)
-				self:hide_weapon(actor, random(1, 4))
+				self:hide_weapon(actor, random(1, 5))
 			end,
 			function(self, actor)
-				self:hide_weapon(actor, random(2, 5))
+				self:hide_weapon(actor, random(1, 5))
 			end,
 			function(self, actor)
 				for i = 0, 2 do
@@ -1649,6 +1649,17 @@ artefact_props = { -- Special props of artefacts that are used in processing
 		end
 	},
 	af_bat = {
+		allow_artefacts = (function()
+			local t = {}
+			ini_sys:section_for_each(function(sec)
+				if SYS_GetParam(0, sec, "kind", "") == "i_arty" then -- Allow artefacts
+					t[sec] = true
+				elseif SYS_GetParam(0, sec, "kind", "") == "i_arty_junk" then -- Allow perk artefacts
+					t[sec] = true
+				end
+			end)
+			return t
+		end)(),
 		ignore_artefacts = (function()
 			local t = {}
 			t["af_bat"] = true -- Can't mutate itself
@@ -1667,6 +1678,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			t["af_oasis_heart"] = true
 			t["af_quest_b14_twisted"] = true
 			t["af_vaselisk"] = true
+			t["monolith_shard"] = true
 			t["jup_b1_half_artifact"] = true
 			t["marker"] = true
 			ini_sys:section_for_each(function(sec)
@@ -1675,6 +1687,8 @@ artefact_props = { -- Special props of artefacts that are used in processing
 				elseif SYS_GetParam(0, sec, "kind", "") == "i_attach" then -- Exclude attachments
 					t[sec] = true
 				elseif SYS_GetParam(0, sec, "kind", "") == "i_quest" then -- Exclude quest items
+					t[sec] = true
+				elseif SYS_GetParam(0, sec, "kind", "") == "i_mutant_belt" then -- Exclude mutant hides
 					t[sec] = true
 				elseif SYS_GetParam(1, sec, "quest_item", false) then -- Exclude quest items
 					t[sec] = true
@@ -1776,8 +1790,15 @@ artefact_props = { -- Special props of artefacts that are used in processing
 		get_random_artefact = function(self, sec, arts_table)
 			local arts_table = arts_table or self.tier_artefacts[2]
 			local new_sec = get_random_key(arts_table)
+			local i = 1
 			while new_sec == sec or self.ignore_artefacts[new_sec] do
+				if i > 100 then
+					trace("Bat, too many tries to find random artefact, returning same section %s", sec)
+					new_sec = sec
+					break
+				end
 				new_sec = get_random_key(arts_table)
+				i = i + 1
 			end
 
 			return new_sec
@@ -1839,16 +1860,30 @@ artefact_props = { -- Special props of artefacts that are used in processing
 		end
 	},
 	af_lucifer = {
+		allow_artefacts = (function()
+			local t = {}
+			ini_sys:section_for_each(function(sec)
+				if SYS_GetParam(0, sec, "kind", "") == "i_arty" then -- Allow artefacts
+					t[sec] = true
+				elseif SYS_GetParam(0, sec, "kind", "") == "i_arty_junk" then -- Allow perk artefacts
+					t[sec] = true
+				end
+			end)
+			return t
+		end)(),
 		ignore_tiers = (function()  -- Artefacts ignore list
 			local t = {}
 			t["af_serofim"] = true -- Seraphim
 			t["af_lucifer"] = true -- Can't sacrifice itself
+			t["monolith_shard"] = true -- Monolith Shard
 			ini_sys:section_for_each(function(sec)
 				if SYS_GetParam(0, sec, "kind", "") == "i_arty_cont" then -- Exclude artefacts in containers
 					t[sec] = true
 				elseif SYS_GetParam(0, sec, "kind", "") == "i_attach" then -- Exclude attachments
 					t[sec] = true
 				elseif SYS_GetParam(0, sec, "kind", "") == "i_quest" then -- Exclude quest items
+					t[sec] = true
+				elseif SYS_GetParam(0, sec, "kind", "") == "i_mutant_belt" then -- Exclude mutant hides
 					t[sec] = true
 				elseif SYS_GetParam(1, sec, "quest_item", false) then -- Exclude quest items
 					t[sec] = true
@@ -3149,7 +3184,8 @@ local bat_transmutate_func = {
 			["loot"] = true,
 		}
 		local af_bat = artefact_props.af_bat
-		return IsArtefact(obj) and af_bat:check_bat() and not af_bat.ignore_artefacts[obj:section()] and modes[mode]
+		local sec = obj:section()
+		return IsArtefact(obj) and af_bat:check_bat() and af_bat.allow_artefacts[sec] and not af_bat.ignore_artefacts[sec] and modes[mode]
 	end,
 	transmutate_string = function(obj, bag, mode)
 		return "st_pba_transmutate"
@@ -3168,7 +3204,8 @@ local lucifer_sacrifice_func = {
 			["loot"] = true,
 		}
 		local af_lucifer = artefact_props.af_lucifer
-		return IsArtefact(obj) and af_lucifer:check_lucifer() and not af_lucifer.ignore_tiers[obj:section()] and modes[mode]
+		local sec = obj:section()
+		return IsArtefact(obj) and af_lucifer:check_lucifer() and af_lucifer.allow_artefacts[sec] and not af_lucifer.ignore_tiers[sec] and modes[mode]
 	end,
 	check_sacrifice = function(obj, bag, mode)
 		return "st_pba_sacrifice"
