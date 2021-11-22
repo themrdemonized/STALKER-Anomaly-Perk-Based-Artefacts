@@ -17,31 +17,31 @@
 	<string id="st_af_lucifer_descr">
 		<text>
 			You signed a Pact with the Zone. You are being rewarded with amazing abilities in exchange for your life force. To prevent your demise and prolong your existence, you are given a chance to sacrifice other Zone's riches. The quality of the offering matters as you will be compensated appropriately. Do not slack off and remember - the clock is ticking.\n \n
-			%c[d_orange]Perk: The Lucifer Effect\n 
-			%c[ui_white]  • %c[d_orange]Lucifer grants you immense strength and abilities, making you a demigod\n
-			%c[ui_white]  • %c[d_orange]At max condition you receive:\n
-			%c[ui_gray_2]      - %c[d_cyan]50%%c[ui_gray_2] reduction of any damage\n
-			%c[ui_gray_2]      - %c[d_cyan]35%%c[ui_gray_2] increase in speed\n
-			%c[ui_gray_2]      - %c[d_cyan]1%/sec%c[ui_gray_2] health regen\n
-			%c[ui_gray_2]      - %c[d_cyan]5%/sec%c[ui_gray_2] psy regen\n
-			%c[ui_gray_2]      - %c[d_cyan]+50kg%c[ui_gray_2] of carry weight\n \n
-			%c[ui_white]  • %c[d_orange]Lucifer will always work even from the backpack \n
-			%c[ui_white]  • %c[d_orange]However, your powers are very short-lived (about 4 days) and drain artefact energy\n
-			%c[ui_white]  • %c[d_orange]With each % of energy loss your powers will be weaker\n
-			%c[ui_white]  • %c[d_orange]At 50% you will have no powers\n
-			%c[ui_white]  • %c[d_orange]Less than 50% the artefact will start to consume your soul to live resulting first in slight loss of stamina\n
-			%c[ui_white]  • %c[d_orange]Less than 40% and your health start to disappear, first slow, then increasing with decrease of condition\n
-			%c[ui_white]  • %c[d_orange]You can sacrifice mere usual artefacts to partially restore Lucifer's condition\n
-			%c[ui_white]  • %c[d_orange]Tier 1 artefacts restore 3-5%\n
-			%c[ui_white]  • %c[d_orange]Tier 2 artefacts restore 6-9%\n
-			%c[ui_white]  • %c[d_orange]Tier 3 artefacts restore 10-13%\n
-			%c[ui_white]  • %c[d_orange]Extra Knot artefacts restore 20-30%\n
-			%c[ui_white]  • %c[d_orange]Seraphim can't be sacrificed\n
-			%c[ui_white]  • %c[d_orange]Death Lamp will overcharge artefact, restoring it to 100% and temporarily boosting it even more\n
-			%c[ui_white]  • %c[d_orange]There is a slight chance that overcharging with Death Lamp will tear you apart\n
-			%c[ui_white]  • %c[d_orange]You cannot dispose the artefact by any means\n
-			%c[ui_white]  • %c[d_orange]Lucifer has unknown influence on other artefacts, enhancing their effects in various ways \n
-			%c[ui_white]  • %c[d_orange]Find more artefacts to restore Lucifer's condition or face the consequences\n
+			%c[0,209,172,56]Perk: %c[d_orange]The Lucifer Effect\n 
+			%c[0,81,63,22]  • %c[0,209,172,56]Lucifer grants you immense strength and abilities, making you a demigod\n
+			%c[0,81,63,22]  • %c[0,209,172,56]At max condition you receive:\n
+			%c[0,192,71,221] -   50%%c[ui_gray_3] reduction of any damage\n
+			%c[0,192,71,221] -   35%%c[ui_gray_3] increase in speed\n
+			%c[0,192,71,221] -   1%/sec%c[ui_gray_3] health regen\n
+			%c[0,192,71,221] -   5%/sec%c[ui_gray_3] psy regen\n
+			%c[0,192,71,221] -   +50kg%c[ui_gray_3] of carry weight\n \n
+			%c[0,81,63,22]  • %c[0,209,172,56]Lucifer will always work even from the backpack \n
+			%c[0,81,63,22]  • %c[0,209,172,56]However, your powers are very short-lived (about 4 days) and drain artefact energy\n
+			%c[0,81,63,22]  • %c[0,209,172,56]With each % of energy loss your powers will be weaker\n
+			%c[0,81,63,22]  • %c[0,209,172,56]At 50% you will have no powers\n
+			%c[0,81,63,22]  • %c[0,209,172,56]Less than 50% the artefact will start to consume your soul to live, resulting in slight loss of stamina at first\n
+			%c[0,81,63,22]  • %c[0,209,172,56]Less than 40% and your health will start to disappear, first slow, then increasing as condition decreases\n
+			%c[0,81,63,22]  • %c[0,209,172,56]You can sacrifice mere usual artefacts to partially restore Lucifer's condition\n
+			%c[0,81,63,22]  • %c[0,209,172,56]Tier 1 artefacts restore 3-5%\n
+			%c[0,81,63,22]  • %c[0,209,172,56]Tier 2 artefacts restore 6-9%\n
+			%c[0,81,63,22]  • %c[0,209,172,56]Tier 3 artefacts restore 10-13%\n
+			%c[0,81,63,22]  • %c[0,209,172,56]Extra Knot artefacts restore 20-30%\n
+			%c[0,81,63,22]  • %c[0,209,172,56]Seraphim can't be sacrificed\n
+			%c[0,81,63,22]  • %c[0,209,172,56]Death Lamp will overcharge artefact, restoring it to 100% and temporarily boosting it even more\n
+			%c[0,81,63,22]  • %c[0,209,172,56]There is a slight chance that overcharging with Death Lamp will tear you apart\n
+			%c[0,81,63,22]  • %c[0,209,172,56]You cannot dispose of the artefact by any means\n
+			%c[0,81,63,22]  • %c[0,209,172,56]Lucifer has unknown influence on other artefacts, enhancing their effects in various ways \n
+			%c[0,81,63,22]  • %c[0,209,172,56]Find more artefacts to restore Lucifer's condition or face the consequences
 		</text>
 	</string>
 

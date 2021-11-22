@@ -8,78 +8,66 @@
   </string>
   <string id="st_af_cocoon_descr">
     <text>A small, irregularly-shaped artefact formed in gravitational anomalies. It owes its name to two different factors. For one, the exterior structure of the artefact resembles caterpillar silk. But the more interesting part lies within its utility. When close to the body, the artefact reacts every time the owner is being hit by blunt or cutting trauma, spreading a cocoon-like substance over them that protects from further damage. The protection comes at a price however, limiting the movement of the user each time Cocoon activates and the protective layer thickens.\n \n
-    %c[ui_gray_2]PROPERTIES:\n
-    \n
-    %c[d_orange]Perk: Stone Skin\n 
-    %c[ui_white]  • %c[d_orange]Receiving melee damage grants you Stone skin stack.\n
-    %c[ui_white]  • %c[d_orange]With receiving stack you get 10% melee damage protection but receive 10% speed penalty.\n
-    %c[ui_white]  • %c[d_orange]Each stack grows protection with diminishing returns and penalize speed more.\n
-    %c[ui_white]  • %c[d_orange]Maximum 10 stacks is possible, at which you receive 75% reduction of melee damage but become completely immobilized.\n
-    %c[ui_white]  • %c[d_orange]Effect lasts for 10 seconds, after which all stacks are burned.\n
-    %c[ui_white]  • %c[d_orange]Multiple artefact increase the rate of gaining stacks.</text>
+    %c[0,209,172,56]Perk: %c[d_orange]Stone Skin\n 
+    %c[0,81,63,22]  • %c[0,209,172,56]Receiving melee damage grants you Stone skin stack.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]With receiving stack you get 10% melee damage protection but receive 10% speed penalty.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Each stack grows protection with diminishing returns and penalize speed more.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Maximum 10 stacks is possible, at which you receive 75% reduction of melee damage but become completely immobilized.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Effect lasts for 10 seconds, after which all stacks are burned.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Multiple artefact increase the rate of gaining stacks.</text>
   </string>
   <string id="st_af_cell_name">
     <text>Cell</text>
   </string>
   <string id="st_af_cell_descr">
     <text>An artefact formed in gravitational anomalies, likely due to intense localized magnetic fields. Its interior structure spins perpetually on its axis as long as it is not disturbed. Cell has one truly noteworthy to an average person property. Any very fast moving objects getting within its close proximity get partially disintegrated, releasing a hefty amount of radioactive particles in the process. Some stalkers use the artefact to their advantage, claiming that dealing with radiation sickness later beats getting hit with a bullet in the present.\n \n
-    %c[ui_gray_2]PROPERTIES:\n
-    \n
-    %c[d_orange]Perk: Disintegrator\n
-    %c[ui_white]  • %c[d_orange]Disintegrates part of the bullet coming to you. Unfortunately in the process a lot of radiation is emitted, making you ill.\n
-    %c[ui_white]  • %c[d_orange]Reduces bullet damage by 15%.\n
-    %c[ui_white]  • %c[d_orange]Reduced amount of damage is converted to radiation.\n
-    %c[ui_white]  • %c[d_orange]Stacks with multiple artefacts.</text>
+    %c[0,209,172,56]Perk: %c[d_orange]Disintegrator\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Disintegrates part of the bullet coming to you. Unfortunately in the process a lot of radiation is emitted, making you ill.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Reduces bullet damage by 15%.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Reduced amount of damage is converted to radiation.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Stacks with multiple artefacts.</text>
   </string>
   <string id="st_af_fountain_name">
     <text>Fountain</text>
   </string>
   <string id="st_af_fountain_descr">
     <text>A common artefact formed in gravitational anomalies. Its bizarre shape makes it is very valued by collectors. Interestingly enough, there's not an insignificant amount of stalkers claiming that being in possession of this artefact helps them strike a better deal with the Zone's traders. Whether it's true or not remains to be confirmed, however the mentioned merchants would rather not speak of it. \n \n
-    %c[ui_gray_2]PROPERTIES:\n
-    \n
-    %c[d_orange]Perk: Letyshops Time\n
-    %c[ui_white]  • %c[d_orange]Receive 2% cashback on each buy.\n
-    %c[ui_white]  • %c[d_orange]Stacks with multiple artefacts.</text>
+    %c[0,209,172,56]Perk: %c[d_orange]Letyshops Time\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Receive 2% cashback on each buy.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Stacks with multiple artefacts.</text>
   </string>
   <string id="st_af_spaika_name">
     <text>Spike</text>
   </string>
   <string id="st_af_spaika_descr">
     <text>A common artefact formed in gravitational anomalies, that resembles petrified wood or bone. Stalkers that dared to use it on their belts say that the artefact calms them down and helps them focus in stressful combat situations, letting them hit their enemies in vital spots. Strangely enough, they also claim that the artefact gets 'angry at them' for missing their shots, which makes most folks avoid using it, fearing a permanent Zone-induced schizophrenia. \n \n
-    %c[ui_gray_2]PROPERTIES:\n
-    \n
-    %c[d_orange]Perk: Critical Ascensi0n\n
-    %c[ui_white]  • %c[d_orange]Consecutive hits give 3% bonus to damage of your next shot.\n
-    %c[ui_white]  • %c[d_orange]Hitting enemy in the critical place gives 6% bonus.\n
-    %c[ui_white]  • %c[d_orange]Missing the shot resets the bonus stack and gives psy damage penalty proportional to the stack you had.\n
-    %c[ui_white]  • %c[d_orange]Bonus can be stacked infinitely as long as you don't miss.\n
-    %c[ui_white]  • %c[d_orange]Each extra artefact adds 2% to both normal and critical hits.\n
-    %c[ui_white]  • %c[d_orange]Unequipping all Spike artefacts will remove the stack without penalties.</text>
+    %c[0,209,172,56]Perk: %c[d_orange]Critical Ascensi0n\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Consecutive hits give 3% bonus to damage of your next shot.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Hitting enemy in the critical place gives 6% bonus.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Missing the shot resets the bonus stack and gives psy damage penalty proportional to the stack you had.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Bonus can be stacked infinitely as long as you don't miss.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Each extra artefact adds 2% to both normal and critical hits.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Unequipping all Spike artefacts will remove the stack without penalties.</text>
   </string>
   <string id="st_af_signet_name">
     <text>Signet</text>
   </string>
   <string id="st_af_signet_descr">
     <text>An artefact that appears to be a warped metal nut. Occasionally also called an "Amulet". The latter comes from the fact that some stalkers tend to keep their Signets instead of selling them, saying that its presence helps them relax and regenerate after a dangerous raid into the Zone.\n \n
-    %c[ui_gray_2]PROPERTIES:\n
-    \n
-    %c[d_orange]Perk: Light of Tranquility\n
-    %c[ui_white]  • %c[d_orange]Restores health and psy while being near campfire, amplifies psy recovery artefacts near campfire.\n
-    %c[ui_white]  • %c[d_orange]Effect stacks with each artefact on belt.</text>
+    %c[0,209,172,56]Perk: %c[d_orange]Light of Tranquility\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Restores health and psy while being near campfire, amplifies psy recovery artefacts near campfire.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Effect stacks with each artefact on belt.</text>
   </string>
   <string id="st_af_repei_name">
     <text>Thistle</text>
   </string>
   <string id="st_af_repei_descr">
     <text>A common artefact spawned in gravitational anomalies. Despite their prickly appearances, Thistles seem incapable of penetrating flesh or damaging the body in any way. Recent experiments and observations confirmed them reacting with various heavy metals - property especially visible with lead. Various medical reports of wounded stalkers and soldiers show that the bullets shot by the user of this artefact shave some of the outer material to become serrated and sharp upon entering the body, creating smaller but much heavier bleeding wounds. To make matters worse, any bullet that was recently within vicinity of a Thistle will start twitching around upon contact with iron contained in human blood, causing the wound to be painful and hard to close up for a period of time.\n \n
-    %c[ui_gray_2]PROPERTIES:\n
-    \n
-    %c[d_orange]Perk: Minor Laceration\n
-    %c[ui_white]  • %c[d_orange]Your weapon loses 50% of raw power but gains the ability to deal bleeding damage.\n
-    %c[ui_white]  • %c[d_orange]With each hit the enemy will receive a bleeding stack and start to slowly loose health proportionally to weapon raw power.\n
-    %c[ui_white]  • %c[d_orange]NPCs will have more chance to fall in wounded state, where they beg for mercy and might give you valuable information, if you reach them before they die.\n
-    %c[ui_white]  • %c[d_orange]Multiple artefacts increase the efficiency of bleeding stacks.\n
+    %c[0,209,172,56]Perk: %c[d_orange]Minor Laceration\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Your weapon loses 50% of raw power but gains the ability to deal bleeding damage.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]With each hit the enemy will receive a bleeding stack and start to slowly loose health proportionally to weapon raw power.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]NPCs will have more chance to fall in wounded state, where they beg for mercy and might give you valuable information, if you reach them before they die.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Multiple artefacts increase the efficiency of bleeding stacks.\n
   </text>
   </string>
   <string id="st_af_bat_name">
@@ -87,311 +75,261 @@
   </string>
   <string id="st_af_bat_descr">
     <text>A rare and beautiful artefact, consisting of two irregularly-shaped "wings" protecting a lustrous spherical core. Does not emit radiation and is quite heavy. Experienced artefact hunters learned how to use its special ability to their advantage. Once activated and placed near another artefact, Bat will extend its "wings", grab it with them, force it into its core and then close up. Soon after that the shell will turn into dust, revealing an artefact with much stronger properties or, sometimes, a completely different one altogether.\n \n
-    %c[ui_gray_2]PROPERTIES:\n
-    \n
-    %c[d_orange]Perk: Zone Alchemy\n
-    %c[ui_white]  • %c[d_orange]With Bat in the backpack you have the ability to transmutate your artefacts.\n
-    %c[ui_white]  • %c[d_orange]Artefacts can be "upgraded" i.e. changed to a better tier (Night Star -> Gravi -> Gold Fish), or can be "mutated" i.e. changed to different type retaining same tier (Night Star -> Stone Blood -> Jellyfish)\n
-    %c[ui_white]  • %c[d_orange]Top tier artefacts can only be mutated.\n
-    %c[ui_white]  • %c[d_orange]Perk artefacts can only be mutated.\n
-    %c[ui_white]  • %c[d_orange]Unique artefacts, including Bat itself, can't be transmutated.\n
-    %c[ui_white]  • %c[d_orange]Each transmutation will cost you one Bat artefact.</text>
+    %c[0,209,172,56]Perk: %c[d_orange]Zone Alchemy\n
+    %c[0,81,63,22]  • %c[0,209,172,56]With Bat in the backpack you have the ability to transmutate your artefacts.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Artefacts can be "upgraded" i.e. changed to a better tier (Night Star -> Gravi -> Gold Fish), or can be "mutated" i.e. changed to different type retaining same tier (Night Star -> Stone Blood -> Jellyfish)\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Top tier artefacts can only be mutated.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Perk artefacts can only be mutated.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Unique artefacts, including Bat itself, can't be transmutated.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Each transmutation will cost you one Bat artefact.</text>
   </string>
   <string id="st_af_sun_name">
     <text>Sun</text>
   </string>
   <string id="st_af_sun_descr">
     <text>A rare artefact that is very much appreciated by collectors. Its exterior shell is unremarkable, but if cracked like a geode, reveals a swirling luminous core that emits a constant source of warm yellow light. Suns enjoy the company of actual sunrays, giving users of this artefact a source of energy when exposed to them. In the same way, when kept away from a direct source of natural light, they grab energy from nearby living things, draining them down slowly.\n \n
-    %c[ui_gray_2]PROPERTIES:\n
-    \n
-    %c[d_orange]Perk: Solar Powered\n
-    %c[ui_white]  • %c[d_orange]Gives health and stamina boost at clear weather, little stamina boost at partly clear and stamina penalty at not clear and at night.\n
-    %c[ui_white]  • %c[d_orange]Effect stacks with each artefact on belt.</text>
+    %c[0,209,172,56]Perk: %c[d_orange]Solar Powered\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Gives health and stamina boost at clear weather, little stamina boost at partly clear and stamina penalty at not clear and at night.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Effect stacks with each artefact on belt.</text>
   </string>
   <string id="st_af_ear_name">
     <text>Heart</text>
   </string>
   <string id="st_af_ear_descr">
     <text>A bizarrely-shaped artefact, whose crystalline core resembles a miniature human circulatory system. Ever since the rumours spread that the artefact is able to heal dying creatures and people, the interest in obtaining these skyrocketed, both for sale to the outside world and for ensuring your own survival inside the Zone.\n \n
-    %c[ui_gray_2]PROPERTIES:\n
-    \n
-    %c[d_orange]Perk: Will to Live\n
-    %c[ui_white]  • %c[d_orange]Gives stronger health regen the less health you have if you have lower than 25% of health up to that amount.\n
-    %c[ui_white]  • %c[d_orange]More artefacts increase the regen and slightly increases the highest health to trigger.</text>
+    %c[0,209,172,56]Perk: %c[d_orange]Will to Live\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Gives stronger health regen the less health you have if you have lower than 25% of health up to that amount.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]More artefacts increase the regen and slightly increases the highest health to trigger.</text>
   </string>
   <string id="st_af_chelust_name">
     <text>Chain</text>
   </string>
   <string id="st_af_chelust_descr">
     <text>An unusual circular artefact, not to be confused with a Ring. Generates a strong gravitational field while nothing touches it. At first glance its weight doesn't justify the minor tiredness and pain alleviation. But those ones who devoted their lives to Vyraj and The Masters can truly realise the potential of the artefact.\n \n
-    %c[ui_gray_2]PROPERTIES:\n
-    \n
-    %c[d_orange]Perk: The Weight Of Devotion\n
-    %c[ui_white]  • %c[d_orange]Provides small health and stamina regen.\n
-    %c[ui_white]  • %c[d_orange]Members of Sin triple the effect of the artefact and add psy regen.\n
-    %c[ui_white]  • %c[d_orange]Sin companions receive health regen one by one, starting from the one with the lowest health.\n
-    %c[ui_white]  • %c[d_orange]Does not stack in any way.</text>
+    %c[0,209,172,56]Perk: %c[d_orange]The Weight Of Devotion\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Provides small health and stamina regen.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Members of Sin triple the effect of the artefact and add psy regen.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Sin companions receive health regen one by one, starting from the one with the lowest health.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Does not stack in any way.</text>
   </string>
   <string id="st_af_atom_name">
     <text>Atom</text>
   </string>
   <string id="st_af_atom_descr">
     <text>A rare and unusual artefact that resembles the old Bohr model of an atom. Not radioactive, but does produce a small amount of heat. It is very valuable to collectors and scientists both due to its shape and its properties. Stalkers suffering from being heavily irradiated due to an unfortunate exposure, when using this artefact, suddenly seem as if they regained their youth in terms of vitality. Over time the effect diminishes, but so does the radiation residing in their bodies.\n \n
-    %c[ui_gray_2]PROPERTIES:\n
-    \n
-    %c[d_orange]Perk: Arszi's Blessing\n
-    %c[ui_white]  • %c[d_orange]Converts radiation illness to stamina boost and gives light radiation cure.\n
-    %c[ui_white]  • %c[d_orange]More artefacts make boost bigger but less continuous.</text>
+    %c[0,209,172,56]Perk: %c[d_orange]Arszi's Blessing\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Converts radiation illness to stamina boost and gives light radiation cure.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]More artefacts make boost bigger but less continuous.</text>
   </string>
   <string id="st_af_lighthouse_name">
     <text>Beacon</text>
   </string>
   <string id="st_af_lighthouse_descr">
     <text>A clotted mass of superdense ferrous metals. It is one of the most mysterious artefacts in the Zone as its inner workings still baffle the greatest minds in modern science. Beacon in its active state is able to detect whenever one living thing kills another, no matter the distance between the two, as long as the intent on murder and causality are very clear. The resulting reaction is no less mysterious - the murderer is almost instantly 'teleported' towards the place where the victim drew their last breath.\n \n
-    %c[ui_gray_2]PROPERTIES:\n
-    \n
-    %c[d_orange]Perk: The Unorthodox Way Of Travelling\n
-    %c[ui_white]  • %c[d_orange]Killing anyone will teleport you to the place of your victim's death.\n
-    %c[ui_white]  • %c[d_orange]Don't try this on crows.\n
-    %c[ui_white]  • %c[d_orange]Does not stack in any way.</text>
+    %c[0,209,172,56]Perk: %c[d_orange]The Unorthodox Way Of Travelling\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Killing anyone will teleport you to the place of your victim's death.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Don't try this on crows.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Does not stack in any way.</text>
   </string>
   <string id="st_af_fire_loop_name">
     <text>Knot</text>
   </string>
   <string id="st_af_fire_loop_descr">
     <text>This artefact is occasionally formed in the extreme heat of thermal anomalies. Various legends surround it, most of them scary enough to make some stalkers avoid ever picking it up. It is known however that whoever had dared to activate a Knot was never able to get rid of it, as the artefact would always come back to them. Other, less reliable sources talk about superhuman abilities, hearing of voices, reckless behaviour and weird disappearances. \n \n
-    %c[ui_gray_2]PROPERTIES:\n
-    \n
-    %c[d_orange]Perk: Deal with the Devil\n
-    %c[ui_white]  • %c[d_orange]Gamechanger Artefact.\n
-    %c[ui_white]  • %c[d_orange]Moving the artefact to belt will sign the Pact with the Zone.\n
-    %c[ui_white]  • %c[d_orange]The Zone empowers your Knot and it becomes the mysterious artefact also known as Lucifer.</text>
+    %c[0,209,172,56]Perk: %c[d_orange]Deal with the Devil\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Gamechanger Artefact.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Moving the artefact to belt will sign the Pact with the Zone.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]The Zone empowers your Knot and it becomes the mysterious artefact also known as Lucifer.</text>
   </string>
   <string id="st_af_zhelch_name">
     <text>Scar</text>
   </string>
   <string id="st_af_zhelch_descr">
     <text>Everyone knows the saying "a sound mind in a sound body". The Zone made it take an artefact form. Back in the day stalkers used to take advantage of Scars to heal their wounds and explore mind-altering anomalies. Unfortunately, over time the artefact showed its more sinister side. People using Scars would behave weirdly and erratically, even more so when recovering from serious damage done to their bodies. Nowadays there are very few brave enough to attach one of these to their belt, as Zone veterans enjoy telling chilling stories about Scar users to rookies gathered around campfires.\n \n
-    %c[ui_gray_2]PROPERTIES:\n
-    \n
-    %c[d_orange]Perk: That Insane Stalker from the Freedom faction\n
-    %c[ui_white]  • %c[d_orange]Provides major psy resistance.\n
-    %c[ui_white]  • %c[d_orange]Drains psy health to restore health.\n
-    %c[ui_white]  • %c[d_orange]When health is full, restores psy health.\n
-    %c[ui_white]  • %c[d_orange]There is a chance that you perform one of crazy uncontrollable actions.\n
-    %c[ui_white]  • %c[d_orange]The lower the psy health, the higher the chance and severity of action.\n
-    %c[ui_white]  • %c[d_orange]Does not stack in any way.</text>
+    %c[0,209,172,56]Perk: %c[d_orange]That Insane Stalker from the Freedom faction\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Provides major psy resistance.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Drains psy health to restore health.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]When health is full, restores psy health.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]There is a chance that you perform one of crazy uncontrollable actions.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]The lower the psy health, the higher the chance and severity of action.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Does not stack in any way.</text>
   </string>
   <string id="st_af_sandstone_name">
     <text>Sandstone</text>
   </string>
   <string id="st_af_sandstone_descr">
     <text>An artefact sometimes formed in extreme temperature anomalies. To this day no one knows how it's possible, but Sandstone seems to possess some sort of intelligence that allows it to identify a user's weapon. Upon linking itself to it, the artefact will seek out an anomaly to interact with, infusing the most lethal elements with corresponding anomalous properties, making them much more damaging.\n \n
-    %c[ui_gray_2]PROPERTIES:\n
-    \n
-    %c[d_orange]Perk: Zone Infusion\n
-    %c[ui_white]  • %c[d_orange]Stepping into anomaly of various types infuses your active weapon.\n
-    %c[ui_white]  • %c[d_orange]Infused weapon loses 30% of its raw power but gains 50% of elemental damage power according to the anomaly type.\n
-    %c[ui_white]  • %c[d_orange]Only electric, thermal and chemical anomalies are valid for infusion, including fields.\n
-    %c[ui_white]  • %c[d_orange]Effect lasts for 3 minutes, the artefact must be equipped for the effect to work.\n
-    %c[ui_white]  • %c[d_orange]Does not stack in any way.</text>
+    %c[0,209,172,56]Perk: %c[d_orange]Zone Infusion\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Stepping into anomaly of various types infuses your active weapon.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Infused weapon loses 30% of its raw power but gains 50% of elemental damage power according to the anomaly type.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Only electric, thermal and chemical anomalies are valid for infusion, including fields.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Effect lasts for 3 minutes, the artefact must be equipped for the effect to work.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Does not stack in any way.</text>
   </string>
   <string id="st_af_kislushka_name">
     <text>Sourpuss</text>
   </string>
   <string id="st_af_kislushka_descr">
     <text>A hollow spherical artefact resembling a transparent parchment of some sorts. Covered with a layer of film, it is pleasant to the touch. Sourpuss activates whenever it gets covered in warm blood, and utilising the user's energy produced from burning calories it starts excreting a stimulant that helps any bleeding wound to clot up and close much faster. This ability gained it a lot of popularity in the medical world, hence the nice price it fetches.\n \n
-    %c[ui_gray_2]PROPERTIES:\n
-    \n
-    %c[d_orange]Perk: What Colour Is Your Blood?\n
-    %c[ui_white]  • %c[d_orange]Drains satiety to cure bleeding.\n
-    %c[ui_white]  • %c[d_orange]Multiple artefacts increase the cure but also increase the drain.</text>
+    %c[0,209,172,56]Perk: %c[d_orange]What Colour Is Your Blood?\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Drains satiety to cure bleeding.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Multiple artefacts increase the cure but also increase the drain.</text>
   </string>
   <string id="st_af_black_angel_name">
     <text>Black Angel</text>
   </string>
   <string id="st_af_black_angel_descr">
     <text>An artefact of anomalous minerals that has been twisted into an ominous semi-symmetrical formation. Despite emitting no heat or radiation, it can condense water vapor in nearby air into steam. The artefact seems to have some sort of defense system. When hit by an incoming bullet, it is able to detect where the shot came from and redirect the potential damage back to the person shooting. \n \n
-    %c[ui_gray_2]PROPERTIES:\n
-    \n
-    %c[d_orange]Perk: Dodge This\n
-    %c[ui_white]  • %c[d_orange]Has 20% chance to reflect 35% of bullet damage back.\n
-    %c[ui_white]  • %c[d_orange]Nullify the damage of hit on reflection.\n
-    %c[ui_white]  • %c[d_orange]More artefacts increase the chance to reflect with diminishing returns.</text>
+    %c[0,209,172,56]Perk: %c[d_orange]Dodge This\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Has 20% chance to reflect 35% of bullet damage back.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Nullify the damage of hit on reflection.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]More artefacts increase the chance to reflect with diminishing returns.</text>
   </string>
   <string id="st_af_grapes_name">
     <text>Grapes</text>
   </string>
   <string id="st_af_grapes_descr">
     <text>A heavy artefact sometimes found in gravitational anomalies, it resembles drops of green-tinted amber twisted together. Very recently scientists were able to confirm what was previously considered to be just another one of the Zone's hearsays - when Grapes find themselves nearby an ongoing digestion process of a living organism, they activate, stimulating one's metabolism to heal more effectively. \n \n
-    %c[ui_gray_2]PROPERTIES:\n
-    \n
-    %c[d_orange]Perk: Necessary Gluttony\n
-    %c[ui_white]  • %c[d_orange]Provides health bonus on food consume based on its callories.\n
-    %c[ui_white]  • %c[d_orange]Effect prolongs with each artefact on belt.</text>
+    %c[0,209,172,56]Perk: %c[d_orange]Necessary Gluttony\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Provides health bonus on food consume based on its callories.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Effect prolongs with each artefact on belt.</text>
   </string>
   <string id="st_af_skull_miser_name">
     <text>Miser's Skull</text>
   </string>
   <string id="st_af_skull_miser_descr">
     <text>A light and fragile artefact consisting of interlinked strands of anomalous plant fibers. The artefact is a favourite among various scum that took residence in the Zone and is sometimes referred to as a "small Wish Granter" by them. When the user of this artefact kills someone by damaging their brain, the Zone rewards them by dropping currency around the victim. Some say it's the Zone wanting stalkers to murder each other so it gets left in peace. Others say that it wouldn't be full of riches like that if it didn't want people around. \n \n
-    %c[ui_gray_2]PROPERTIES:\n
-    \n
-    %c[d_orange]Perk: Crack the Jackpot\n
-    %c[ui_white]  • %c[d_orange]Upon killing an npc in the head spawn extra money in a fashionable way.\n
-    %c[ui_white]  • %c[d_orange]More artefacts will spawn more money items.</text>
+    %c[0,209,172,56]Perk: %c[d_orange]Crack the Jackpot\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Upon killing an npc in the head spawn extra money in a fashionable way.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]More artefacts will spawn more money items.</text>
   </string>
   <string id="st_af_star_phantom_name">
     <text>Phantom Star</text>
   </string>
   <string id="st_af_star_phantom_descr">
     <text>This artefact appears to be a plasma-like substance suspended within a striated transparent shell. Generates a weak gravitational field, making it difficult to hold still or balance. Phantom Star when active seems to be affecting minds of nearby living beings - its user suddenly stops being noticed until some sort of forceful interaction happens. The artefact manipulates the owner as well, preventing them from being able to engage in any sort of hostility.\n \n
-    %c[ui_gray_2]PROPERTIES:\n
-    \n
-    %c[d_orange]Perk: Phantom Pacifist\n
-    %c[ui_white]  • %c[d_orange]Become invisible to anybody.\n
-    %c[ui_white]  • %c[d_orange]You can't draw a weapon, talk to anybody or interact with anything.\n
-    %c[ui_white]  • %c[d_orange]Does not stack in any way.</text>
+    %c[0,209,172,56]Perk: %c[d_orange]Phantom Pacifist\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Become invisible to anybody.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]You can't draw a weapon, talk to anybody or interact with anything.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Does not stack in any way.</text>
   </string>
   <string id="st_af_medallion_name">
     <text>Medal</text>
   </string>
   <string id="st_af_medallion_descr">
     <text>An artefact consisting of a small hoop embedded with four triangular shapes, with a small central sphere embedded in the middle. Medal has successfully dodged any attempts at logically explaining its inner workings. Not only is this artefact able to tell whether the user is a part of a group, it possesses another, much more mysterious ability. Whether it manipulates objects or bodies themselves still remains to be determined, however it is a known fact that when a person using this artefact is about to get hurt, there is a non-insignificant chance that they remain unscathed, as an identical type of damage gets inflicted on someone else from that person's company instead. While such an effect might be desirable in a selfish way, it is not unheard of among stalkers and many of them might not take kindly to the fact that they are being exposed to it. \n \n
-    %c[ui_gray_2]PROPERTIES:\n
-    \n
-    %c[d_orange]Perk: The (Un)lucky charm\n
-    %c[ui_white]  • %c[d_orange]35% chance that incoming bullet damage will be fully redirected to your companion.\n
-    %c[ui_white]  • %c[d_orange]Some companions are smarter than others and they'll smell something fishy before they die.\n
-    %c[ui_white]  • %c[d_orange]Stacks with multiple artefacts with diminishing returns.</text>
+    %c[0,209,172,56]Perk: %c[d_orange]The (Un)lucky charm\n
+    %c[0,81,63,22]  • %c[0,209,172,56]35% chance that incoming bullet damage will be fully redirected to your companion.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Some companions are smarter than others and they'll smell something fishy before they die.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Stacks with multiple artefacts with diminishing returns.</text>
   </string>
   <string id="st_af_peas_name">
     <text>Moon</text>
   </string>
   <string id="st_af_peas_descr">
     <text>An artefact shaped like a lunar crescent. The exterior shell continuously generates a very dim light that seems to be stimulating the user. At night, it will make you feel rested and energetic, but reverse effect will happen during daylight.\n \n
-    %c[ui_gray_2]PROPERTIES:\n
-    \n
-    %c[d_orange]Perk: Friend of the Night\n
-    %c[ui_white]  • %c[d_orange]Gives bleeding cure and speed increase from dusk till dawn at any weather.\n
-    %c[ui_white]  • %c[d_orange]Decreases sleepiness at night, increases sleepiness at day.\n
-    %c[ui_white]  • %c[d_orange]Effect stacks with each artefact on belt.</text>
+    %c[0,209,172,56]Perk: %c[d_orange]Friend of the Night\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Gives bleeding cure and speed increase from dusk till dawn at any weather.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Decreases sleepiness at night, increases sleepiness at day.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Effect stacks with each artefact on belt.</text>
   </string>
   <string id="st_af_generator_name">
     <text>Generator</text>
   </string>
   <string id="st_af_generator_descr">
     <text>This anomalous disk is not radioactive, but generates a strong, small electromagnetic field. It can easily be made to 'spin' perpetually on its axis, especially when the user is moving fast. When that happens, the energy from the artefact connects itself to nearby drained batteries and devices and, provided they still had some electric charge left in them, restores their power slowly. \n \n
-    %c[ui_gray_2]PROPERTIES:\n
-    \n
-    %c[d_orange]Perk: Godzilla is Approaching\n
-    %c[ui_white]  • %c[d_orange]Restores batteries charge of items while sprinting.\n
-    %c[ui_white]  • %c[d_orange]Won't revive completely dead batteries or devices with no batteries.\n
-    %c[ui_white]  • %c[d_orange]More artefacts gives more recharge rate and slight increase in sprint speed.</text>
+    %c[0,209,172,56]Perk: %c[d_orange]Godzilla is Approaching\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Restores batteries charge of items while sprinting.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Won't revive completely dead batteries or devices with no batteries.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]More artefacts gives more recharge rate and slight increase in sprint speed.</text>
   </string>
   <string id="st_af_ball_name">
     <text>Ball</text>
   </string>
   <string id="st_af_ball_descr">
     <text>Despite appearing as a mottled ball of dirt and rock, this artefact is unusually light and bouncy, hence its name. It is believed to be a product of electrical anomalies. When worn on the belt the artefact generates a force that can be activated to repel living creatures, for some reason excluding humans. To release said force a fast and strong movement needs to happen between the user and the target, hence why most stalkers using it resort to simply kicking various mutants. Obviously, the practice of getting this close to a Zone inhabitant is not advised. But is that going to stop you? \n \n
-    %c[ui_gray_2]PROPERTIES:\n
-    \n
-    %c[d_orange]Perk: The Nutcracker\n
-    %c[ui_white]  • %c[d_orange]Tier Based Artefact.\n
-    %c[ui_white]  • %c[d_orange]Amplifies player's mighty foot and allows him to kick more mutants, resulting in instant death.\n
-    %c[ui_white]  • %c[d_orange]Each artefact on the belt allows kicking more monsters.\n
-    %c[ui_white]  • %c[d_orange]Has a cooldown of 2 seconds with 1 artefact, increases with more artefacts on belt by 1 second each.</text>
+    %c[0,209,172,56]Perk: %c[d_orange]The Nutcracker\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Tier Based Artefact.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Amplifies player's mighty foot and allows him to kick more mutants, resulting in instant death.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Each artefact on the belt allows kicking more monsters.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Has a cooldown of 2 seconds with 1 artefact, increases with more artefacts on belt by 1 second each.</text>
   </string>
   <string id="st_af_fonar_name">
     <text>Lamp</text>
   </string>
   <string id="st_af_fonar_descr">
     <text>This light, glassy artefact emits a modest amount of near-ultraviolet light. It reacts weirdly with certain radio waves, making sources of various transmissions glow. Stalkers tend to use this property to search for hidden stashes at night. \n \n
-    %c[ui_gray_2]PROPERTIES:\n
-    \n
-    %c[d_orange]Perk: Enlightening Kleptomania\n
-    %c[ui_white]  • %c[d_orange]The artefact catches frequencies of packages and sends energy to light them up.\n
-    %c[ui_white]  • %c[d_orange]Lights up stashes and items emitting signal to RF-receiver.\n
-    %c[ui_white]  • %c[d_orange]The light is very dim and hardly visible at day, so searching at night is advisable.\n
-    %c[ui_white]  • %c[d_orange]Does not stack in any way.</text>
+    %c[0,209,172,56]Perk: %c[d_orange]Enlightening Kleptomania\n
+    %c[0,81,63,22]  • %c[0,209,172,56]The artefact catches frequencies of packages and sends energy to light them up.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Lights up stashes and items emitting signal to RF-receiver.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]The light is very dim and hardly visible at day, so searching at night is advisable.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Does not stack in any way.</text>
   </string>
   <string id="st_af_tapeworm_name">
     <text>Tapeworm</text>
   </string>
   <string id="st_af_tapeworm_descr">
     <text>This artefact is pure silicon dioxide, twisted into an unusual shape and color by gravitational anomalies. It would be otherwise unremarkable, except for one fact. When activated, it will send strong electric shock towards any living creature that attacks the user via direct contact, effectively stunning them for a short duration of time. Very valued by stalkers that hunt mutants for a living.\n \n
-    %c[ui_gray_2]PROPERTIES:\n
-    \n
-    %c[d_orange]Perk: Stunner\n
-    %c[ui_white]  • %c[d_orange]Getting melee hit by enemies will make them stunned for 2.5 seconds.\n
-    %c[ui_white]  • %c[d_orange]While being stunned the enemy is disabled in fight and won't attack.\n
-    %c[ui_white]  • %c[d_orange]Has a cooldown of 2 seconds between uses.\n
-    %c[ui_white]  • %c[d_orange]Each extra artefact adds additional 2 seconds to effect.</text>
+    %c[0,209,172,56]Perk: %c[d_orange]Stunner\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Getting melee hit by enemies will make them stunned for 2.5 seconds.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]While being stunned the enemy is disabled in fight and won't attack.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Has a cooldown of 2 seconds between uses.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Each extra artefact adds additional 2 seconds to effect.</text>
   </string>
   <string id="st_af_moh_name">
     <text>Moss</text>
   </string>
   <string id="st_af_moh_descr">
     <text>An artefact formed in electric anomalies. It has a sharp, jagged appearance but is actually quite soft and pleasing to the touch. Attached to the belt it is able to detect contents of the user's stomach. Once it recognizes any raw meat of the Zone origin within the digestive system, it will activate, using the flesh's energetic value to fuel all sorts of stimulating effects, depending on the type of creature consumed.\n \n
-    %c[ui_gray_2]PROPERTIES:\n
-    \n
-    %c[d_orange]Perk: Culinary Hyperversity\n
-    %c[ui_white]  • %c[d_orange]Convert energy of raw mutant meat to special abilities.\n
-    %c[ui_white]  • %c[d_orange]Extra artefacts or eating same meat multiple times does not stack the effect.\n
-    %c[ui_white]  • %c[d_orange]Last for 1 minute, eating different mutant meat overrides previous time and resets.\n \n
-    %c[ui_white]  • %c[d_orange] %c[d_orange]Table of effects: \n
-    %c[ui_gray_2]      - %c[d_cyan]Flesh meat: %c[ui_gray_2] 1%/sec health regen, 33% bullet damage penalty.\n
-    %c[ui_gray_2]      - %c[d_cyan]Boar meat: %c[ui_gray_2] 25% melee damage reduction.\n
-    %c[ui_gray_2]      - %c[d_cyan]Dog meat: %c[ui_gray_2] slight bleeding cure, 1%/sec psy regen.\n
-    %c[ui_gray_2]      - %c[d_cyan]Pseudodog: %c[ui_gray_2] 2%/sec psy regen, 25% psy damage reduction.\n
-    %c[ui_gray_2]      - %c[d_cyan]Bloodsucker: %c[ui_gray_2] become invisible until shooting or hitting enemy, moderate bleeding cure.\n
-    %c[ui_gray_2]      - %c[d_cyan]Psysucker: %c[ui_gray_2] become invisible until shooting or hitting enemy, 5%/sec psy regen.\n
-    %c[ui_gray_2]      - %c[d_cyan]Snork: %c[ui_gray_2] 50% radiation damage reduction, 5%/sec stamina regen, 5msv/sec radiation cure, big satiety decrease.\n
-    %c[ui_gray_2]      - %c[d_cyan]Chimera: %c[ui_gray_2] 2%/sec health regen, 10%/sec stamina regen, 33% raditation damage reduction.\n
-    %c[ui_gray_2]      - %c[d_cyan]Lurker: %c[ui_gray_2] 33% chem/fire/electric anomaly damage reduction, including fields.\n
-    %c[ui_gray_2]      - %c[d_cyan]Tushkano: %c[ui_gray_2] 20% speed increase, 20% melee damage penalty.</text>
+    %c[0,209,172,56]Perk: %c[d_orange]Culinary Hyperversity\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Convert energy of raw mutant meat to special abilities.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Extra artefacts or eating same meat multiple times does not stack the effect.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Last for 1 minute, eating different mutant meat overrides previous time and resets.\n \n
+    %c[d_orange]Table of effects: \n
+          %c[0,192,71,221] -   Flesh meat: %c[ui_gray_3]1%/sec health regen, 33% bullet damage penalty.\n
+          %c[0,192,71,221] -   Boar meat: %c[ui_gray_3]25% melee damage reduction.\n
+          %c[0,192,71,221] -   Dog meat: %c[ui_gray_3]slight bleeding cure, 1%/sec psy regen.\n
+          %c[0,192,71,221] -   Pseudodog: %c[ui_gray_3]2%/sec psy regen, 25% psy damage reduction.\n
+          %c[0,192,71,221] -   Bloodsucker: %c[ui_gray_3]become invisible until shooting or hitting enemy, moderate bleeding cure.\n
+          %c[0,192,71,221] -   Psysucker: %c[ui_gray_3]become invisible until shooting or hitting enemy, 5%/sec psy regen.\n
+          %c[0,192,71,221] -   Snork: %c[ui_gray_3]50% radiation damage reduction, 5%/sec stamina regen, 5msv/sec radiation cure, big satiety decrease.\n
+          %c[0,192,71,221] -   Chimera: %c[ui_gray_3]2%/sec health regen, 10%/sec stamina regen, 33% raditation damage reduction.\n
+          %c[0,192,71,221] -   Lurker: %c[ui_gray_3]33% chem/fire/electric anomaly damage reduction, including fields.\n
+          %c[0,192,71,221] -   Tushkano: %c[ui_gray_3]20% speed increase, 20% melee damage penalty.</text>
   </string>
   <string id="st_af_serofim_name">
     <text>Seraphim</text>
   </string>
   <string id="st_af_serofim_descr">
     <text>Seraphim was for the longest time considered to be nothing but a pretty bauble to be sold. That was until one veteran group of stalkers came back from a deep excursion and shared their story. According to them, at some point during their trip they got ambushed by a sniper. Their leader was taken out instantly and dropped dead with his skull split in half. While sending suppressive fire they noticed his belt lighting up and as he stood up with no sign of scratch on him, with his helmet still having obvious entry and exit holes from the sniper's bullet. They managed to retreat and find out that the Seraphim artefact the leader kept as his lucky charm was gone and left behind only some glowing dust. Ever since then people that heard of this story hold their Seraphims dear, believing that the artefact will bring them back from the dead, should the worst happen. Of course, no one so far was brave enough to test if any of it was indeed true. \n \n
-    %c[ui_gray_2]PROPERTIES:\n
-    \n
-    %c[d_orange]Perk: Rain of Revival. \n
-    %c[ui_white]  • %c[d_orange]Upon receiving a fatal blow, the artefact is destroyed and player is revived.\n
-    %c[ui_white]  • %c[d_orange]50% of health is restored, all debuffs are healed and 5 seconds of immunity are granted.\n
-    %c[ui_white]  • %c[d_orange]Upon reviving current weapon is dropped and vision is screwed up.\n
-    %c[ui_white]  • %c[d_orange]Does not stack in any way.</text>
+    %c[0,209,172,56]Perk: %c[d_orange]Rain of Revival. \n
+    %c[0,81,63,22]  • %c[0,209,172,56]Upon receiving a fatal blow, the artefact is destroyed and player is revived.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]50% of health is restored, all debuffs are healed and 5 seconds of immunity are granted.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Upon reviving current weapon is dropped and vision is screwed up.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Does not stack in any way.</text>
   </string>
   <string id="st_af_elektron_name">
     <text>Electron</text>
   </string>
   <string id="st_af_elektron_descr">
     <text>This artefact is a product of electrical anomalies. It is extremely heavy despite its small size. It has one interesting property. It is able to combine the common electro anomalies with other electric charges it finds nearby, using the anomaly as a power source. The most fascinating part of it is that the artefact considers human body to be a battery too, converting the energy into one that can be used by human cells during physical activity. As such, despite being a painful experience, one can enjoy being tireless for a short period of time. Side effects? Well, someone has yet to report them...\n \n
-    %c[ui_gray_2]PROPERTIES:\n
-    %c[ui_cyan] • %c[ui_gray_2] inert artefact\n
-    %c[d_cyan] • %c[ui_gray_2] valuable\n
-    \n
-    %c[d_orange]Perk: Crank High Voltage\n
-    %c[ui_white]  • %c[d_orange]Stepping on Electra will fully recharge player's batteries of active devices.\n
-    %c[ui_white]  • %c[d_orange]Recharges random amount of devices and batteries combined in the inventory.\n
-    %c[ui_white]  • %c[d_orange]Gives infinite sprint for some time.\n
-    %c[ui_white]  • %c[d_orange]Sometimes the pleasure of fresh charge is too big to handle, making you scream a bit more excited than usual.\n
-    %c[ui_white]  • %c[d_orange]Does not stack in any way.</text>
+    %c[0,209,172,56]Perk: %c[d_orange]Crank High Voltage\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Stepping on Electra will fully recharge player's batteries of active devices.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Recharges random amount of devices and batteries combined in the inventory.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Gives infinite sprint for some time.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Sometimes the pleasure of fresh charge is too big to handle, making you scream a bit more excited than usual.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Does not stack in any way.</text>
   </string>
   <string id="st_af_kogot_name">
     <text>Claw</text>
   </string>
   <string id="st_af_kogot_descr">
     <text>A beautiful glass-like artefact occasionally fished out of electrostatic anomalies. When used, it seems to fill its user with a weird combination of rage and desire to attack enemies directly, reinvigorating them for doing so. There's a pretty common story associated with this artefact - of a rookie that found a Claw together with his friend, only for them both to get chased by a pack of hungry dogs moments after. The 'friend' shot the rookie and took off, leaving him to certain death. To everyone's surprise the betrayed stalker came back to his camp, perfectly healthy, despite his clothes being completely torn from dog bites, with only a knife to his side and the artefact hanging by his belt. What happened to the backstabber is better off not being mentioned though.\n \n
-    %c[ui_gray_2]PROPERTIES:\n
-    \n
-    %c[d_orange]Perk: Bloodlust\n
-    %c[ui_white]  • %c[d_orange]10% Increase of melee damage.\n
-    %c[ui_white]  • %c[d_orange]Vampire effect: 3.5% of new melee damage is converted to player's health.\n
-    %c[ui_white]  • %c[d_orange]Upon killing certain mutants spawns raw chunk of meat near him.\n
-    %c[ui_white]  • %c[d_orange]Stacks with multiple artefacts.</text>
+    %c[0,209,172,56]Perk: %c[d_orange]Bloodlust\n
+    %c[0,81,63,22]  • %c[0,209,172,56]10% Increase of melee damage.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Vampire effect: 3.5% of new melee damage is converted to player's health.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Upon killing certain mutants spawns raw chunk of meat near him.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Stacks with multiple artefacts.</text>
   </string>
   <string id="st_af_vaselisk_name">
     <text>Basilisk</text>
@@ -425,16 +363,12 @@
   </string>
   <string id="st_af_dragon_eye_descr">
     <text>This artefact is sometimes formed in thermal anomalies and has the appearance of a reptile's eye. It has a very dangerous and volatile property associated with it. In some peculiar way, when the user of this artefact secures a kill, there's a small chance for a violent explosion to happen within the victim's body, killing or hurting anyone and anything nearby. The more superstitious say that it's the Zone ripping out violently the souls of fallen beings. Most just prefer to avoid using the artefact altogether because of the stories of people getting caught in such explosion at an unfortunate distance.\n \n
-    %c[ui_gray_2]PROPERTIES:\n
-    %c[ui_cyan] • %c[ui_gray_2] inert artefact\n
-    %c[d_cyan] • %c[ui_gray_2] valuable\n
-    \n
-    %c[d_orange]Perk: Good ol' Ultra-Violence\n
-    %c[ui_white]  • %c[d_orange]5% chance that the shot would be explosive.\n
-    %c[ui_white]  • %c[d_orange]Upon killing an npc or mutant with explosive shot it will explode violently.\n
-    %c[ui_white]  • %c[d_orange]Explosion spawn meaty gibs and hurts everyone in the radius.\n
-    %c[ui_white]  • %c[d_orange]User's discretion is advised.\n
-    %c[ui_white]  • %c[d_orange]Multiple artefacts increase the chance to explode.</text>
+    %c[0,209,172,56]Perk: %c[d_orange]Good ol' Ultra-Violence\n
+    %c[0,81,63,22]  • %c[0,209,172,56]5% chance that the shot would be explosive.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Upon killing an npc or mutant with explosive shot it will explode violently.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Explosion spawn meaty gibs and hurts everyone in the radius.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]User's discretion is advised.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Multiple artefacts increase the chance to explode.</text>
   </string>
   <string id="st_arty_save">
     <text>Eye of the Noosphere</text>
@@ -442,6 +376,6 @@
   <string id="st_arty_save_descr">
     <text>One of the most mysterious artefacts in the Zone, the Eye of the Noosphere can transport its wielder back in time, even to escape death. A tight squeeze of the artefact activates its ability, creating a restoration point to go back to on activation or death. Frequent use can cause the artefact to change colour, but if discharged too frequently it may cease to function altogether. The Eye gradually restores its power over time, supposedly being fuelled by the anomalous energy of the Zone.\n \n
     %c[ui_gray_2]PROPERTIES:\n
-    %c[ui_white] • %c[0,255,215,0] superartefact</text>
+    %c[0,81,63,22] • %c[0,255,215,0] superartefact</text>
   </string>
 </string_table>
