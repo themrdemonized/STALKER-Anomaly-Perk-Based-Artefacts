@@ -31,6 +31,7 @@ local RemoveTimeEvent = RemoveTimeEvent
 local ResetTimeEvent = ResetTimeEvent
 local round_100 = round_100
 local script_light = script_light
+local shuffle_table = shuffle_table
 local str_explode = str_explode
 local SYS_GetParam = SYS_GetParam
 local time_global = time_global
@@ -60,6 +61,8 @@ local get_time_hours = level.get_time_hours
 local get_time_minutes = level.get_time_minutes
 local level_name = level.name
 local level_object_by_id = level.object_by_id
+local press_action = level.press_action
+local remove_cam_effector = level.remove_cam_effector
 local remove_pp_effector = level.remove_pp_effector
 
 local get_weather_manager = level_weathers.get_weather_manager
@@ -309,7 +312,7 @@ local default_smoothing = 300
 local smoothing_alpha = 2.0 / (default_smoothing + 1)
 
 local function set_smoothing(n)
-	local n = math_max(n, 1)
+	local n = max(n, 1)
 	smoothing_alpha = 2.0 / (n + 1)
 end
 
@@ -415,7 +418,9 @@ end
 local callbacks = {}
 local function register_callback(callback, callback_function, on_end_function, key)
 	trace("registering callback %s", callback)
-	RegisterScriptCallback(callback, callback_function)
+	if key and callbacks[key] then
+		UnregisterScriptCallback(callbacks[key].callback, callbacks[key].func)
+	end
 
 	local t = {
 		callback = callback,
@@ -424,13 +429,7 @@ local function register_callback(callback, callback_function, on_end_function, k
 	}
 
 	local key = key or (#callbacks + 1)
-
-	if callbacks[key] then
-		UnregisterScriptCallback(callbacks[key].callback, callbacks[key].func)
-	end
-
 	callbacks[key] = t
-
 	RegisterScriptCallback(callbacks[key].callback, callbacks[key].func)
 	return key
 end
@@ -1603,6 +1602,89 @@ artefact_props = { -- Special props of artefacts that are used in processing
 					return true
 				end)
 			end,
+			press_pda = function(self, actor, func, ...) -- Show pda and hide it quickly
+				CloseAll_UI()
+				local time = 0
+
+				if actor:active_slot() == 8 then
+					time = 0
+				elseif actor:active_slot() == 0 then
+					time = 0.6
+				else
+					time = 1.5
+				end
+
+				local delayed_time = time + 0.33
+				actor:activate_slot(8)
+				local t = {...}
+				CreateTimeEvent("af_zhelch_press_pda", "af_zhelch_press_pda", time, function()
+					actor:activate_slot(0)
+					CreateTimeEvent("af_zhelch_press_pda_delay", "af_zhelch_press_pda_delay", delayed_time, function()
+						func(unpack(t))
+						return true
+					end)
+					return true
+				end)
+				return delayed_time
+			end,
+			fire_weapon = function(self, actor, time) -- Fire active weapon for time
+				local item
+				local item_slot
+				local t = 0
+				if actor:active_slot() == 2 or actor:active_slot() == 3 then
+					item = actor:active_item()
+					item_slot = actor:active_slot()
+				elseif actor:item_in_slot(2) then
+					item = actor:item_in_slot(2)
+					item_slot = 2
+					t = 1.2
+				elseif actor:item_in_slot(3) then
+					item = actor:item_in_slot(3)
+					item_slot = 3
+					t = 1.2
+				else
+					return
+				end
+
+				t = t + (actor:active_slot() == 0 and 0 or 1)
+				local time = time + t
+				actor:activate_slot(item_slot)
+				
+				CreateTimeEvent("af_zhelch_activate_fire", "af_zhelch_activate_fire", t, function()
+					register_callback("actor_on_update", function()
+						local firekey = bind_to_dik(key_bindings.kWPN_FIRE)
+						press_action(firekey)
+					end, nil, "af_zhelch_fire_weapon")
+
+					CreateTimeEvent("af_zhelch_fire_weapon", "af_zhelch_fire_weapon", time, function()
+						unregister_callback("af_zhelch_fire_weapon")
+						return true
+					end)
+					return true
+				end)
+
+				return t
+			end,
+			hurt_psy = function(self, actor, psy_volume, psy_sounds, psy_sound_amount, hurt_psy_duration, hurt_psy_health) -- Hurt player psy health
+				play_sound_on_actor("perk_based_artefacts\\psy_1", psy_volume or 0.5)
+
+				if psy_sounds then
+					local t = psy_sounds
+					shuffle_table(t)
+					for i = 1, (psy_sound_amount or 1) do
+						CreateTimeEvent("af_zhelch_play_psy" .. i, "af_zhelch_play_psy" .. i, (i - 1) * 5.2 + 2, function()
+							play_sound_on_actor("perk_based_artefacts\\psya_" .. t[i])
+							return true
+						end)
+					end
+				end
+
+				if hurt_psy_duration and hurt_psy_health then
+					add_simple_timed_effect(hurt_psy_duration, function()
+						change_psy_health(-hurt_psy_health)
+					end)
+				end
+			end,
 
 			-- Actions list, chooses one of the below
 			function(self, actor)
@@ -1618,6 +1700,9 @@ artefact_props = { -- Special props of artefacts that are used in processing
 						return true
 					end)
 				end
+			end,
+			function(self, actor)
+				play_sound_on_actor("perk_based_artefacts\\f" .. random(4))
 			end,
 			function(self, actor)
 				play_sound_on_actor("perk_based_artefacts\\dsc")
@@ -1636,11 +1721,121 @@ artefact_props = { -- Special props of artefacts that are used in processing
 				end
 			end,
 			function(self, actor)
+				local item = actor:item_in_slot(8)
+				if not item then return end
+
+				local snd
+				local function start_music()
+					CreateTimeEvent("af_zhelch_muzon", "af_zhelch_muzon", 0.66, function()
+						add_cam_effector("camera_effects\\tolik2.anm", 69421, true, "")
+						snd = play_sound_on_actor("perk_based_artefacts\\csky_bandit")
+						return true
+					end)
+				end
+
+				local function end_music()
+					remove_cam_effector(69421)
+					if snd then snd:stop() end
+				end
+
+				local time = self:press_pda(actor, start_music)		
+				CreateTimeEvent("af_zhelch_muzon_stop", "af_zhelch_muzon_stop", time + 20, function()
+					self:press_pda(actor, end_music)
+					return true
+				end)
+			end,
+			function(self, actor)
 				self:look_at_npc(actor, 7)
 			end,
 			function(self, actor)
-				--
+				if actor:is_talking() then
+					actor:stop_talk()
+				end
+				CloseAll_UI()
+
+				play_sound_on_actor("perk_based_artefacts\\mil_crazy" .. random(3))
 				self:look_at_npc(actor, 4)
+			end,
+			function(self, actor)
+				if actor:is_talking() then
+					actor:stop_talk()
+				end
+				CloseAll_UI()
+				
+				local time = 1.5
+				local t = self:fire_weapon(actor, time)
+				CreateTimeEvent("af_zhelch_fire_weapon_sound", "af_zhelch_fire_weapon_sound", max(t - 0.5, 0), function()
+					play_sound_on_actor("perk_based_artefacts\\mil_crazy" .. random(3))
+					return true
+				end)
+			end,
+			function(self, actor)
+				if actor:is_talking() then
+					actor:stop_talk()
+				end
+				CloseAll_UI()
+				
+				set_smoothing(35)
+				local time = 1.5
+				local t = self:fire_weapon(actor, time)
+				time = time + t
+				self:look_at_npc(actor, time)
+				CreateTimeEvent("af_zhelch_fire_weapon_sound", "af_zhelch_fire_weapon_sound", max(t - 0.5, 0), function()
+					play_sound_on_actor("perk_based_artefacts\\mil_crazy" .. random(3))
+					return true
+				end)
+				CreateTimeEvent("af_zhelch_return_smoothing", "af_zhelch_return_smoothing", time, function()
+					set_smoothing(default_smoothing)
+					return true
+				end)
+			end,
+			function(self, actor)
+				self:hurt_psy(actor, 0.3, nil, nil, 5, 0.006)
+			end,
+			function(self, actor)
+				self:hurt_psy(actor, 0.5, {1, 2, 3, 4, 5}, 2, 10, 0.0075)
+			end,
+			function(self, actor)
+				self:hurt_psy(actor, 0.7, {1, 2, 3, 4, 5}, 3, 15, 0.009)
+			end,
+			function(self, actor)
+				self:hurt_psy(actor, 0.7, {1, 2, 3, 4}, 3, 15, 0.009)
+
+				CreateTimeEvent("af_zhelch_fatality", "af_zhelch_fatality", 16, function()
+					play_sound_on_actor("perk_based_artefacts\\psy_1", 0.8)
+					play_sound_on_actor("perk_based_artefacts\\psya_fatality")
+					CreateTimeEvent("af_zhelch_suicide", "af_zhelch_suicide", 5, function()
+						set_psy_health(-1)
+						return true
+					end)
+					return true
+				end)
+			end,
+			function(self, actor)
+				if actor:is_talking() then
+					actor:stop_talk()
+				end
+				CloseAll_UI()
+				
+				local quick_throw = actor_effects.Hit_GrenadeQuickthrow
+				quick_throw()
+			end,
+			function(self, actor)
+				if actor:is_talking() then
+					actor:stop_talk()
+				end
+				CloseAll_UI()
+
+				local quick_throw = actor_effects.Hit_GrenadeQuickthrow
+				play_sound_on_actor("perk_based_artefacts\\mil_crazy4")
+
+				register_callback("actor_on_update", function()
+					quick_throw()
+				end, nil, "af_zhelch_grenade_stop")
+				
+				CreateTimeEvent("af_zhelch_grenade_stop", "af_zhelch_grenade_stop", 5, function()
+					unregister_callback("af_zhelch_grenade_stop")
+				end)
 			end,
 		},
 		perform_action = function(self, actor)
@@ -2634,10 +2829,10 @@ local artefact_on_before_hit_functions = {
 
 		if random(100) < 15 then
 			play_sound_on_actor("perk_based_artefacts\\lyutii", 0.7)
-			add_timed_effect(12, infinite_sprint)
+			add_timed_effect(60, infinite_sprint)
 		else
 			play_sound_on_actor("perk_based_artefacts\\rnd_scr3", 1)
-			add_timed_effect(6, infinite_sprint)
+			add_timed_effect(25, infinite_sprint)
 		end
 	end,
 
