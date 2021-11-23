@@ -417,7 +417,6 @@ end
 -- Callbacks
 local callbacks = {}
 local function register_callback(callback, callback_function, on_end_function, key)
-	trace("registering callback %s", callback)
 	if key and callbacks[key] then
 		UnregisterScriptCallback(callbacks[key].callback, callbacks[key].func)
 	end
@@ -430,6 +429,7 @@ local function register_callback(callback, callback_function, on_end_function, k
 
 	local key = key or (#callbacks + 1)
 	callbacks[key] = t
+	trace("registering callback %s, key %s", callback, key)
 	RegisterScriptCallback(callbacks[key].callback, callbacks[key].func)
 	return key
 end
@@ -1665,6 +1665,12 @@ artefact_props = { -- Special props of artefacts that are used in processing
 
 				return t
 			end,
+			hide_all_ui = function(self, actor)  -- Hide all UI
+				if actor:is_talking() then
+					actor:stop_talk()
+				end
+				CloseAll_UI()
+			end,
 			hurt_psy = function(self, actor, psy_volume, psy_sounds, psy_sound_amount, hurt_psy_duration, hurt_psy_health) -- Hurt player psy health
 				play_sound_on_actor("perk_based_artefacts\\psy_1", psy_volume or 0.5)
 
@@ -1748,19 +1754,13 @@ artefact_props = { -- Special props of artefacts that are used in processing
 				self:look_at_npc(actor, 7)
 			end,
 			function(self, actor)
-				if actor:is_talking() then
-					actor:stop_talk()
-				end
-				CloseAll_UI()
+				self:hide_all_ui(actor)
 
 				play_sound_on_actor("perk_based_artefacts\\mil_crazy" .. random(3))
 				self:look_at_npc(actor, 4)
 			end,
 			function(self, actor)
-				if actor:is_talking() then
-					actor:stop_talk()
-				end
-				CloseAll_UI()
+				self:hide_all_ui(actor)
 				
 				local time = 1.5
 				local t = self:fire_weapon(actor, time)
@@ -1770,10 +1770,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 				end)
 			end,
 			function(self, actor)
-				if actor:is_talking() then
-					actor:stop_talk()
-				end
-				CloseAll_UI()
+				self:hide_all_ui(actor)
 				
 				set_smoothing(35)
 				local time = 1.5
@@ -1812,19 +1809,13 @@ artefact_props = { -- Special props of artefacts that are used in processing
 				end)
 			end,
 			function(self, actor)
-				if actor:is_talking() then
-					actor:stop_talk()
-				end
-				CloseAll_UI()
-				
+				self:hide_all_ui(actor)
+
 				local quick_throw = actor_effects.Hit_GrenadeQuickthrow
 				quick_throw()
 			end,
 			function(self, actor)
-				if actor:is_talking() then
-					actor:stop_talk()
-				end
-				CloseAll_UI()
+				self:hide_all_ui(actor)
 
 				local quick_throw = actor_effects.Hit_GrenadeQuickthrow
 				play_sound_on_actor("perk_based_artefacts\\mil_crazy4")
@@ -1835,6 +1826,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 				
 				CreateTimeEvent("af_zhelch_grenade_stop", "af_zhelch_grenade_stop", 5, function()
 					unregister_callback("af_zhelch_grenade_stop")
+					return true
 				end)
 			end,
 		},
