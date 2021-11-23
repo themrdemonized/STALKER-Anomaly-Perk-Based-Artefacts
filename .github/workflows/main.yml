@@ -30,12 +30,12 @@ jobs:
         run: echo "::set-output name=today::$(date +'%Y.%m.%d')"
 
       - name: Zip folder FULL
-        run: zip -r '$RELEASE_NAME_FULL.zip' gamedata readme.txt
+        run: zip -r 'Perk Based Artefacts (FULL).zip' gamedata readme.txt
         env: 
           RELEASE_NAME_FULL: "Perk Based Artefacts (FULL)"
         
       - name: Zip folder LITE
-        run: zip -r '$RELEASE_NAME_LITE.zip' gamedata readme.txt -x gamedata/configs/items/items/items_a*.ltx gamedata/configs/items/items/items_c*.ltx
+        run: zip -r 'Perk Based Artefacts (LITE).zip' gamedata readme.txt -x gamedata/configs/items/items/items_a*.ltx gamedata/configs/items/items/items_c*.ltx
         env: 
           RELEASE_NAME_LITE: "Perk Based Artefacts (LITE)"
       
