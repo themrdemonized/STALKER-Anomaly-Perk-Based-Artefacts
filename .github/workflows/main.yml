@@ -32,12 +32,12 @@ jobs:
       - name: Zip folder FULL
         run: zip -r $RELEASE_NAME_FULL.zip gamedata readme.txt
         env: 
-          RELEASE_NAME_FULL: ${{ github.event.repository.name }}-FULL.${{ steps.date.outputs.today }}
+          RELEASE_NAME_FULL: Perk Based Artefacts (FULL)
         
       - name: Zip folder LITE
         run: zip -r $RELEASE_NAME_LITE.zip gamedata readme.txt -x gamedata/configs/items/items/items_a*.ltx gamedata/configs/items/items/items_c*.ltx
         env: 
-          RELEASE_NAME_LITE: ${{ github.event.repository.name }}-LITE.${{ steps.date.outputs.today }}
+          RELEASE_NAME_LITE: Perk Based Artefacts (LITE)
       
       - name: Publish
         uses: "marvinpinto/action-automatic-releases@v1.2.1"
