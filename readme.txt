@@ -1,9 +1,8 @@
-Perk Based Artefacts, 0.8
+Perk Based Artefacts, RC1
 A unique twist on overhauling old junk artefacts beyond the boundaries of simple stat changers
 Junk artefacts are no longer junk and received unique special abilities or Perks. The degree of perks vary from simple boosters to marvellous staff like recharging batteries by stepping in Electra, receiving Money on Headshots or Even Evading Death itself when all hope is lost.
 Multiple artefacts might or might not stack the effects and penalties of Perks in various ways, and effects are triggered on very various conditions
 
-This is very first test versions to see the first problems, bugs and compatibility issues. The descriptions of artefacts aren't changed and no balancing of their prices, tiers or relations to usual artefacts were performed. Not all artefacts are affected and their Perks are a subject to change many times
 
 So far the perks are
 
