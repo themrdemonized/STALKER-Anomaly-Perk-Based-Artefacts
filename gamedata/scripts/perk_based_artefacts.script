@@ -1643,7 +1643,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 					item_slot = 3
 					t = 1.2
 				else
-					return
+					return t
 				end
 
 				t = t + (actor:active_slot() == 0 and 0 or 1)
