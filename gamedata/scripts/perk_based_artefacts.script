@@ -355,6 +355,7 @@ local force_refresh_state
 local artefacts = {}
 local belt = {}
 
+-- Find artefact in a container
 local function get_artefact_from_container(sec)
 	local sec = sec
 	if (string_find(sec, "(lead.-_box)",3)) then
