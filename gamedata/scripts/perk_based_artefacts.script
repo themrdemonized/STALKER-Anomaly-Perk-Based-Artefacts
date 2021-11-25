@@ -147,7 +147,10 @@ local indoor_levels = {
 	labx8				 	= true
 }
 
-local debug_mode = true
+local settings = {
+	debug_mode = false,
+	allow_arty_containers = false,
+}
 
 -- Utils
 local function print_table(table, subs)
@@ -195,7 +198,7 @@ local function print_table(table, subs)
 end
 
 local function trace(str, ...)
-	if debug_mode then
+	if settings.debug_mode then
 		printf("Perk Based Artefacts: " .. str, ...)
 	end
 	-- printf("-
@@ -209,7 +212,7 @@ local function trace(str, ...)
 end
 
 local function trace_table(t)
-	if debug_mode then
+	if settings.debug_mode then
 		printf("Perk Based Artefacts: Table Print")
 		print_table(t)
 	end
@@ -352,6 +355,20 @@ local force_refresh_state
 local artefacts = {}
 local belt = {}
 
+local function get_artefact_from_container(sec)
+	local sec = sec
+	if (string_find(sec, "(lead.-_box)",3)) then
+		sec = sec:gsub("_lead_box", "")		
+	elseif (string_find(sec, "(af.-_iam)",3)) then
+		sec = sec:gsub("_af_iam", "")
+	elseif (string_find(sec, "(af.-_aac)",3)) then
+		sec = sec:gsub("_af_aac", "")
+	elseif (string_find(sec, "(af.-_aam)",3)) then
+		sec = sec:gsub("_af_aam", "")
+	end
+	return sec
+end
+
 iterate_belt = function(actor)
 	local artefacts = {}
 	local belt = {}
@@ -376,6 +393,12 @@ iterate_belt = function(actor)
 
 	local function iterate_belt_function(owner, artefact)
 		local sec = artefact:section()
+
+		-- Find artefact in a container if its allowed in settings
+		if settings.allow_arty_containers then
+			sec = get_artefact_from_container(sec)
+		end
+
 		if artefacts[sec] then
 			artefacts[sec].count = artefacts[sec].count + 1
 			table_insert(artefacts[sec].ids, artefact:id())
@@ -1627,6 +1650,30 @@ artefact_props = { -- Special props of artefacts that are used in processing
 				end)
 				return delayed_time
 			end,
+			play_muzon = function(self, actor)
+				local item = actor:item_in_slot(8)
+				if not item then return end
+
+				local snd
+				local function start_music()
+					CreateTimeEvent("af_zhelch_muzon", "af_zhelch_muzon", 0.66, function()
+						add_cam_effector("camera_effects\\tolik2.anm", 69421, true, "")
+						snd = play_sound_on_actor("perk_based_artefacts\\csky_bandit")
+						return true
+					end)
+				end
+
+				local function end_music()
+					remove_cam_effector(69421)
+					if snd then snd:stop() end
+				end
+
+				local time = self:press_pda(actor, start_music)		
+				CreateTimeEvent("af_zhelch_muzon_stop", "af_zhelch_muzon_stop", time + 20, function()
+					self:press_pda(actor, end_music)
+					return true
+				end)
+			end,
 			fire_weapon = function(self, actor, time) -- Fire active weapon for time
 				local item
 				local item_slot
@@ -1727,28 +1774,13 @@ artefact_props = { -- Special props of artefacts that are used in processing
 				end
 			end,
 			function(self, actor)
-				local item = actor:item_in_slot(8)
-				if not item then return end
-
-				local snd
-				local function start_music()
-					CreateTimeEvent("af_zhelch_muzon", "af_zhelch_muzon", 0.66, function()
-						add_cam_effector("camera_effects\\tolik2.anm", 69421, true, "")
-						snd = play_sound_on_actor("perk_based_artefacts\\csky_bandit")
-						return true
-					end)
-				end
-
-				local function end_music()
-					remove_cam_effector(69421)
-					if snd then snd:stop() end
-				end
-
-				local time = self:press_pda(actor, start_music)		
-				CreateTimeEvent("af_zhelch_muzon_stop", "af_zhelch_muzon_stop", time + 20, function()
-					self:press_pda(actor, end_music)
-					return true
-				end)
+				self:play_muzon(actor)
+			end,
+			function(self, actor)
+				self:play_muzon(actor)
+			end,
+			function(self, actor)
+				self:play_muzon(actor)
 			end,
 			function(self, actor)
 				self:look_at_npc(actor, 7)
@@ -3826,7 +3858,10 @@ end
 
 local function on_option_change()
 	if ui_mcm then
-		debug_mode = ui_mcm.get("perk_based_artefacts/debug_mode")
+		for k, v in pairs(settings) do
+			settings[k] = ui_mcm.get("perk_based_artefacts/" .. k)
+		end
+		force_refresh_state()
 	end
 end
 

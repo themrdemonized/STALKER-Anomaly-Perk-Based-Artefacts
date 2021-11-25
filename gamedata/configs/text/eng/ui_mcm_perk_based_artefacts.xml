@@ -11,5 +11,14 @@
 	<string id="ui_mcm_perk_based_artefacts_debug_mode">
 		<text>Debug Mode</text>
 	</string>
+	<string id="ui_mcm_perk_based_artefacts_debug_mode_desc">
+		<text>Enables message spam in console</text>
+	</string>
+	<string id="ui_mcm_perk_based_artefacts_allow_arty_containers">
+		<text>Allow artefacts in containers</text>
+	</string>
+	<string id="ui_mcm_perk_based_artefacts_allow_arty_containers_desc">
+		<text>Allows perk artefacts in containers to utilize their perks. Perk descriptions will still be only available for container-less artefacts</text>
+	</string>
 	
 </string_table>
