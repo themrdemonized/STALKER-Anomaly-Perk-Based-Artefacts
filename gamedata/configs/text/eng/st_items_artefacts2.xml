@@ -269,12 +269,13 @@
     <text>Tapeworm</text>
   </string>
   <string id="st_af_tapeworm_descr">
-    <text>This artefact is pure silicon dioxide, twisted into an unusual shape and color by gravitational anomalies. It would be otherwise unremarkable, except for one fact. When activated, it will send strong electric shock towards any living creature that attacks the user via direct contact, effectively stunning them for a short duration of time. Very valued by stalkers that hunt mutants for a living.\n \n
+    <text>This artefact is pure silicon dioxide, twisted into an unusual shape and color by gravitational anomalies. It would be otherwise unremarkable, except for one fact. When activated, it will send strong electric shock towards any living creature that attacks the user via direct contact, effectively stunning them for a short duration of time. And as most things in the Zone, it doesn't distinguish between who attacks the wielder of the artefact, including himself. Very valued by stalkers that hunt mutants for a living.\n \n
     %c[0,209,172,56]Perk: %c[d_orange]Stunner\n
     %c[0,81,63,22]  • %c[0,209,172,56]Getting melee hit by enemies will make them stunned for 2.5 seconds.\n
     %c[0,81,63,22]  • %c[0,209,172,56]While being stunned the enemy is disabled in fight and won't attack.\n
     %c[0,81,63,22]  • %c[0,209,172,56]Has a cooldown of 2 seconds between uses.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Each extra artefact adds additional 2 seconds to effect.</text>
+    %c[0,81,63,22]  • %c[0,209,172,56]Each extra artefact adds additional 2 seconds to effect.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Getting hurt by yourself (for example, falling down from a height) will result in artefact discharge. Don't hurt yourself and stay safe</text>
   </string>
   <string id="st_af_moh_name">
     <text>Moss</text>
