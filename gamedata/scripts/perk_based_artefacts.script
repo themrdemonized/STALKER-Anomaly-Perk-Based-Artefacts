@@ -966,12 +966,14 @@ artefact_props = { -- Special props of artefacts that are used in processing
 				local gg = game_graph()
 				for id, v in pairs(rf_targets) do
 					local se_obj = sim:object(id)
-					local lvl = sim:level_name(gg:vertex(se_obj.m_game_vertex_id):level_id())
-					if lvl == actor_level then
-						if not _self.targets then _self.targets = {} end
-						_self.targets[id] = true
-						trace("Lamp, adding target %s", id)
-						has_targets = true
+					if se_obj then
+						local lvl = sim:level_name(gg:vertex(se_obj.m_game_vertex_id):level_id())
+						if lvl == actor_level then
+							if not _self.targets then _self.targets = {} end
+							_self.targets[id] = true
+							trace("Lamp, adding target %s", id)
+							has_targets = true
+						end
 					end
 				end
 
@@ -3355,8 +3357,10 @@ local artefact_on_equip_functions = {
 		if rf_stashes[actor_level] then
 			for k, v in pairs(rf_stashes[actor_level]) do
 				local obj = get_object_by_id(k)
-				local pos = obj:position()
-				trace("stash id %s, freq %s, coords %s %s %s", k, v, pos.x, pos.y, pos.z)
+				if obj then
+					local pos = obj:position()
+					trace("stash id %s, freq %s, coords %s %s %s", k, v, pos.x, pos.y, pos.z)
+				end
 			end
 		end
 
