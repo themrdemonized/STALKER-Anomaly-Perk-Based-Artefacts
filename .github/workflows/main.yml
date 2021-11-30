@@ -35,7 +35,7 @@ jobs:
           mkdir Perk_Based_Artefacts_LITE
           cp -R gamedata Perk_Based_Artefacts_FULL
           cp -R gamedata Perk_Based_Artefacts_LITE
-          zip -r 'Perk_Based_Artefacts.zip' Perk_Based_Artefacts_FULL Perk_Based_Artefacts_LITE -x Perk_Based_Artefacts_LITE/gamedata/configs/items/items/items_a*.ltx Perk_Based_Artefacts_LITE/gamedata/configs/items/items/items_c*.ltx
+          zip -r 'Perk_Based_Artefacts.zip' readme.txt Perk_Based_Artefacts_FULL Perk_Based_Artefacts_LITE -x Perk_Based_Artefacts_LITE/gamedata/configs/items/items/items_a*.ltx Perk_Based_Artefacts_LITE/gamedata/configs/items/items/items_c*.ltx
         env: 
           RELEASE_NAME_FULL: "Perk Based Artefacts (FULL)"
       
