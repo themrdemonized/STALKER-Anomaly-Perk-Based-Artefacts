@@ -29,15 +29,15 @@ jobs:
         id: date
         run: echo "::set-output name=today::$(date +'%Y.%m.%d')"
 
-      - name: Zip folder FULL
-        run: zip -r 'Perk_Based_Artefacts_FULL.zip' gamedata readme.txt
+      - name: Zip folder
+        run: |
+          mkdir Perk_Based_Artefacts_FULL
+          mkdir Perk_Based_Artefacts_LITE
+          cp -R gamedata Perk_Based_Artefacts_FULL
+          cp -R gamedata Perk_Based_Artefacts_LITE
+          zip -r 'Perk_Based_Artefacts.zip' Perk_Based_Artefacts_FULL Perk_Based_Artefacts_LITE -x Perk_Based_Artefacts_LITE/gamedata/configs/items/items/items_a*.ltx Perk_Based_Artefacts_LITE/gamedata/configs/items/items/items_c*.ltx
         env: 
           RELEASE_NAME_FULL: "Perk Based Artefacts (FULL)"
-        
-      - name: Zip folder LITE
-        run: zip -r 'Perk_Based_Artefacts_LITE.zip' gamedata readme.txt -x gamedata/configs/items/items/items_a*.ltx gamedata/configs/items/items/items_c*.ltx
-        env: 
-          RELEASE_NAME_LITE: "Perk Based Artefacts (LITE)"
       
       - name: Publish
         uses: "marvinpinto/action-automatic-releases@v1.2.1"
