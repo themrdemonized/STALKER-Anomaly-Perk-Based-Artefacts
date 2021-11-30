@@ -458,6 +458,10 @@ local function register_callback(callback, callback_function, on_end_function, k
 	return key
 end
 
+local function register_on_equip_callback(callback, callback_function, on_end_function, key)
+	register_callback(callback, callback_function, on_end_function, key .. "_on_equip")
+end
+
 local function unregister_callback(key)
 	if not callbacks[key] then return end
 	trace("unregistering callback %s, %s", key, callbacks[key].callback)
@@ -471,6 +475,14 @@ end
 local function unregister_callbacks()
 	for i, props in pairs(callbacks) do
 		unregister_callback(i)
+	end
+end
+
+local function unregister_on_equip_callbacks()
+	for key, props in pairs(callbacks) do
+		if string_find(key, "on_equip") then
+			unregister_callback(key)
+		end
 	end
 end
 
@@ -3328,10 +3340,10 @@ local artefact_on_equip_functions = {
 			actor:hide_weapon()
 			af_star_phantom.weapon_hidden = true
 		end
-		register_callback("on_enemy_eval", af_star_phantom.ignore_enemy_function, function()
+		register_on_equip_callback("on_enemy_eval", af_star_phantom.ignore_enemy_function, function()
 			actor:restore_weapon()
 			af_star_phantom.weapon_hidden = false
-		end)
+		end, "af_star_phantom")
 	end,
 
 	-- Generator, Perk: Godzilla is Approaching
@@ -3366,7 +3378,7 @@ local artefact_on_equip_functions = {
 
 		local af_fonar = artefact_props.af_fonar
 		RegisterScriptCallback("actor_on_item_take", af_fonar.on_item_take)
-		register_callback("actor_on_update", af_fonar.light_sources_update, function()
+		register_on_equip_callback("actor_on_update", af_fonar.light_sources_update, function()
 			for k, v in pairs(af_fonar.light_sources) do
 				local light = v.light
 				light.enabled = false
@@ -3375,7 +3387,7 @@ local artefact_on_equip_functions = {
 			end
 			af_fonar.targets = nil
 			UnregisterScriptCallback("actor_on_item_take", af_fonar.on_item_take)
-		end)
+		end, "af_fonar")
 	end,
 
 	-- Knot, Perk: Deal with the Devil
@@ -3626,7 +3638,7 @@ refresh_state = function()
 	if refresh_artefacts() then
 		remove_speed_boosts()
 		remove_stack_effects()
-		unregister_callbacks()
+		unregister_on_equip_callbacks()
 		process_artefacts(artefact_on_equip_functions)
 	end
 end
@@ -3635,7 +3647,7 @@ force_refresh_state = function()
 	refresh_artefacts(true)
 	remove_speed_boosts()
 	remove_stack_effects()
-	unregister_callbacks()
+	unregister_on_equip_callbacks()
 	process_artefacts(artefact_on_equip_functions)
 	return true
 end
