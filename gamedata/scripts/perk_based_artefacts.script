@@ -9,20 +9,19 @@
 
 local AC_ID = AC_ID
 local alife_create_item = alife_create_item
-local alife_object = alife_object
 local alife_release_id = alife_release_id
-local clamp = clamp
 local CloseAll_UI = CloseAll_UI
 local CreateTimeEvent = CreateTimeEvent
-local empty_table = empty_table
 local get_console = get_console
 local has_alife_info = has_alife_info
+local ipairs = ipairs
 local is_empty = is_empty
 local is_not_empty = is_not_empty
 local IsAnomaly = IsAnomaly
 local IsArtefact = IsArtefact
 local IsMoveState = IsMoveState
 local normalize = normalize
+local pairs = pairs
 local particles_object = particles_object
 local printf = printf
 local random_float = random_float
@@ -31,12 +30,9 @@ local RemoveTimeEvent = RemoveTimeEvent
 local ResetTimeEvent = ResetTimeEvent
 local round_100 = round_100
 local script_light = script_light
-local shuffle_table = shuffle_table
-local str_explode = str_explode
 local SYS_GetParam = SYS_GetParam
 local time_global = time_global
 local UnregisterScriptCallback = UnregisterScriptCallback
-local VEC_Y = VEC_Y
 local vector_rotate_y = vector_rotate_y
 
 local change_sleep = actor_status_sleep.actor_on_item_use
