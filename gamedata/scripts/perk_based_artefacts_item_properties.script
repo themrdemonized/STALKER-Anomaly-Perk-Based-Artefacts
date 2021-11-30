@@ -1,0 +1,14 @@
+local gc = game.translate_string
+
+local build_desc_footer = ui_item.build_desc_footer
+ui_item.build_desc_footer = function(obj, sec, str)
+	local str = build_desc_footer(obj, sec, str)
+	local s = "st_pba_" .. sec .. "_perk"
+	local translation = gc(s)
+	if s == translation then
+		return str
+	end
+
+	str = str .. "\\n" .. translation
+	return str
+end

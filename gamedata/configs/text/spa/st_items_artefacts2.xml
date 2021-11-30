@@ -8,328 +8,210 @@
   </string>
   <string id="st_af_cocoon_descr">
     <text>Un pequeno artefacto, con forma irregular, generado en anomalias gravitacionales. Su nombre se debe a dos factores distintos. Por un lado, la estructura exterior del artefacto se asemeja a la seda de una oruga. Pero lo mas interesante radica en su utilidad. Al acercarse al cuerpo, el artefacto reacciona cada vez que el propietario sufra un traumatismo contundente o cortante,esparciendo una sustancia similar a un capullo sobre el que lo protege de un dano mayor. Sin embargo, esta proteccion tiene un precio, ya que limita el movimiento del usuario cada vez que se activa el artefacto.\n \n
-    %c[0,209,172,56]Ventaja: %c[d_orange]Piel de Piedra\n 
-    %c[0,81,63,22]  • %c[0,209,172,56]Recibir dano cuerpo a cuerpo te otorga acumulacion bonus de Piel de Piedra.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Con cada acumulacion, obtienes un 10% de proteccion contra danos cuerpo a cuerpo, pero recibes una penalizacion de velocidad de un 10%.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Cada acumulacion aumenta la proteccion pero penaliza mas la velocidad.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Es posible un maximo de 10 acumulaciones, en las que recibes un 75% de reduccion del dano cuerpo a cuerpo pero quedas completamente inmovilizado en el lugar.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]El efecto dura hasta 10 segundos, despues de los cuales se eliminan todas las acumulaciones..\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Multiples artefactos del mismo tipo aumentan la tasa de acumulacion.</text>
+    </text>
   </string>
   <string id="st_af_cell_name">
     <text>Celula</text>
   </string>
   <string id="st_af_cell_descr">
     <text>Un artefacto formado en anomalias gravitacionales, probablemente debido a los intensos campos magneticos localizados. Su estructura interior gira perpetuamente sobre su eje siempre que no se perturbe. Celula tiene una propiedad verdaderamente digna de mencion para una persona promedio. Cualquier objeto que se mueva muy rapido y que se acerque a la proximidad del usuario, se desintegra parcialmente, liberando una gran cantidad de particulas radiactivas en el proceso. Algunos Stalkers usan el artefacto a su favor, alegando que lidiar con la radiacion mas tarde es mejor que recibir un impacto de bala en el lugar.\n \n
-    %c[0,209,172,56]Ventaja: %c[d_orange]Desintegrador\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Desintegra parte de la bala que viene hacia ti. Desafortunadamente, en el proceso se emite mucha radiacion, lo que lleva al usuario a sufrir enfermedad por radiacion.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Reduce el dano por balas en un 15%.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]La cantidad recibida de dano se convierte en radiacion.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Se acumula con varios artefactos del mismo tipo.</text>
+    </text>
   </string>
   <string id="st_af_fountain_name">
     <text>Fuente</text>
   </string>
   <string id="st_af_fountain_descr">
     <text>Un artefacto comun formado en anomalias gravitacionales. Su extrana forma hace que sea muy valorada por los coleccionistas. Curiosamente, hay una cantidad insignificante de Stalkers que afirman que estar en posesion de este artefacto les ayuda a llegar a un mejor trato con los comerciantes de la Zona. Queda por confirmar si es cierto o no, sin embargo, los comerciantes mencionados prefieren no hablar de ello. \n \n
-    %c[0,209,172,56]Ventaja: %c[d_orange]Hora de Letyshops\n
-    %c[0,81,63,22]  • %c[0,209,172,56]El usuario recibe un reembolso del 2% en cada compra.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Se acumula con varios artefactos del mismo tipo.</text>
+    </text>
   </string>
   <string id="st_af_spaika_name">
     <text>Espina</text>
   </string>
   <string id="st_af_spaika_descr">
     <text>Un artefacto comun formado en anomalias gravitacionales, que se asemeja a madera o hueso petrificado. Los Stalkers que se atrevieron a usarlo en sus cinturones dicen que el artefacto los ayuda a calmarse y a concentrarse en situaciones de combate estresantes, permitiendoles golpear a sus enemigos en puntos vitales. Curiosamente, tambien afirman que el artefacto se 'enoja' con ellos por fallar sus disparos, lo que hace que la mayoria de la gente evite usarlo, por temor a una esquizofrenia permanente inducida por la Zona. \n \n
-    %c[0,209,172,56]Ventaja: %c[d_orange]Ascension critica\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Los golpes consecutivos otorgan una bonificacion del 3% de dano a tu proximo disparo.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Golpear al enemigo en el lugar critico otorga una bonificacion del 6%.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Fallar el disparo restablece la acumulacion de la bonificacion y otorga una penalizacion de dano psiquico proporcional a la acumulacion que tenias.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]La bonificacion se puede acumular infinitamente siempre que no erres un disparo.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Cada artefacto adicional agrega un 2% a los golpes normales y criticos.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Desequipar todos los artefactos Spike eliminara las acumulaciones sin ninguna penalizacion.</text>
+    </text>
   </string>
   <string id="st_af_signet_name">
     <text>Sello</text>
   </string>
   <string id="st_af_signet_descr">
     <text>Un artefacto que parece ser una tuerca de metal deformada. De vez en cuando tambien se lo llama "amuleto". Este ultimo proviene del hecho de que algunos Stalkers tienden a quedarse con sus Sellos en lugar de venderlos, diciendo que su presencia los ayuda a relajarse y regenerarse despues de una incursion peligrosa en la Zona. \n \n
-    %c[0,209,172,56]Ventaja: %c[d_orange]Luz de la tranquilidad\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Restaura la salud y la psi mientras esta cerca de la fogata, y amplifica aquellos artefactos de recuperacion psiquica cerca de la fogata.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]El efecto se acumula con cada artefacto en el cinturon.</text>
+    </text>
   </string>
   <string id="st_af_repei_name">
     <text>Cardo</text>
   </string>
   <string id="st_af_repei_descr">
     <text>Un artefacto comun generado en anomalias gravitacionales. A pesar de su apariencia espinosa, los Cardos parecen incapaces de penetrar la carne o danar el cuerpo de ninguna manera. Experimentos y observaciones recientes confirmaron que reaccionan con varios metales pesados, propiedad especialmente visible con el plomo. Varios informes medicos de Stalkers y soldados heridos muestran que las balas disparadas por el usuario de este artefacto afeitan parte del material exterior para volverse aserrado y afilado al entrar en el cuerpo, creando heridas sangrantes mas pequenas pero mucho mas intensas. Para empeorar las cosas, cualquier bala que haya estado recientemente cerca de un Cardo comenzara a moverse al entrar en contacto con el hierro contenido en la sangre humana, lo que hara que la herida sea dolorosa y dificil de cerrar durante un periodo de tiempo.\n \n
-    %c[0,209,172,56]Ventaja: %c[d_orange]Laceracion menor\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Tu arma pierde el 50% de la potencia pura, pero gana la capacidad de infligir dano hemorragico.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Con cada golpe, el enemigo recibira una acumulacion de sangrado y comenzara a perder salud lentamente proporcional a la potencia pura del arma.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Los NPC tendran mas posibilidades de caer en el estado herido, donde piden piedad y pueden darte informacion valiosa, si los alcanzas antes de que mueran.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Multiples artefactos aumentan la eficiencia de las acumulaciones de sangrado.\n
-  </text>
+    </text>
   </string>
   <string id="st_af_bat_name">
     <text>Murcielago</text>
   </string>
   <string id="st_af_bat_descr">
     <text>Un artefacto raro y hermoso, que consta de dos "alas" de forma irregular que protegen un nucleo esferico brillante. No emite radiacion y es bastante pesado. Los cazadores de artefactos experimentados aprendieron a usar su habilidad especial para su beneficio. Una vez activado y colocado cerca de otro artefacto, Bat extendera sus "alas", lo agarrara con ellas, lo empujara hacia su nucleo y luego se cerrara. Poco despues, el caparazon se convertira en polvo, revelando un artefacto con propiedades mucho mas fuertes o, a veces, uno completamente diferente.\n \n
-    %c[0,209,172,56]Perk: %c[d_orange]Alquimia de la Zona\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Con Murcielago en la mochila tienes la capacidad de transmutar tus artefactos..\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Los artefactos se pueden "upgradear", es decir, cambiar a un nivel mejor (Estrella Nocturna -> Gravi -> Pez de Colores), o se pueden "mutar", es decir, cambiar a un tipo diferente manteniendo el mismo nivel(Estrella Nocturna -> Sangre Petrificada -> Medusa)\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Solo los artefactos de nivel superior se pueden mutar.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Los artefactos con Ventajas solo se pueden mutar.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Los artefactos unicos, incluido el propio Murcielago, no se pueden transmutar.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Cada transmutacion te costara un artefacto de Murcielago.</text>
+    </text>
   </string>
   <string id="st_af_sun_name">
     <text>Sol</text>
   </string>
   <string id="st_af_sun_descr">
     <text>Un artefacto raro que es muy apreciado por los coleccionistas. Su capa exterior no tiene nada especial, pero si se agrieta como una geoda, revela un nucleo luminoso giratorio que emite una fuente constante de luz amarilla calida. Los Sol disfrutan de la compania de los rayos solares reales, lo que brinda a los usuarios de este artefacto una fuente de energia cuando se exponen a ellos. De la misma manera, cuando se mantienen alejados de una fuente directa de luz natural, capturan energia de los seres vivos cercanos y la drena lentamente..\n \n
-    %c[0,209,172,56]Perk: %c[d_orange]Energia solar\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Aumenta la salud y la resistencia en climas despejados, un pequeno aumento de resistencia en condiciones parcialmente despejadas y una penalizacion de resistencia en condiciones no despejadas y de noche.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]El efecto se acumula con cada artefacto en el cinturon.</text>
+    </text>
   </string>
   <string id="st_af_ear_name">
     <text>Corazon </text>
   </string>
   <string id="st_af_ear_descr">
     <text>Un artefacto de forma extrana, cuyo nucleo cristalino se asemeja al sistema circulatorio humano pero en miniatura. Desde que se difundieron los rumores de que el artefacto es capaz de curar a criaturas y personas moribundas, el interes en obtenerlos se disparo, tanto para venderlos al mundo exterior como para garantizar la propia supervivencia dentro de la Zona.\n \n
-    %c[0,209,172,56]Perk: %c[d_orange]Voluntad de vivir\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Otorga una regeneracion de salud mas fuerte cuanto menos salud tengas si tienes menos del 25% de salud hasta esa cantidad.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Mas artefactos aumentan la regeneracion y aumentan ligeramente la salud para poder activarse.</text>
+    </text>
   </string>
   <string id="st_af_chelust_name">
     <text>Cadena</text>
   </string>
   <string id="st_af_chelust_descr">
     <text>Un artefacto circular inusual, que no debe confundirse con un Anillo. Genera un fuerte campo gravitacional sin que nada lo toque. A primera vista, su peso no justifica el cansancio y el alivio del dolor. Pero aquellos que dedicaron sus vidas a Vyraj y Los Maestros pueden realmente darse cuenta del potencial del artefacto.\n \n
-    %c[0,209,172,56]Perk: %c[d_orange]El peso de la devocion.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Proporciona una pequena regeneracion de salud y resistencia.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Los miembros de Pecado triplican el efecto del artefacto y anaden regeneracion psiquica.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Los companeros de Pecado reciben regeneracion de salud uno por uno, comenzando por el que tiene la salud mas baja.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]No se acumula de ninguna manera.</text>
+    </text>
   </string>
   <string id="st_af_atom_name">
     <text>Atomo</text>
   </string>
   <string id="st_af_atom_descr">
     <text>Un artefacto raro e inusual que se asemeja al antiguo modelo de Bohr de un atomo. No es radiactivo, pero produce una pequena cantidad de calor. Es muy valioso para coleccionistas y cientificos tanto por su forma como por sus propiedades. Los Stalkers que sufren una fuerte irradiacion debido a una exposicion desafortunada, cuando usan este artefacto, de repente parecen como si hubieran recuperado su juventud en terminos de vitalidad. Con el tiempo, el efecto disminuye, pero tambien lo hace la radiacion que reside en sus cuerpos.\n \n
-    %c[0,209,172,56]Perk: %c[d_orange]Bendicion de Arszi\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Convierte la enfermedad por radiacion en un refuerzo de resistencia y proporciona una cura por radiacion ligera.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Mas artefactos del mismo tipo hacen que el impulso sea mas grande pero menos continuo.</text>
+    </text>
   </string>
   <string id="st_af_lighthouse_name">
     <text>Faro</text>
   </string>
   <string id="st_af_lighthouse_descr">
     <text>Una masa coagulada de metales ferrosos superdensos. Es uno de los artefactos mas misteriosos de la Zona, ya que su funcionamiento interno aun desconcierta a las mentes mas grandes de la ciencia moderna. Faro en su estado activo es capaz de detectar cada vez que un ser vivo mata a otro, sin importar la distancia entre los dos, siempre que la intencion de asesinato y la causalidad sean muy claras. La reaccion resultante no es menos misteriosa: el asesino es casi instantaneamente 'teletransportado' hacia el lugar donde la victima exhalo su ultimo aliento.\n \n
-    %c[0,209,172,56]Perk: %c[d_orange]La forma poco ortodoxa de viajar\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Matar a alguien te teletransportara al lugar de la muerte de tu victima.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]No intentes esto en cuervos.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]No se acumula de ninguna manera.</text>
+    </text>
   </string>
   <string id="st_af_fire_loop_name">
     <text>Nudo</text>
   </string>
   <string id="st_af_fire_loop_descr">
     <text>Este artefacto se forma ocasionalmente en el calor extremo de las anomalias termicas. Varias leyendas lo rodean, la mayoria de ellas lo suficientemente aterradoras como para hacer que algunos Stalkers eviten recogerlo. Sin embargo, se sabe que aquel que se haya atrevido a activar un Nudo nunca sera capaz de deshacerse de el, ya que el artefacto siempre volveria a el. Otras fuentes menos confiables hablan de habilidades sobrehumanas, escuchar voces, comportamiento imprudente y desapariciones extranas.\n \n
-    %c[0,209,172,56]Perk: %c[d_orange]Trato con el diablo\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Artefacto que cambia las reglas del juego.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Mover el artefacto al cinturon firmara el Pacto con la Zona..\n
-    %c[0,81,63,22]  • %c[0,209,172,56]La Zona da poder a tu Nudo y se convierte en el misterioso artefacto tambien conocido como Lucifer.</text>
+    </text>
   </string>
   <string id="st_af_zhelch_name">
     <text>Scar</text>
   </string>
   <string id="st_af_zhelch_descr">
     <text>Todo el mundo conoce el dicho "una mente sana en un cuerpo sano". La Zona hizo que tomara la forma de un artefacto. En el pasado, los stalkers solian aprovechar los artefactos Scar para curar sus heridas y explorar anomalias que alteran la mente. Desafortunadamente, con el tiempo, el artefacto mostro su lado mas siniestro. Las personas que usan Scar se comportan de manera extrana y erratica, incluso mas cuando se recuperan de un dano grave causado a sus cuerpos. Hoy en dia hay muy pocos lo suficientemente valientes como para sujetar uno de estos a su cinturon, ya que los veteranos de la Zona disfrutan contando historias escalofriantes sobre los usuarios de Scar a los novatos reunidos alrededor de las fogatas.\n \n
-    %c[0,209,172,56]Perk: %c[d_orange]Ese stalker loco de la faccion Libertad\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Proporciona una gran resistencia psiquica.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Drena la salud psiquica para restaurar la salud.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Cuando la salud esta llena, restaura la salud psiquica.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Existe la posibilidad de que el usuario realice una de las locas acciones incontrolables.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Cuanto menor sea la salud psiquica, mayor sera la probabilidad y la gravedad de la accion.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]No se acumula de ninguna manera.</text>
+    </text>
   </string>
   <string id="st_af_sandstone_name">
     <text>Arenisca</text>
   </string>
   <string id="st_af_sandstone_descr">
     <text>Un artefacto a veces se forma en anomalias de temperaturas extremas. Hasta el dia de hoy nadie sabe como es posible, pero Arenisca parece poseer algun tipo de inteligencia que le permite identificar el arma de un usuario. Al vincularse a el, el artefacto buscara una anomalia con la que interactuar, infundiendo los elementos mas letales con las correspondientes propiedades anomalas, haciendolos mucho mas daninos.\n \n
-    %c[0,209,172,56]Perk: %c[d_orange]Infusion de la Zona\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Entrar en anomalias de varios tipos infunde tu arma activa.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]El arma infundida pierde el 30% de su poder bruto pero gana el 50% del poder de dano elemental segun el tipo de anomalia.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Solo las anomalias electricas, termicas y quimicas son validas para la infusion.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]El efecto dura 3 minutos, el artefacto debe estar equipado para que funcione.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]No se acumula de ninguna manera.</text>
+    </text>
   </string>
   <string id="st_af_kislushka_name">
     <text>Desabrido</text>
   </string>
   <string id="st_af_kislushka_descr">
     <text>Un artefacto esferico hueco que se asemeja a un pergamino transparente de algun tipo. Recubierto con una capa de film, es agradable al tacto. Desabrido se activa cada vez que se cubre de sangre caliente y, utilizando la energia del usuario producida por la quema de calorias, comienza a excretar un estimulante provocando que cualquier herida sangrante se coagule y se cierre mucho mas rapido. Esta habilidad le gano mucha popularidad en el mundo medico, de ahi el buen precio que obtiene.\n \n
-    %c[0,209,172,56]Perk: %c[d_orange]?De que color es tu sangre?\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Drena la saciedad para curar el sangrado.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Multiples artefactos aumentan la curacion pero tambien aumentan la sed.</text>
+    </text>
   </string>
   <string id="st_af_black_angel_name">
     <text>Angel Negro</text>
   </string>
   <string id="st_af_black_angel_descr">
     <text>Un artefacto de minerales anomalos que se ha torcido en una formacion semi-simetrica siniestra. A pesar de no emitir calor ni radiacion, puede condensar el vapor de agua en el aire cercano en vapor. El artefacto parece tener algun tipo de sistema de defensa. Cuando es alcanzado por una bala entrante, es capaz de detectar de donde vino el disparo y redirigir el dano potencial a la persona que dispara. \n \n
-    %c[0,209,172,56]Perk: %c[d_orange]Esquiva esto\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Tiene un 20% de probabilidad de reflejar el 35% del dano de bala.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Anula el dano de golpe en la reflexion.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Mas artefactos aumentan la posibilidad de reflejar con rendimientos decrecientes.</text>
+    </text>
   </string>
   <string id="st_af_grapes_name">
     <text>Uvas</text>
   </string>
   <string id="st_af_grapes_descr">
     <text>Un artefacto pesado que a veces se encuentra en anomalias gravitacionales, se asemeja a gotas de ambar tenido de verde retorcidas. Muy recientemente, los cientificos pudieron confirmar algo que anteriormente se consideraba solo otro de los rumores de la Zona: cuando las Uvas se encuentran cerca de un proceso de digestion en curso de un organismo vivo, se activan, estimulando el metabolismo para que se cure de manera mas efectiva. \n \n
-    %c[0,209,172,56]Perk: %c[d_orange]Insaciable\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Proporciona una bonificacion de salud en el consumo de alimentos en funcion de sus calorias.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]El efecto se prolonga con cada artefacto en el cinturon..</text>
+    </text>
   </string>
   <string id="st_af_skull_miser_name">
     <text>Calavera de Miseria</text>
   </string>
   <string id="st_af_skull_miser_descr">
     <text>Un artefacto ligero y fragil que consiste en hebras interconectadas de fibras vegetales anomalas. El artefacto es uno de los favoritos entre las escorias que se instalaron en la Zona y, a veces, se refiere a el como un "pequeno" Wish Granter. Cuando el usuario de este artefacto mata a alguien al danar su cerebro, la Zona lo recompensa arrojando dinero alrededor de la victima. Algunos dicen que es la Zona que quiere que los stalkers se maten entre si para que haya paz. Otros dicen que no estaria lleno de riquezas como esa si no quisiera gente cerca. \n \n
-    %c[0,209,172,56]Perk: %c[d_orange]Consigue el premio gordo\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Al matar a un NPC en la cabeza, dinero extra se genera de una manera moderna.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Mas artefactos generaran mas dinero.</text>
+    </text>
   </string>
   <string id="st_af_star_phantom_name">
     <text>Estrella Fantasma</text>
   </string>
   <string id="st_af_star_phantom_descr">
     <text>Este artefacto parece ser una sustancia similar al plasma suspendida dentro de una capa transparente estriada. Genera un campo gravitacional debil, lo que dificulta mantenerse quieto o mantener el equilibrio. Estrella Fantasma, cuando esta activo, parece estar afectando las mentes de los seres vivos cercanos: su usuario deja de ser notado repentinamente hasta que ocurre algun tipo de interaccion contundente. El artefacto tambien manipula al propietario, evitando que pueda participar en cualquier tipo de hostilidad.\n \n
-    %c[0,209,172,56]Perk: %c[d_orange]Fantasma\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Vuelvete invisible para cualquiera.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]No puedes sacar un arma, hablar con nadie o interactuar con nada.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]No se acumula de ninguna manera.</text>
+    </text>
   </string>
   <string id="st_af_medallion_name">
     <text>Medalla</text>
   </string>
   <string id="st_af_medallion_descr">
     <text>Un artefacto que consiste en un pequeno aro incrustado con cuatro formas triangulares, con una pequena esfera central incrustada en el medio. Medalla ha evitado con exito cualquier intento de explicar logicamente su funcionamiento interno. Este artefacto no solo es capaz de detectar si el usuario es parte de un grupo, sino que posee otra habilidad mucho mas misteriosa. Aun queda por determinar si manipula objetos o cuerpos, sin embargo, es un hecho conocido que cuando una persona que usa este artefacto esta a punto de resultar herida, existe una posibilidad no insignificante de que quede ilesa, como un tipo de dano identico, se inflige a otra persona del grupo del usuario. Si bien tal efecto puede ser deseable de una manera egoista, no es inaudito entre los stalkers y es posible que muchos de ellos no tomen con agrado el hecho de que estan expuestos a el. \n \n
-    %c[0,209,172,56]Perk: %c[d_orange]El encanto (des)afortunado\n
-    %c[0,81,63,22]  • %c[0,209,172,56]35% de probabilidad de que el dano de la bala entrante se redirija por completo a un companero.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Algunos companeros son mas inteligentes que otros y se daran cuenta de que algo estuvo mal antes de morir.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Se acumula con varios artefactos.</text>
+    </text>
   </string>
   <string id="st_af_peas_name">
     <text>Luna</text>
   </string>
   <string id="st_af_peas_descr">
     <text>Un artefacto con forma de media-luna lunar. La carcasa exterior genera continuamente una luz muy tenue que parece estimular al usuario. Por la noche, te hara sentir descansado y energico, pero se produce el efecto inverso durante el dia.\n \n
-    %c[0,209,172,56]Perk: %c[d_orange]Amigo de la noche\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Da un bonus de curacion de sangrado y aumenta la velocidad, desde el anochecer hasta el amanecer en cualquier clima.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Disminuye la somnolencia nocturna, aumenta la somnolencia diurna.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]El efecto se acumula con cada artefacto en el cinturon.</text>
+    </text>
   </string>
   <string id="st_af_generator_name">
     <text>Generador</text>
   </string>
   <string id="st_af_generator_descr">
     <text>Este disco anomalo no es radiactivo, pero genera un campo electromagnetico pequeno y fuerte. Se puede hacer facilmente que "gire" perpetuamente sobre su eje, especialmente cuando el usuario se mueve rapido. Cuando eso sucede, la energia del artefacto se conecta a las baterias y dispositivos agotados cercanos y, siempre que aun les quede algo de carga electrica, restaura su energia lentamente. \n \n
-    %c[0,209,172,56]Perk: %c[d_orange]Duracell\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Restaura la carga de las baterias de los articulos mientras corres.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]No revivira baterias completamente agotadas o dispositivos sin baterias.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Mas artefactos aumentan la velocidad de recarga y un ligero aumento en la velocidad de carrera..</text>
+    </text>
   </string>
   <string id="st_af_ball_name">
     <text>Bola</text>
   </string>
   <string id="st_af_ball_descr">
     <text>A pesar de aparecer como una bola moteada de tierra y roca, este artefacto es inusualmente ligero y reboton, de ahi su nombre. Se cree que es producto de anomalias electricas. Cuando se usa en el cinturon, el artefacto genera una fuerza que se puede activar para repeler a las criaturas vivientes, excluyendo por alguna razon a los humanos. Para liberar dicha fuerza, es necesario que ocurra un movimiento rapido y fuerte entre el usuario y el objetivo, por lo que la mayoria de los stalkers que la usan recurren simplemente a patear a varios mutantes. Obviamente, no se recomienda la practica de acercarse tanto a una criatura de la Zona. ?Pero eso te detendra?\n \n
-    %c[0,209,172,56]Perk: %c[d_orange]El cascanueces\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Artefacto basado en nivel.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Amplifica el pie del jugador y le permite patear mas mutantes, resultando en una muerte instantanea para las victimas.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Cada artefacto en el cinturon permite patear mas monstruos.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Tiene un tiempo de recarga de 2 segundos con 1 artefacto, aumenta con mas artefactos en el cinturon, en 1 segundo cada uno.</text>
+    </text>
   </string>
   <string id="st_af_fonar_name">
     <text>Lampara</text>
   </string>
   <string id="st_af_fonar_descr">
     <text>Este artefacto liviano y vidrioso emite una cantidad modesta de luz casi ultravioleta. Reacciona de manera extrana con ciertas ondas de radio, haciendo brillar las fuentes de varias transmisiones. Los stalkers tienden a usar esta propiedad para buscar alijos escondidos por la noche. \n \n
-    %c[0,209,172,56]Perk: %c[d_orange]Cleptomania \n
-    %c[0,81,63,22]  • %c[0,209,172,56]El artefacto capta las frecuencias de los paquetes y envia energia para iluminarlos.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Ilumina los alijos y los articulos que emiten una senal al receptor RF.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]La luz es apenas visible durante el dia, por lo que es aconsejable buscar por la noche\n
-    %c[0,81,63,22]  • %c[0,209,172,56]No se acumula de ninguna manera.</text>
+    </text>
   </string>
   <string id="st_af_tapeworm_name">
     <text>Solitaria</text>
   </string>
   <string id="st_af_tapeworm_descr">
     <text>Este artefacto es dioxido de silicio puro, retorcido en una forma y color inusuales por anomalias gravitacionales. De lo contrario, no tendria nada de especial, excepto por un hecho. Cuando se activa, enviara una fuerte descarga electrica hacia cualquier criatura viviente que ataque al usuario a traves del contacto directo, aturdiendolo efectivamente por un corto periodo de tiempo. Muy valorado por los stalkers que cazan mutantes para ganarse la vida en la Zona.\n \n
-    %c[0,209,172,56]Perk: %c[d_orange]Aturdidor\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Ser golpeado cuerpo a cuerpo por enemigos, provocara que sean aturdidos durante 2,5 segundos.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Mientras esta aturdido, el enemigo queda inhabilitado en la lucha y no podra atacar.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Tiene un tiempo de recarga de 2 segundos entre usos.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Cada artefacto adicional agrega 2 segundos adicionales al efecto.</text>
+    </text>
   </string>
   <string id="st_af_moh_name">
     <text>Musgo</text>
   </string>
   <string id="st_af_moh_descr">
     <text>Un artefacto formado en anomalias electricas. Tiene una apariencia afilada e irregular, pero en realidad es bastante suave y agradable al tacto. Cuando es equipado al cinturon, puede detectar el contenido del estomago del usuario. Una vez que reconoce cualquier carne cruda del origen de la Zona dentro del sistema digestivo, se activara, usando el valor energetico de la carne para alimentar todo tipo de efectos estimulantes, dependiendo del tipo de criatura consumida.\n \n
-    %c[0,209,172,56]Perk: %c[d_orange]Hiperversidad culinaria\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Convierte la energia de la carne mutante cruda en habilidades especiales.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Los artefactos adicionales o comer la misma carne varias veces no acumula el efecto.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Dura 1 minuto, comer carne mutante diferente anula el tiempo anterior y se reinicia.\n \n
-    %c[d_orange]Lista de efectos: \n
-          %c[0,192,71,221] -   Filete de 'Carnes': %c[ui_gray_3]1% / segundo de regeneracion de salud, 33% de penalizacion por dano de bala.\n
-          %c[0,192,71,221] -   Chuleta de Jabali: %c[ui_gray_3]25% de reduccion de dano cuerpo a cuerpo.\n
-          %c[0,192,71,221] -   Carne de perro: %c[ui_gray_3]Curacion de hemorragia leve, 1% / segundo de regeneracion psiquica.\n
-          %c[0,192,71,221] -   Carne de Pseudoperro: %c[ui_gray_3]Regeneracion psiquica del 2% / seg, reduccion del dano psiquico del 25%.\n
-          %c[0,192,71,221] -   Carne de Chupasangre: %c[ui_gray_3]Volverse invisible hasta disparar o golpear al enemigo, cura de sangrado moderado.\n
-          %c[0,192,71,221] -   Carne de Psicovampiro: %c[ui_gray_3]Volverse invisible hasta disparar o golpear al enemigo, 5% / s de regeneracion psiquica.\n
-          %c[0,192,71,221] -   Mano de Snork: %c[ui_gray_3]50% de reduccion del dano por radiacion, 5% / s de regeneracion de resistencia, 5 msv / s de curado por radiacion, gran disminucion de la saciedad.\n
-          %c[0,192,71,221] -   Trozo de carne de Chimera: %c[ui_gray_3]2% / seg de regeneracion de salud, 10% / seg de regeneracion de resistencia, 33% de reduccion del dano por radiacion.\n
-          %c[0,192,71,221] -   Carne de asechador: %c[ui_gray_3]33% de reduccion de danos por anomalias quimicas / incendios / electricas, incluidos los campos.\n
-          %c[0,192,71,221] -   Carne de roedor: %c[ui_gray_3]20% de aumento de velocidad, 20% de penalizacion por dano cuerpo a cuerpo.</text>
+    </text>
   </string>
   <string id="st_af_serofim_name">
     <text>Serafin</text>
   </string>
   <string id="st_af_serofim_descr">
     <text>Serafin fue considerado durante mucho tiempo como nada mas que una bonita chucheria para vender. Eso fue hasta que un grupo veterano de stalkers regreso de una excursion profunda y compartio su historia. Segun ellos, en algun momento durante su viaje fueron emboscados por un francotirador. Su lider fue eliminado instantaneamente y cayo muerto con el craneo partido por la mitad. Mientras enviaban fuego de supresion, notaron que su cinturon se encendia y mientras se ponia de pie sin ningun signo de rasguno en el, con su casco todavia teniendo orificios obvios de entrada y salida de la bala del francotirador. Se las arreglaron para escapar y descubrir que el artefacto Serafin, que el lider habia guardado no estaba mas y en su lugar dejo solo un poco de polvo brillante. Desde entonces, las personas que se enteraron de esta historia aprecian a sus Serafines, creyendo que el artefacto los resucitara en caso de que ocurra lo peor. Por supuesto, nadie hasta ahora fue lo suficientemente valiente como para probar si algo de eso era realmente cierto. \n \n
-    %c[0,209,172,56]Perk: %c[d_orange]Lluvia de Reactivacion. \n
-    %c[0,81,63,22]  • %c[0,209,172,56]Al recibir un golpe fatal, el artefacto se destruye y el jugador revive.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Se restaura el 50% de la salud, se curan todas las desventajas y se otorgan 5 segundos de inmunidad.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Al revivir el arma actual se cae y la vision se arruina.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]No se acumula de ninguna manera.</text>
+    </text>
   </string>
   <string id="st_af_elektron_name">
     <text>Electron</text>
   </string>
   <string id="st_af_elektron_descr">
     <text>Este artefacto es producto de anomalias electricas. Es extremadamente pesado a pesar de su pequeno tamano. Tiene una propiedad interesante. Es capaz de combinar las anomalias electricas comunes con otras cargas electricas que encuentra cerca, utilizando a la anomalia como fuente de energia. La parte mas fascinante es que el artefacto considera que el cuerpo humano tambien es una bateria, convirtiendo la energia en una haciendo que las celulas humanas pueden utilizar durante la actividad fisica. Como tal, a pesar de ser una experiencia dolorosa, uno puede sentirse incansable por un corto periodo de tiempo. ?Efectos secundarios? Bueno, alguien aun tiene que reportarlos ... \n \n
-    %c[0,209,172,56]Perk: %c[d_orange]Alto Voltaje\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Pisar en una anomalia Electra recargara completamente las baterias de los dispositivos activos del jugador.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Recarga una cantidad aleatoria de dispositivos y baterias combinados en el inventario.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Da una resistencia infinita durante algun tiempo..\n
-    %c[0,81,63,22]  • %c[0,209,172,56]A veces, el placer de una carga es demasiado grande para manejarlo, lo que te hace gritar un poco mas emocionado de lo habitual.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]No se acumula de ninguna manera.</text>
+    </text>
   </string>
   <string id="st_af_kogot_name">
     <text>Garra</text>
   </string>
   <string id="st_af_kogot_descr">
     <text>Un hermoso artefacto parecido al vidrio, ocasionalmente se extrae de anomalias electrostaticas. Cuando se usa, parece llenar a su usuario con una extrana combinacion de rabia y deseo de atacar a los enemigos directamente, revitalizandolos por hacerlo. Hay una historia bastante comun asociada con este artefacto: un novato que encontro una Garra junto con su amigo, solo para que ambos fueran perseguidos por una jauria de perros hambrientos momentos despues. El 'amigo' disparo al novato y se fue, dejandolo a una muerte segura. Para sorpresa de todos, el stalker novato traicionado regreso a su campamento, perfectamente sano, a pesar de que su ropa estaba completamente desgarrada por las mordeduras de perro, con solo un cuchillo en el costado y el artefacto colgando de su cinturon. Sin embargo, es mejor que no se mencione lo que le sucedio al 'amigo'.\n \n
-    %c[0,209,172,56]Perk: %c[d_orange]Sed de sangre\n
-    %c[0,81,63,22]  • %c[0,209,172,56]10% de aumento del dano cuerpo a cuerpo.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Efecto vampiro: el 3.5% del dano cuerpo a cuerpo se convierte en salud del jugador.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Al matar a ciertos mutantes, se genera un trozo de carne cruda cerca de el.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Se acumula con varios artefactos.</text>
+    </text>
   </string>
   <string id="st_af_vaselisk_name">
     <text>Basilisk</text>
@@ -363,12 +245,7 @@
   </string>
   <string id="st_af_dragon_eye_descr">
     <text>Este artefacto a veces se forma en anomalias termicas y tiene la apariencia de un ojo de reptil. Tiene una propiedad muy peligrosa y volatil asociada. De alguna manera peculiar, cuando el usuario de este artefacto comete un asesinato, existe una pequena posibilidad de que ocurra una explosion violenta dentro del cuerpo de la victima, matando o lastimando a cualquier persona y a cualquier cosa cercana. Los mas supersticiosos dicen que es la Zona arrancando violentamente las almas de los seres caidos. La mayoria simplemente prefiere evitar el uso del artefacto por completo debido a las historias de personas atrapadas en tal explosion a una distancia desafortunada.\n \n
-    %c[0,209,172,56]Perk: %c[d_orange]Ultraviolencia\n
-    %c[0,81,63,22]  • %c[0,209,172,56]5% de probabilidad de que el disparo sea explosivo.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Al matar a un NPC o mutante con un disparo explosivo, explotara violentamente.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]La explosion genera pedazos de carne voladoras y lastima a todos en un radio.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Se aconseja la discrecion del usuario.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Multiples artefactos aumentan la probabilidad de explotar..</text>
+    </text>
   </string>
   <string id="st_arty_save">
     <text>Ojo de la Noosfera</text>

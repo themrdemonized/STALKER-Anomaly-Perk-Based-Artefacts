@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<!--
+  New Artefacts
+-->
+<string_table>
+  <string id="st_pba_af_cocoon_perk">
+    <text>
+    %c[0,209,172,56]Perk: %c[d_orange]Stone Skin\n 
+    %c[0,81,63,22]  • %c[0,209,172,56]Receiving melee damage grants you Stone skin stack.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]With receiving stack you get 10% melee damage protection but receive 10% speed penalty.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Each stack grows protection with diminishing returns and penalize speed more.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Maximum 10 stacks is possible, at which you receive 75% reduction of melee damage but become completely immobilized.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Effect lasts for 10 seconds, after which all stacks are burned.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Multiple artefact increase the rate of gaining stacks.</text>
+  </string>
+  <string id="st_pba_af_cell_perk">
+    <text>
+    %c[0,209,172,56]Perk: %c[d_orange]Disintegrator\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Disintegrates part of the bullet coming to you. Unfortunately in the process a lot of radiation is emitted, making you ill.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Reduces bullet damage by 15%.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Reduced amount of damage is converted to radiation.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Stacks with multiple artefacts.</text>
+  </string>
+  <string id="st_pba_af_fountain_perk">
+    <text>
+    %c[0,209,172,56]Perk: %c[d_orange]Letyshops Time\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Receive 2% cashback on each buy.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Stacks with multiple artefacts.</text>
+  </string>
+  <string id="st_pba_af_spaika_perk">
+    <text>
+    %c[0,209,172,56]Perk: %c[d_orange]Critical Ascensi0n\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Consecutive hits give 3% bonus to damage of your next shot.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Hitting enemy in the critical place gives 6% bonus.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Missing the shot resets the bonus stack and gives psy damage penalty proportional to the stack you had.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Bonus can be stacked infinitely as long as you don't miss.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Each extra artefact adds 2% to both normal and critical hits.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Unequipping all Spike artefacts will remove the stack without penalties.</text>
+  </string>
+  <string id="st_pba_af_signet_perk">
+    <text>
+    %c[0,209,172,56]Perk: %c[d_orange]Light of Tranquility\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Restores health and psy while being near campfire, amplifies psy recovery artefacts near campfire.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Effect stacks with each artefact on belt.</text>
+  </string>
+  <string id="st_pba_af_repei_perk">
+    <text>
+    %c[0,209,172,56]Perk: %c[d_orange]Minor Laceration\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Your weapon loses 50% of raw power but gains the ability to deal bleeding damage.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]With each hit the enemy will receive a bleeding stack and start to slowly loose health proportionally to weapon raw power.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]NPCs will have more chance to fall in wounded state, where they beg for mercy and might give you valuable information, if you reach them before they die.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Multiple artefacts increase the efficiency of bleeding stacks.\n
+  </text>
+  </string>
+  <string id="st_pba_af_bat_perk">
+    <text>
+    %c[0,209,172,56]Perk: %c[d_orange]Zone Alchemy\n
+    %c[0,81,63,22]  • %c[0,209,172,56]With Bat in the backpack you have the ability to transmutate your artefacts.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Artefacts can be "upgraded" i.e. changed to a better tier (Night Star -> Gravi -> Gold Fish), or can be "mutated" i.e. changed to different type retaining same tier (Night Star -> Stone Blood -> Jellyfish)\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Top tier artefacts can only be mutated.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Perk artefacts can only be mutated.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Unique artefacts, including Bat itself, can't be transmutated.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Each transmutation will cost you one Bat artefact.</text>
+  </string>
+  <string id="st_pba_af_sun_perk">
+    <text>
+    %c[0,209,172,56]Perk: %c[d_orange]Solar Powered\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Gives health and stamina boost at clear weather, little stamina boost at partly clear and stamina penalty at not clear and at night.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Effect stacks with each artefact on belt.</text>
+  </string>
+  <string id="st_pba_af_ear_perk">
+    <text>
+    %c[0,209,172,56]Perk: %c[d_orange]Will to Live\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Gives stronger health regen the less health you have if you have lower than 25% of health up to that amount.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]More artefacts increase the regen and slightly increases the highest health to trigger.</text>
+  </string>
+  <string id="st_pba_af_chelust_perk">
+    <text>
+    %c[0,209,172,56]Perk: %c[d_orange]The Weight Of Devotion\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Provides small health and stamina regen.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Members of Sin triple the effect of the artefact and add psy regen.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Sin companions receive health regen one by one, starting from the one with the lowest health.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Does not stack in any way.</text>
+  </string>
+  <string id="st_pba_af_atom_perk">
+    <text>
+    %c[0,209,172,56]Perk: %c[d_orange]Arszi's Blessing\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Converts radiation illness to stamina boost and gives light radiation cure.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]More artefacts make boost bigger but less continuous.</text>
+  </string>
+  <string id="st_pba_af_lighthouse_perk">
+    <text>
+    %c[0,209,172,56]Perk: %c[d_orange]The Unorthodox Way Of Travelling\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Killing anyone will teleport you to the place of your victim's death.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Don't try this on crows.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Does not stack in any way.</text>
+  </string>
+  <string id="st_pba_af_fire_loop_perk">
+    <text>
+    %c[0,209,172,56]Perk: %c[d_orange]Deal with the Devil\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Gamechanger Artefact.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Moving the artefact to belt will sign the Pact with the Zone.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]The Zone empowers your Knot and it becomes the mysterious artefact also known as Lucifer.</text>
+  </string>
+  <string id="st_pba_af_zhelch_perk">
+    <text>
+    %c[0,209,172,56]Perk: %c[d_orange]That Insane Stalker from the Freedom faction\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Provides major psy resistance.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Drains psy health to restore health.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]When health is full, restores psy health.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]There is a chance that you perform one of crazy uncontrollable actions.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]The lower the psy health, the higher the chance and severity of action.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Does not stack in any way.</text>
+  </string>
+  <string id="st_pba_af_sandstone_perk">
+    <text>
+    %c[0,209,172,56]Perk: %c[d_orange]Zone Infusion\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Stepping into anomaly of various types infuses your active weapon.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Infused weapon loses 30% of its raw power but gains 50% of elemental damage power according to the anomaly type.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Only electric, thermal and chemical anomalies are valid for infusion, including fields.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Effect lasts for 3 minutes, the artefact must be equipped for the effect to work.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Does not stack in any way.</text>
+  </string>
+  <string id="st_pba_af_kislushka_perk">
+    <text>
+    %c[0,209,172,56]Perk: %c[d_orange]What Colour Is Your Blood?\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Drains satiety to cure bleeding.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Multiple artefacts increase the cure but also increase the drain.</text>
+  </string>
+  <string id="st_pba_af_black_angel_perk">
+    <text>
+    %c[0,209,172,56]Perk: %c[d_orange]Dodge This\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Has 20% chance to reflect 35% of bullet damage back.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Nullify the damage of hit on reflection.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]More artefacts increase the chance to reflect with diminishing returns.</text>
+  </string>
+  <string id="st_pba_af_grapes_perk">
+    <text>
+    %c[0,209,172,56]Perk: %c[d_orange]Necessary Gluttony\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Provides health bonus on food consume based on its callories.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Effect prolongs with each artefact on belt.</text>
+  </string>
+  <string id="st_pba_af_skull_miser_perk">
+    <text>
+    %c[0,209,172,56]Perk: %c[d_orange]Crack the Jackpot\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Upon killing an npc in the head spawn extra money in a fashionable way.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]More artefacts will spawn more money items.</text>
+  </string>
+  <string id="st_pba_af_star_phantom_perk">
+    <text>
+    %c[0,209,172,56]Perk: %c[d_orange]Phantom Pacifist\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Become invisible to anybody.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]You can't draw a weapon, talk to anybody or interact with anything.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Does not stack in any way.</text>
+  </string>
+  <string id="st_pba_af_medallion_perk">
+    <text>
+    %c[0,209,172,56]Perk: %c[d_orange]The (Un)lucky charm\n
+    %c[0,81,63,22]  • %c[0,209,172,56]35% chance that incoming bullet damage will be fully redirected to your companion.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Some companions are smarter than others and they'll smell something fishy before they die.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Stacks with multiple artefacts with diminishing returns.</text>
+  </string>
+  <string id="st_pba_af_peas_perk">
+    <text>
+    %c[0,209,172,56]Perk: %c[d_orange]Friend of the Night\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Gives bleeding cure and speed increase from dusk till dawn at any weather.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Decreases sleepiness at night, increases sleepiness at day.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Effect stacks with each artefact on belt.</text>
+  </string>
+  <string id="st_pba_af_generator_perk">
+    <text>
+    %c[0,209,172,56]Perk: %c[d_orange]Godzilla is Approaching\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Restores batteries charge of items while sprinting.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Won't revive completely dead batteries or devices with no batteries.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]More artefacts gives more recharge rate and slight increase in sprint speed.</text>
+  </string>
+  <string id="st_pba_af_ball_perk">
+    <text>
+    %c[0,209,172,56]Perk: %c[d_orange]The Nutcracker\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Tier Based Artefact.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Amplifies player's mighty foot and allows him to kick more mutants, resulting in instant death.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Each artefact on the belt allows kicking more monsters.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Has a cooldown of 2 seconds with 1 artefact, increases with more artefacts on belt by 1 second each.</text>
+  </string>
+  <string id="st_pba_af_fonar_perk">
+    <text>
+    %c[0,209,172,56]Perk: %c[d_orange]Enlightening Kleptomania\n
+    %c[0,81,63,22]  • %c[0,209,172,56]The artefact catches frequencies of packages and sends energy to light them up.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Lights up stashes and items emitting signal to RF-receiver.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]The light is very dim and hardly visible at day, so searching at night is advisable.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Does not stack in any way.</text>
+  </string>
+  <string id="st_pba_af_tapeworm_perk">
+    <text>
+    %c[0,209,172,56]Perk: %c[d_orange]Stunner\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Getting melee hit by enemies will make them stunned for 2.5 seconds.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]While being stunned the enemy is disabled in fight and won't attack.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Has a cooldown of 2 seconds between uses.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Each extra artefact adds additional 2 seconds to effect.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Getting hurt by yourself (for example, falling down from a height) will result in artefact discharge. Don't hurt yourself and stay safe</text>
+  </string>
+  <string id="st_pba_af_moh_perk">
+    <text>
+    %c[0,209,172,56]Perk: %c[d_orange]Culinary Hyperversity\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Convert energy of raw mutant meat to special abilities.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Extra artefacts or eating same meat multiple times does not stack the effect.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Last for 1 minute, eating different mutant meat overrides previous time and resets.\n \n
+    %c[d_orange]Table of effects: \n
+          %c[0,192,71,221] -   Flesh meat: %c[ui_gray_3]1%/sec health regen, 33% bullet damage penalty.\n
+          %c[0,192,71,221] -   Boar meat: %c[ui_gray_3]25% melee damage reduction.\n
+          %c[0,192,71,221] -   Dog meat: %c[ui_gray_3]slight bleeding cure, 1%/sec psy regen.\n
+          %c[0,192,71,221] -   Pseudodog: %c[ui_gray_3]2%/sec psy regen, 25% psy damage reduction.\n
+          %c[0,192,71,221] -   Bloodsucker: %c[ui_gray_3]become invisible until shooting or hitting enemy, moderate bleeding cure.\n
+          %c[0,192,71,221] -   Psysucker: %c[ui_gray_3]become invisible until shooting or hitting enemy, 5%/sec psy regen.\n
+          %c[0,192,71,221] -   Snork: %c[ui_gray_3]50% radiation damage reduction, 5%/sec stamina regen, 5msv/sec radiation cure, big satiety decrease.\n
+          %c[0,192,71,221] -   Chimera: %c[ui_gray_3]2%/sec health regen, 10%/sec stamina regen, 33% raditation damage reduction.\n
+          %c[0,192,71,221] -   Lurker: %c[ui_gray_3]33% chem/fire/electric anomaly damage reduction, including fields.\n
+          %c[0,192,71,221] -   Tushkano: %c[ui_gray_3]20% speed increase, 20% melee damage penalty.</text>
+  </string>
+  <string id="st_pba_af_serofim_perk">
+    <text>
+    %c[0,209,172,56]Perk: %c[d_orange]Rain of Revival. \n
+    %c[0,81,63,22]  • %c[0,209,172,56]Upon receiving a fatal blow, the artefact is destroyed and player is revived.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]50% of health is restored, all debuffs are healed and 5 seconds of immunity are granted.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Upon reviving current weapon is dropped and vision is screwed up.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Does not stack in any way.</text>
+  </string>
+  <string id="st_pba_af_elektron_perk">
+    <text>
+    %c[0,209,172,56]Perk: %c[d_orange]Crank High Voltage\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Stepping on Electra will fully recharge player's batteries of active devices.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Recharges random amount of devices and batteries combined in the inventory.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Gives infinite sprint for some time.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Sometimes the pleasure of fresh charge is too big to handle, making you scream a bit more excited than usual.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Does not stack in any way.</text>
+  </string>
+  <string id="st_pba_af_kogot_perk">
+    <text>
+    %c[0,209,172,56]Perk: %c[d_orange]Bloodlust\n
+    %c[0,81,63,22]  • %c[0,209,172,56]10% Increase of melee damage.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Vampire effect: 3.5% of new melee damage is converted to player's health.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Upon killing certain mutants spawns raw chunk of meat near him.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Stacks with multiple artefacts.</text>
+  </string>
+  <string id="st_pba_af_dragon_eye_perk">
+    <text>
+    %c[0,209,172,56]Perk: %c[d_orange]Good ol' Ultra-Violence\n
+    %c[0,81,63,22]  • %c[0,209,172,56]5% chance that the shot would be explosive.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Upon killing an npc or mutant with explosive shot it will explode violently.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Explosion spawn meaty gibs and hurts everyone in the radius.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]User's discretion is advised.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Multiple artefacts increase the chance to explode.</text>
+  </string>
+</string_table>
