@@ -2312,20 +2312,19 @@ local artefact_on_update_functions = {
 	af_peas = function(actor, artefact_count, artefact_ids, artefact_names)
 		local af_peas = artefact_props.af_peas
 		local hours = get_time_hours()
-		if hours <= 21 or hours >= 5 then
+		if hours >= 21 or hours <= 5 then
+			local bleeding_cure_boost = 0.0015 * artefact_count
+			actor.bleeding = bleeding_cure_boost
+
+			add_speed(speed_boosts.af_peas.name, 1 + speed_boosts.af_peas.boost * artefact_count, false, true)
+			for i = 1, artefact_count do
+				af_peas:change_sleep(false)
+			end
+		else
 			for i = 1, artefact_count do
 				af_peas:change_sleep(true)
 				remove_speed(speed_boosts.af_peas.name)
 			end
-			return
-		end
-
-		local bleeding_cure_boost = 0.0009 * artefact_count
-		actor.bleeding = bleeding_cure_boost
-
-		add_speed(speed_boosts.af_peas.name, 1 + speed_boosts.af_peas.boost * artefact_count, false, true)
-		for i = 1, artefact_count do
-			af_peas:change_sleep(false)
 		end
 	end,
 
