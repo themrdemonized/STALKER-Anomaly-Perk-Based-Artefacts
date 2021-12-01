@@ -1,8 +1,11 @@
 local gc = game.translate_string
 
+local get_artefact_from_container = perk_based_artefacts.get_artefact_from_container
+
 local build_desc_footer = ui_item.build_desc_footer
 ui_item.build_desc_footer = function(obj, sec, str)
 	local str = build_desc_footer(obj, sec, str)
+	sec = get_artefact_from_container(sec)
 	local s = "st_pba_" .. sec .. "_perk"
 	local translation = gc(s)
 	if s == translation then
