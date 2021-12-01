@@ -104,6 +104,7 @@ local actor_on_update_time = 0
 local tg_lag = 0 --stores the time_global on game start and then used to correct timers for loaded time effects
 
 local time_elapsed = 0 -- Time from game start used for effects and cooldowns
+local saved_time_elapsed = 0 -- time_elapsed at the save_state
 local time_factor = 6 -- Default time_factor
 
 local actor_is_dying = false
@@ -501,6 +502,10 @@ local function check_cooldown(name)
 	end
 	trace("cooldown not expired yet, name %s, time %s, current_time %s", name, cooldowns[name], time_elapsed)
 	return false
+end
+
+function remove_cooldown(name)
+	cooldowns[name] = nil
 end
 
 local status_effects = {} -- Table of status effects of artefacts (["artefact"] = time_elapsed + cooldown)
@@ -2168,6 +2173,10 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			}
 		},
 		condition = 1,
+		degradation_rate = 0.00000029, --25% per day is 0.00000029
+		get_degradation_rate = function(self)
+			return self.degradation_rate * time_factor
+		end,
 		check_lucifer = function(self)
 			-- return has_alife_info("lucifer_active") and db.actor:object("af_lucifer")
 			return artefacts.af_lucifer
@@ -2471,23 +2480,24 @@ local artefact_on_update_functions = {
 
 	-- Lucifer, Perk: The Lucifer Effect
 	af_lucifer = function(actor, artefact_count, artefact_ids, artefact_names)
+		if not artefact_ids[1] then return end
+
+		local af_lucifer = get_object_by_id(artefact_ids[1])
+		local _self = artefact_props.af_lucifer
+		local condition = _self.condition
+
 		local health_boost = 0.001
 		local psy_boost = 0.005
 		local power_boost = 0.01
 		local bleeding_cure_boost = 0.0025
 		local speed_boost = 0
 
-		local degradation_rate = 0.00000029 * time_factor --25% per day is 0.00000029
+		local degradation_rate = _self:get_degradation_rate()
 
-		if not artefact_ids[1] then return end
-
-		local af_lucifer = get_object_by_id(artefact_ids[1])
-		local condition = artefact_props.af_lucifer.condition
-		local _self = artefact_props.af_lucifer
 		af_lucifer:set_condition(condition) -- Double set to set initial condition after loading state
 
 		if condition > 0.5 then
-			local overcharge = artefact_props.af_lucifer:get_overcharge()
+			local overcharge = _self:get_overcharge()
 			local normal_condition = normalize(condition, 0.5, 1)
 			actor:change_health(health_boost * normal_condition + health_boost * 0.5 * overcharge)
 			actor:change_power(power_boost * normal_condition + power_boost * overcharge)
@@ -2506,6 +2516,54 @@ local artefact_on_update_functions = {
 				_self:set_condition(condition, artefact_ids[1])
 				actor:set_health_ex(0)
 				return
+			end
+
+			if check_cooldown("af_lucifer_action") then
+				local dice_roll = random() * 100
+				local chance = 0.5
+				if dice_roll <= chance then
+					if condition > 0.2 then
+						local sounds = {
+							"perk_based_artefacts\\heartbeat_pulse_loop",
+							"perk_based_artefacts\\heartbeat_pulse_loop",
+							"perk_based_artefacts\\heartbeat_loop",
+							"perk_based_artefacts\\heartbeat_loop",
+							"perk_based_artefacts\\startlevel",
+							"perk_based_artefacts\\startlevel",
+							"perk_based_artefacts\\churchbell_loop",
+							"perk_based_artefacts\\churchbell_loop",
+							"perk_based_artefacts\\churchbell_loop",
+							"perk_based_artefacts\\death_chant",
+							"perk_based_artefacts\\death_chant2",
+							"perk_based_artefacts\\devil_prayer",
+							"perk_based_artefacts\\devil_prayer2",
+							"perk_based_artefacts\\devil_prayer3",
+							"perk_based_artefacts\\dream_sequence_example1",
+							"perk_based_artefacts\\dream_sequence_example1",
+						}
+						play_sound_on_actor(get_random_array_element(sounds), max(0.25, 1 - normalize(condition, 0, 0.5)), random_float(0.95, 1))
+						change_psy_health(-random_float(0.1, 0.15))
+					else
+						local sounds = {
+							"perk_based_artefacts\\startlevel",
+							"perk_based_artefacts\\churchbell_loop",
+							"perk_based_artefacts\\helpme",
+							"perk_based_artefacts\\dream_sequence_example1",
+							"perk_based_artefacts\\creepy_moaning",
+							"perk_based_artefacts\\crying_01",
+							"perk_based_artefacts\\crying_03",
+							"perk_based_artefacts\\devilbaby_01",
+							"perk_based_artefacts\\tortured_voices",
+							"perk_based_artefacts\\ohgodplease",
+							"perk_based_artefacts\\screams_01",
+						}
+						play_sound_on_actor(get_random_array_element(sounds), max(0.25, 1 - normalize(condition, 0, 0.5)), random_float(0.95, 1))
+						change_psy_health(-random_float(0.15, 0.35))
+					end
+					add_cooldown(180, "af_lucifer_action")
+				end
+			else
+				-- trace("Lucifer, action is in cooldown")
 			end
 		end
 
@@ -3775,6 +3833,14 @@ local function monster_on_death_callback(monster, who)
 	process_artefacts(artefact_on_monster_death_functions, monster, who, last_monster_hit, last_monster_hit_bone_index)
 end
 
+local function actor_on_sleep(hours)
+	local af_lucifer = artefact_props.af_lucifer
+	local degradation_rate = af_lucifer.degradation_rate * 10
+	local adjust_condition = degradation_rate * 60 * 60 * hours
+	trace("Lucifer condition after sleep adjusted by %s, slept %s hours", adjust_condition, hours)
+	af_lucifer:change_condition(-adjust_condition)
+end
+
 local function actor_on_first_update()
 	time_factor = get_time_factor()
 	force_refresh_state()
@@ -3796,9 +3862,19 @@ local function actor_on_first_update()
 		effect.timer = effect.timer + tg_add
 	end
 
+	if saved_time_elapsed > 0 then
+		local time_elapsed = get_time_elapsed()
+		local af_lucifer = artefact_props.af_lucifer
+		local degradation_rate = af_lucifer:get_degradation_rate()
+		local adjust_condition = degradation_rate * (time_elapsed - saved_time_elapsed)
+		trace("Lucifer condition on first update adjusted by %s, new time %s, old time %s", adjust_condition, time_elapsed, saved_time_elapsed)
+		af_lucifer:change_condition(-adjust_condition)
+	end
+
 	RegisterScriptCallback("actor_item_to_slot", refresh_state)
 	RegisterScriptCallback("actor_item_to_belt", refresh_state)
 	RegisterScriptCallback("actor_item_to_ruck", refresh_state)
+	RegisterScriptCallback("actor_on_sleep", actor_on_sleep)
 	RegisterScriptCallback("actor_on_update", actor_on_update)
 	RegisterScriptCallback("actor_on_weapon_fired", actor_on_weapon_fired)
 	RegisterScriptCallback("actor_on_before_hit", actor_on_before_hit)
@@ -3848,6 +3924,7 @@ local function save_state(m_data)
 	m_data.perk_based_artefacts_cooldowns = cooldowns
 	m_data.perk_based_artefacts_status_effects = status_effects
 	m_data.perk_based_artefacts_lucifer_condition = artefact_props.af_lucifer.condition
+	m_data.perk_based_artefacts_last_time = time_elapsed
 end
 
 local function load_state(m_data)
@@ -3870,6 +3947,7 @@ local function load_state(m_data)
 	cooldowns = m_data.perk_based_artefacts_cooldowns or {}
 	status_effects = m_data.perk_based_artefacts_status_effects or {}
 	artefact_props.af_lucifer.condition = m_data.perk_based_artefacts_lucifer_condition or 1
+	saved_time_elapsed = m_data.perk_based_artefacts_last_time or 0
 end
 
 local function on_option_change()
@@ -3894,3 +3972,7 @@ function on_game_start()
 	RegisterScriptCallback("on_option_change", on_option_change)
 end
 
+--Debug
+function set_lucifer_condition(condition)
+	artefact_props.af_lucifer:set_condition(condition)
+end
