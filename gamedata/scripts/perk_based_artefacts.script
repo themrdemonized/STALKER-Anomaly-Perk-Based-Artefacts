@@ -3893,3 +3893,4 @@ function on_game_start()
 	RegisterScriptCallback("ActorMenu_on_trade_closed", ActorMenu_on_trade_closed)
 	RegisterScriptCallback("on_option_change", on_option_change)
 end
+
