@@ -2173,7 +2173,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			}
 		},
 		condition = 1,
-		degradation_rate = 0.00000029, --25% per day is 0.00000029
+		degradation_rate = 0.0000029, --25% per day is 0.0000029
 		get_degradation_rate = function(self)
 			return self.degradation_rate * time_factor
 		end,
@@ -2492,8 +2492,6 @@ local artefact_on_update_functions = {
 		local bleeding_cure_boost = 0.0025
 		local speed_boost = 0
 
-		local degradation_rate = _self:get_degradation_rate()
-
 		af_lucifer:set_condition(condition) -- Double set to set initial condition after loading state
 
 		if condition > 0.5 then
@@ -2570,7 +2568,9 @@ local artefact_on_update_functions = {
 		add_speed(speed_boosts.af_lucifer.name, 1 + speed_boost, true, true)
 		add_speed(speed_boosts.af_lucifer.name, 1 + speed_boost, false, true)
 
-		_self.condition = condition - degradation_rate
+		local degradation_rate = _self:get_degradation_rate()
+		local adjust_condition = degradation_rate * (time_elapsed - saved_time_elapsed)
+		_self.condition = condition - adjust_condition
 		af_lucifer:set_condition(_self.condition)
 		trace("Lucifer, condition: %s", _self.condition * 100)
 	end,
@@ -3725,6 +3725,7 @@ local function actor_on_update()
 	--trace("current time_elapsed %s", time_elapsed)
 	process_artefacts(artefact_on_update_functions)
 	process_timed_effects()
+	saved_time_elapsed = time_elapsed
 end
 
 local function actor_on_weapon_fired(obj, wpn, ammo_elapsed, grenade_elapsed, ammo_type, grenade_type)
@@ -3834,11 +3835,13 @@ local function monster_on_death_callback(monster, who)
 end
 
 local function actor_on_sleep(hours)
-	local af_lucifer = artefact_props.af_lucifer
-	local degradation_rate = af_lucifer.degradation_rate * 10
-	local adjust_condition = degradation_rate * 60 * 60 * hours
-	trace("Lucifer condition after sleep adjusted by %s, slept %s hours", adjust_condition, hours)
-	af_lucifer:change_condition(-adjust_condition)
+	if check_lucifer() then
+		local af_lucifer = artefact_props.af_lucifer
+		local degradation_rate = af_lucifer.degradation_rate
+		local adjust_condition = degradation_rate * 60 * 60 * hours
+		trace("Lucifer condition after sleep adjusted by %s, slept %s hours", adjust_condition, hours)
+		af_lucifer:change_condition(-adjust_condition)
+	end
 end
 
 local function actor_on_first_update()
@@ -3862,7 +3865,7 @@ local function actor_on_first_update()
 		effect.timer = effect.timer + tg_add
 	end
 
-	if saved_time_elapsed > 0 then
+	if saved_time_elapsed > 0 and check_lucifer() then
 		local time_elapsed = get_time_elapsed()
 		local af_lucifer = artefact_props.af_lucifer
 		local degradation_rate = af_lucifer:get_degradation_rate()
