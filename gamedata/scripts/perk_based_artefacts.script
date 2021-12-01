@@ -104,7 +104,7 @@ local actor_on_update_time = 0
 local tg_lag = 0 --stores the time_global on game start and then used to correct timers for loaded time effects
 
 local time_elapsed = 0 -- Time from game start used for effects and cooldowns
-local saved_time_elapsed = 0 -- time_elapsed at the save_state
+local saved_time_elapsed = 0 -- time_elapsed at the end of update
 local time_factor = 6 -- Default time_factor
 
 local actor_is_dying = false
@@ -2452,7 +2452,7 @@ local artefact_on_update_functions = {
 		local af_lucifer = artefact_props.af_lucifer
 		local health_boost = 0.003
 		local psy_drain = -0.0025 * (2 - af_lucifer.condition)
-		local psy_boost = 0.0035
+		local psy_boost = 0.0035 * af_lucifer.condition
 
 		if actor.health < 0.99 then
 			actor:change_health(health_boost)
@@ -2520,7 +2520,7 @@ local artefact_on_update_functions = {
 				local dice_roll = random() * 100
 				local chance = 0.5
 				if dice_roll <= chance then
-					if condition > 0.2 then
+					if condition > 0.4 then
 						local sounds = {
 							"perk_based_artefacts\\heartbeat_pulse_loop",
 							"perk_based_artefacts\\heartbeat_pulse_loop",
@@ -2541,6 +2541,29 @@ local artefact_on_update_functions = {
 						}
 						play_sound_on_actor(get_random_array_element(sounds), max(0.25, 1 - normalize(condition, 0, 0.5)), random_float(0.95, 1))
 						change_psy_health(-random_float(0.1, 0.15))
+					elseif condition > 0.25 then
+						local sounds = {
+							"perk_based_artefacts\\heartbeat_pulse_loop",
+							"perk_based_artefacts\\heartbeat_loop",
+							"perk_based_artefacts\\startlevel",
+							"perk_based_artefacts\\churchbell_loop",
+							"perk_based_artefacts\\death_chant",
+							"perk_based_artefacts\\death_chant2",
+							"perk_based_artefacts\\devil_prayer",
+							"perk_based_artefacts\\devil_prayer2",
+							"perk_based_artefacts\\devil_prayer3",
+							"perk_based_artefacts\\dream_sequence_example1",
+							"perk_based_artefacts\\helpme",
+							"perk_based_artefacts\\creepy_moaning",
+							"perk_based_artefacts\\crying_01",
+							"perk_based_artefacts\\crying_03",
+							"perk_based_artefacts\\devilbaby_01",
+							"perk_based_artefacts\\tortured_voices",
+							"perk_based_artefacts\\ohgodplease",
+							"perk_based_artefacts\\screams_01",
+						}
+						play_sound_on_actor(get_random_array_element(sounds), max(0.25, 1 - normalize(condition, 0, 0.5)), random_float(0.95, 1))
+						change_psy_health(-random_float(0.15, 0.25))
 					else
 						local sounds = {
 							"perk_based_artefacts\\startlevel",
@@ -3835,13 +3858,13 @@ local function monster_on_death_callback(monster, who)
 end
 
 local function actor_on_sleep(hours)
-	if check_lucifer() then
-		local af_lucifer = artefact_props.af_lucifer
-		local degradation_rate = af_lucifer.degradation_rate
-		local adjust_condition = degradation_rate * 60 * 60 * hours
-		trace("Lucifer condition after sleep adjusted by %s, slept %s hours", adjust_condition, hours)
-		af_lucifer:change_condition(-adjust_condition)
-	end
+	-- if check_lucifer() then
+	-- 	local af_lucifer = artefact_props.af_lucifer
+	-- 	local degradation_rate = af_lucifer.degradation_rate
+	-- 	local adjust_condition = degradation_rate * 60 * 60 * hours
+	-- 	trace("Lucifer condition after sleep adjusted by %s, slept %s hours", adjust_condition, hours)
+	-- 	af_lucifer:change_condition(-adjust_condition)
+	-- end
 end
 
 local function actor_on_first_update()
