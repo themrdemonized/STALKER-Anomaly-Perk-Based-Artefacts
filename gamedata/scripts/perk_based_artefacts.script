@@ -35,8 +35,6 @@ local time_global = time_global
 local UnregisterScriptCallback = UnregisterScriptCallback
 local vector_rotate_y = vector_rotate_y
 
-local change_sleep = actor_status_sleep.actor_on_item_use
-
 local change_psy_health = arszi_psy.change_psy_health
 local manage_psy_health = arszi_psy.manage_psy_health
 local get_psy_health = arszi_psy.get_psy_health
@@ -337,6 +335,12 @@ local function look_at_nearest_npc(npc, actor)
 		look_position.z = ema("look_z", npc_position.z, look_position.z)
 
 		actor:actor_look_at_point(look_position)
+	end
+end
+
+local function change_sleep(item)
+	if get_game_factor("sleep") then
+		actor_status_sleep.actor_on_item_use(item)
 	end
 end
 
