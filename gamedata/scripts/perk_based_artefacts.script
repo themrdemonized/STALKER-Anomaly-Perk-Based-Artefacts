@@ -638,11 +638,11 @@ local speed_boosts = { -- Table of speed boosts for different artefacts
 	},
 	af_generator = {
 		name = "af_generator_boost",
-		boost = 0.135
+		boost = 0.115
 	},
 	af_lucifer = {
 		name = "af_lucifer_boost",
-		boost = 0.24
+		boost = 0.2
 	}
 }
 
