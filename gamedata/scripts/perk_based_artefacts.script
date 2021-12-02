@@ -2520,6 +2520,46 @@ local artefact_on_update_functions = {
 				local dice_roll = random() * 100
 				local chance = 0.5
 				if dice_roll <= chance then
+					local function blood_sky()
+						local function modify_val_vec(name, add_R, add_G, add_B)
+							local get_val_vec = weather.get_value_vector(name)
+							local mod_R = clamp(get_val_vec.x + add_R, 0, 1)
+							local mod_G = clamp(get_val_vec.y + add_G, 0, 1)
+							local mod_B = clamp(get_val_vec.z + add_B, 0, 1)
+							trace("sky color %s, %s, %s", mod_R, mod_G, mod_B)
+							weather.set_value_vector(name, mod_R, mod_G, mod_B)
+						end
+
+						local sounds = {
+							"perk_based_artefacts\\dream_sequence_example1",
+						}
+						play_sound_on_actor(get_random_array_element(sounds), 0.66, random_float(0.95, 1))
+						change_psy_health(-random_float(0.25, 0.4))
+
+						local get_val_vec = weather.get_value_vector("sky_color")
+						local r = 0
+						local g = 0
+						local b = 0
+						register_callback("actor_on_update", function()
+							r = r - 0.0015
+							g = g - 0.0015
+							b = b + 0.0015
+							modify_val_vec("sky_color", r, g, b)
+						end, function()
+							add_pp_effector("black_infinite.ppe", c_id_ppe.black_infinite, true)
+							CreateTimeEvent("af_lucifer_black", "af_lucifer_black", 0.5, function()
+								weather.set_value_vector("sky_color", get_val_vec.x, get_val_vec.y, get_val_vec.z)
+								remove_pp_effector(c_id_ppe.black_infinite)
+								return true
+							end)
+						end, "af_lucifer_sky_color")
+
+						CreateTimeEvent("af_lucifer_remove", "af_lucifer_remove", 7, function()
+							unregister_callback("af_lucifer_sky_color")
+							return true
+						end)
+					end
+
 					if condition > 0.4 then
 						local sounds = {
 							"perk_based_artefacts\\heartbeat_pulse_loop",
@@ -2542,44 +2582,51 @@ local artefact_on_update_functions = {
 						play_sound_on_actor(get_random_array_element(sounds), max(0.25, 1 - normalize(condition, 0, 0.5)), random_float(0.95, 1))
 						change_psy_health(-random_float(0.1, 0.15))
 					elseif condition > 0.25 then
-						local sounds = {
-							"perk_based_artefacts\\heartbeat_pulse_loop",
-							"perk_based_artefacts\\heartbeat_loop",
-							"perk_based_artefacts\\startlevel",
-							"perk_based_artefacts\\churchbell_loop",
-							"perk_based_artefacts\\death_chant",
-							"perk_based_artefacts\\death_chant2",
-							"perk_based_artefacts\\devil_prayer",
-							"perk_based_artefacts\\devil_prayer2",
-							"perk_based_artefacts\\devil_prayer3",
-							"perk_based_artefacts\\dream_sequence_example1",
-							"perk_based_artefacts\\helpme",
-							"perk_based_artefacts\\creepy_moaning",
-							"perk_based_artefacts\\crying_01",
-							"perk_based_artefacts\\crying_03",
-							"perk_based_artefacts\\devilbaby_01",
-							"perk_based_artefacts\\tortured_voices",
-							"perk_based_artefacts\\ohgodplease",
-							"perk_based_artefacts\\screams_01",
-						}
-						play_sound_on_actor(get_random_array_element(sounds), max(0.25, 1 - normalize(condition, 0, 0.5)), random_float(0.95, 1))
-						change_psy_health(-random_float(0.15, 0.25))
+						if random(100) <= 25 then
+							blood_sky()
+						else
+							local sounds = {
+								"perk_based_artefacts\\heartbeat_pulse_loop",
+								"perk_based_artefacts\\heartbeat_loop",
+								"perk_based_artefacts\\startlevel",
+								"perk_based_artefacts\\churchbell_loop",
+								"perk_based_artefacts\\death_chant",
+								"perk_based_artefacts\\death_chant2",
+								"perk_based_artefacts\\devil_prayer",
+								"perk_based_artefacts\\devil_prayer2",
+								"perk_based_artefacts\\devil_prayer3",
+								"perk_based_artefacts\\dream_sequence_example1",
+								"perk_based_artefacts\\helpme",
+								"perk_based_artefacts\\creepy_moaning",
+								"perk_based_artefacts\\crying_01",
+								"perk_based_artefacts\\crying_03",
+								"perk_based_artefacts\\devilbaby_01",
+								"perk_based_artefacts\\tortured_voices",
+								"perk_based_artefacts\\ohgodplease",
+								"perk_based_artefacts\\screams_01",
+							}
+							play_sound_on_actor(get_random_array_element(sounds), max(0.25, 1 - normalize(condition, 0, 0.5)), random_float(0.95, 1))
+							change_psy_health(-random_float(0.15, 0.25))
+						end
 					else
-						local sounds = {
-							"perk_based_artefacts\\startlevel",
-							"perk_based_artefacts\\churchbell_loop",
-							"perk_based_artefacts\\helpme",
-							"perk_based_artefacts\\dream_sequence_example1",
-							"perk_based_artefacts\\creepy_moaning",
-							"perk_based_artefacts\\crying_01",
-							"perk_based_artefacts\\crying_03",
-							"perk_based_artefacts\\devilbaby_01",
-							"perk_based_artefacts\\tortured_voices",
-							"perk_based_artefacts\\ohgodplease",
-							"perk_based_artefacts\\screams_01",
-						}
-						play_sound_on_actor(get_random_array_element(sounds), max(0.25, 1 - normalize(condition, 0, 0.5)), random_float(0.95, 1))
-						change_psy_health(-random_float(0.15, 0.35))
+						if random(100) <= 50 then
+							blood_sky()
+						else
+							local sounds = {
+								"perk_based_artefacts\\startlevel",
+								"perk_based_artefacts\\churchbell_loop",
+								"perk_based_artefacts\\helpme",
+								"perk_based_artefacts\\creepy_moaning",
+								"perk_based_artefacts\\crying_01",
+								"perk_based_artefacts\\crying_03",
+								"perk_based_artefacts\\devilbaby_01",
+								"perk_based_artefacts\\tortured_voices",
+								"perk_based_artefacts\\ohgodplease",
+								"perk_based_artefacts\\screams_01",
+							}
+							play_sound_on_actor(get_random_array_element(sounds), max(0.25, 1 - normalize(condition, 0, 0.5)), random_float(0.95, 1))
+							change_psy_health(-random_float(0.15, 0.35))
+						end
 					end
 					add_cooldown(180, "af_lucifer_action")
 				end
