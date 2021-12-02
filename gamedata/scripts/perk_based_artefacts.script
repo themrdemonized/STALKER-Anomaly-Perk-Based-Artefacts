@@ -2592,7 +2592,7 @@ local artefact_on_update_functions = {
 		add_speed(speed_boosts.af_lucifer.name, 1 + speed_boost, false, true)
 
 		local degradation_rate = _self:get_degradation_rate()
-		local adjust_condition = degradation_rate * (time_elapsed - saved_time_elapsed)
+		local adjust_condition = saved_time_elapsed > 0 and degradation_rate * (time_elapsed - saved_time_elapsed) or degradation_rate
 		_self.condition = condition - adjust_condition
 		af_lucifer:set_condition(_self.condition)
 		trace("Lucifer, condition: %s", _self.condition * 100)
