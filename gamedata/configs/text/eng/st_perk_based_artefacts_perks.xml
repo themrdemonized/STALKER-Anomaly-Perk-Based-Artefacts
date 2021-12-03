@@ -17,9 +17,9 @@
     <text>
     %c[0,209,172,56]Perk: %c[d_orange]Disintegrator\n
     %c[0,81,63,22]  • %c[0,209,172,56]Disintegrates part of the bullet coming to you. Unfortunately in the process a lot of radiation is emitted, making you ill.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Reduces bullet damage by 15%.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Reduces bullet damage by 20%.\n
     %c[0,81,63,22]  • %c[0,209,172,56]Reduced amount of damage is converted to radiation.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Stacks with multiple artefacts.</text>
+    %c[0,81,63,22]  • %c[0,209,172,56]Stacks with multiple artefacts with diminishing returns.</text>
   </string>
   <string id="st_pba_af_fountain_perk">
     <text>

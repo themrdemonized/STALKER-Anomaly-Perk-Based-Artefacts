@@ -731,6 +731,15 @@ artefact_props = { -- Special props of artefacts that are used in processing
 		end
 	},
 	af_cell = {
+		reduction_coeff = (function() -- LUT with chances to trigger by artefact count
+			local t = {}
+			for artefact_count = 1, 5 do
+				-- Parabolic curve
+				-- Progression is 20 -> 35 -> 48 -> 60 -> 70
+				t[artefact_count] = round((17.5 - 0.8333333 * artefact_count) * artefact_count + 3.3333333) * 0.01
+			end
+			return t
+		end)(),
 		valid_hits = { -- Valid hit types to trigger
 			[hit.fire_wound] = true
 		}
@@ -3006,11 +3015,11 @@ local artefact_on_before_hit_functions = {
 	af_cell = function(actor, artefact_count, artefact_ids, artefact_names, s_hit, bone_id, flags)
 		local af_cell = artefact_props.af_cell
 		if not af_cell.valid_hits[s_hit.type] then
-			trace("Cage, not a valid hit type %s", s_hit.type)
+			trace("Cell, not a valid hit type %s", s_hit.type)
 			return
 		end
 
-		local rad_k = 0.15 * artefact_count
+		local rad_k = af_cell.reduction_coeff[artefact_count]
 		local power = s_hit.power
 		s_hit.power = s_hit.power * (1 - rad_k)
 		power = power - s_hit.power

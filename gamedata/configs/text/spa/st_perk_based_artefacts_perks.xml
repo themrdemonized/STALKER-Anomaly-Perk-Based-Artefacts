@@ -17,7 +17,7 @@
     <text>
     %c[0,209,172,56]Ventaja: %c[d_orange]Desintegrador\n
     %c[0,81,63,22]  • %c[0,209,172,56]Desintegra parte de la bala que viene hacia ti. Desafortunadamente, en el proceso se emite mucha radiacion, lo que lleva al usuario a sufrir enfermedad por radiacion.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Reduce el dano por balas en un 15%.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Reduce el dano por balas en un 20%.\n
     %c[0,81,63,22]  • %c[0,209,172,56]La cantidad recibida de dano se convierte en radiacion.\n
     %c[0,81,63,22]  • %c[0,209,172,56]Se acumula con varios artefactos del mismo tipo.</text>
   </string>
