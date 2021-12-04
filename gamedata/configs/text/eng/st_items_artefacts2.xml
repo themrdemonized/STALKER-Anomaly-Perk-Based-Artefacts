@@ -7,181 +7,187 @@
     <text>Cocoon</text>
   </string>
   <string id="st_af_cocoon_descr">
-    <text>A small, irregularly-shaped artefact formed in gravitational anomalies. It owes its name to two different factors. For one, the exterior structure of the artefact resembles caterpillar silk. But the more interesting part lies within its utility. When close to the body, the artefact reacts every time the owner is being hit by blunt or cutting trauma, spreading a cocoon-like substance over them that protects from further damage. The protection comes at a price however, limiting the movement of the user each time Cocoon activates and the protective layer thickens.\n \n</text>
+    <text>A small, irregularly-shaped artefact formed in gravitational anomalies. It owes its name to two different factors. For one, the exterior structure of the artefact resembles caterpillar silk. But the more interesting part lies within its utility. When close to the body, the artefact reacts every time the owner is being hit by blunt or cutting trauma, spreading a cocoon-like substance over them that protects from further damage. The protection comes at a price however, limiting the movement of the user each time Cocoon activates and the protective layer thickens.\n</text>
   </string>
   <string id="st_af_cell_name">
     <text>Cell</text>
   </string>
   <string id="st_af_cell_descr">
-    <text>An artefact formed in gravitational anomalies, likely due to intense localized magnetic fields. Its interior structure spins perpetually on its axis as long as it is not disturbed. Cell has one truly noteworthy to an average person property. Any very fast moving objects getting within its close proximity get partially disintegrated, releasing a hefty amount of radioactive particles in the process. Some stalkers use the artefact to their advantage, claiming that dealing with radiation sickness later beats getting hit with a bullet in the present.\n \n</text>
+    <text>An artefact formed in gravitational anomalies, likely due to intense localized magnetic fields. Its interior structure spins perpetually on its axis as long as it is not disturbed. Cell has one truly noteworthy to an average person property. Any very fast moving objects getting within its close proximity get partially disintegrated, releasing a hefty amount of radioactive particles in the process. Some stalkers use the artefact to their advantage, claiming that dealing with radiation sickness later beats getting hit with a bullet in the present.\n</text>
   </string>
   <string id="st_af_fountain_name">
     <text>Fountain</text>
   </string>
   <string id="st_af_fountain_descr">
-    <text>A common artefact formed in gravitational anomalies. Its bizarre shape makes it is very valued by collectors. Interestingly enough, there's not an insignificant amount of stalkers claiming that being in possession of this artefact helps them strike a better deal with the Zone's traders. Whether it's true or not remains to be confirmed, however the mentioned merchants would rather not speak of it. \n \n</text>
+    <text>A common artefact formed in gravitational anomalies. Its bizarre shape makes it is very valued by collectors. Interestingly enough, there's not an insignificant amount of stalkers claiming that being in possession of this artefact helps them strike a better deal with the Zone's traders. Whether it's true or not remains to be confirmed, however the mentioned merchants would rather not speak of it. \n</text>
   </string>
   <string id="st_af_spaika_name">
     <text>Spike</text>
   </string>
   <string id="st_af_spaika_descr">
-    <text>A common artefact formed in gravitational anomalies, that resembles petrified wood or bone. Stalkers that dared to use it on their belts say that the artefact calms them down and helps them focus in stressful combat situations, letting them hit their enemies in vital spots. Strangely enough, they also claim that the artefact gets 'angry at them' for missing their shots, which makes most folks avoid using it, fearing a permanent Zone-induced schizophrenia. \n \n</text>
+    <text>A common artefact formed in gravitational anomalies, that resembles petrified wood or bone. Stalkers that dared to use it on their belts say that the artefact calms them down and helps them focus in stressful combat situations, letting them hit their enemies in vital spots. Strangely enough, they also claim that the artefact gets 'angry at them' for missing their shots, which makes most folks avoid using it, fearing a permanent Zone-induced schizophrenia. \n</text>
   </string>
   <string id="st_af_signet_name">
     <text>Signet</text>
   </string>
   <string id="st_af_signet_descr">
-    <text>An artefact that appears to be a warped metal nut. Occasionally also called an "Amulet". The latter comes from the fact that some stalkers tend to keep their Signets instead of selling them, saying that its presence helps them relax and regenerate after a dangerous raid into the Zone.\n \n</text>
+    <text>An artefact that appears to be a warped metal nut. Occasionally also called an "Amulet". The latter comes from the fact that some stalkers tend to keep their Signets instead of selling them, saying that its presence helps them relax and regenerate after a dangerous raid into the Zone.\n</text>
   </string>
   <string id="st_af_repei_name">
     <text>Thistle</text>
   </string>
   <string id="st_af_repei_descr">
-    <text>A common artefact spawned in gravitational anomalies. Despite their prickly appearances, Thistles seem incapable of penetrating flesh or damaging the body in any way. Recent experiments and observations confirmed them reacting with various heavy metals - property especially visible with lead. Various medical reports of wounded stalkers and soldiers show that the bullets shot by the user of this artefact shave some of the outer material to become serrated and sharp upon entering the body, creating smaller but much heavier bleeding wounds. To make matters worse, any bullet that was recently within vicinity of a Thistle will start twitching around upon contact with iron contained in human blood, causing the wound to be painful and hard to close up for a period of time.\n \n</text>
+    <text>A common artefact spawned in gravitational anomalies. Despite their prickly appearances, Thistles seem incapable of penetrating flesh or damaging the body in any way. Recent experiments and observations confirmed them reacting with various heavy metals - property especially visible with lead. Various medical reports of wounded stalkers and soldiers show that the bullets shot by the user of this artefact shave some of the outer material to become serrated and sharp upon entering the body, creating smaller but much heavier bleeding wounds. To make matters worse, any bullet that was recently within vicinity of a Thistle will start twitching around upon contact with iron contained in human blood, causing the wound to be painful and hard to close up for a period of time.\n</text>
   </string>
   <string id="st_af_bat_name">
     <text>Bat</text>
   </string>
   <string id="st_af_bat_descr">
-    <text>A rare and beautiful artefact, consisting of two irregularly-shaped "wings" protecting a lustrous spherical core. Does not emit radiation and is quite heavy. Experienced artefact hunters learned how to use its special ability to their advantage. Once activated and placed near another artefact, Bat will extend its "wings", grab it with them, force it into its core and then close up. Soon after that the shell will turn into dust, revealing an artefact with much stronger properties or, sometimes, a completely different one altogether.\n \n</text>
+    <text>A rare and beautiful artefact, consisting of two irregularly-shaped "wings" protecting a lustrous spherical core. Does not emit radiation and is quite heavy. Experienced artefact hunters learned how to use its special ability to their advantage. Once activated and placed near another artefact, Bat will extend its "wings", grab it with them, force it into its core and then close up. Soon after that the shell will turn into dust, revealing an artefact with much stronger properties or, sometimes, a completely different one altogether.\n</text>
   </string>
   <string id="st_af_sun_name">
     <text>Sun</text>
   </string>
   <string id="st_af_sun_descr">
-    <text>A rare artefact that is very much appreciated by collectors. Its exterior shell is unremarkable, but if cracked like a geode, reveals a swirling luminous core that emits a constant source of warm yellow light. Suns enjoy the company of actual sunrays, giving users of this artefact a source of energy when exposed to them. In the same way, when kept away from a direct source of natural light, they grab energy from nearby living things, draining them down slowly.\n \n</text>
+    <text>A rare artefact that is very much appreciated by collectors. Its exterior shell is unremarkable, but if cracked like a geode, reveals a swirling luminous core that emits a constant source of warm yellow light. Suns enjoy the company of actual sunrays, giving users of this artefact a source of energy when exposed to them. In the same way, when kept away from a direct source of natural light, they grab energy from nearby living things, draining them down slowly.\n</text>
   </string>
   <string id="st_af_ear_name">
     <text>Heart</text>
   </string>
   <string id="st_af_ear_descr">
-    <text>A bizarrely-shaped artefact, whose crystalline core resembles a miniature human circulatory system. Ever since the rumours spread that the artefact is able to heal dying creatures and people, the interest in obtaining these skyrocketed, both for sale to the outside world and for ensuring your own survival inside the Zone.\n \n</text>
+    <text>A bizarrely-shaped artefact, whose crystalline core resembles a miniature human circulatory system. Ever since the rumours spread that the artefact is able to heal dying creatures and people, the interest in obtaining these skyrocketed, both for sale to the outside world and for ensuring your own survival inside the Zone.\n</text>
   </string>
   <string id="st_af_chelust_name">
     <text>Chain</text>
   </string>
   <string id="st_af_chelust_descr">
-    <text>An unusual circular artefact, not to be confused with a Ring. Generates a strong gravitational field while nothing touches it. At first glance its weight doesn't justify the minor tiredness and pain alleviation. But those ones who devoted their lives to Vyraj and The Masters can truly realise the potential of the artefact.\n \n</text>
+    <text>An unusual circular artefact, not to be confused with a Ring. Generates a strong gravitational field while nothing touches it. At first glance its weight doesn't justify the minor tiredness and pain alleviation. But those ones who devoted their lives to Vyraj and The Masters can truly realise the potential of the artefact.\n</text>
   </string>
   <string id="st_af_atom_name">
     <text>Atom</text>
   </string>
   <string id="st_af_atom_descr">
-    <text>A rare and unusual artefact that resembles the old Bohr model of an atom. Not radioactive, but does produce a small amount of heat. It is very valuable to collectors and scientists both due to its shape and its properties. Stalkers suffering from being heavily irradiated due to an unfortunate exposure, when using this artefact, suddenly seem as if they regained their youth in terms of vitality. Over time the effect diminishes, but so does the radiation residing in their bodies.\n \n</text>
+    <text>A rare and unusual artefact that resembles the old Bohr model of an atom. Not radioactive, but does produce a small amount of heat. It is very valuable to collectors and scientists both due to its shape and its properties. Stalkers suffering from being heavily irradiated due to an unfortunate exposure, when using this artefact, suddenly seem as if they regained their youth in terms of vitality. Over time the effect diminishes, but so does the radiation residing in their bodies.\n</text>
   </string>
   <string id="st_af_lighthouse_name">
     <text>Beacon</text>
   </string>
   <string id="st_af_lighthouse_descr">
-    <text>A clotted mass of superdense ferrous metals. It is one of the most mysterious artefacts in the Zone as its inner workings still baffle the greatest minds in modern science. Beacon in its active state is able to detect whenever one living thing kills another, no matter the distance between the two, as long as the intent on murder and causality are very clear. The resulting reaction is no less mysterious - the murderer is almost instantly 'teleported' towards the place where the victim drew their last breath.\n \n</text>
+    <text>A clotted mass of superdense ferrous metals. It is one of the most mysterious artefacts in the Zone as its inner workings still baffle the greatest minds in modern science. Beacon in its active state is able to detect whenever one living thing kills another, no matter the distance between the two, as long as the intent on murder and causality are very clear. The resulting reaction is no less mysterious - the murderer is almost instantly 'teleported' towards the place where the victim drew their last breath.\n</text>
   </string>
   <string id="st_af_fire_loop_name">
     <text>Knot</text>
   </string>
   <string id="st_af_fire_loop_descr">
-    <text>This artefact is occasionally formed in the extreme heat of thermal anomalies. Various legends surround it, most of them scary enough to make some stalkers avoid ever picking it up. It is known however that whoever had dared to activate a Knot was never able to get rid of it, as the artefact would always come back to them. Other, less reliable sources talk about superhuman abilities, hearing of voices, reckless behaviour and weird disappearances. \n \n</text>
+    <text>This artefact is occasionally formed in the extreme heat of thermal anomalies. Various legends surround it, most of them scary enough to make some stalkers avoid ever picking it up. It is known however that whoever had dared to activate a Knot was never able to get rid of it, as the artefact would always come back to them. Other, less reliable sources talk about superhuman abilities, hearing of voices, reckless behaviour and weird disappearances. \n</text>
   </string>
   <string id="st_af_zhelch_name">
     <text>Scar</text>
   </string>
   <string id="st_af_zhelch_descr">
-    <text>Everyone knows the saying "a sound mind in a sound body". The Zone made it take an artefact form. Back in the day stalkers used to take advantage of Scars to heal their wounds and explore mind-altering anomalies. Unfortunately, over time the artefact showed its more sinister side. People using Scars would behave weirdly and erratically, even more so when recovering from serious damage done to their bodies. Nowadays there are very few brave enough to attach one of these to their belt, as Zone veterans enjoy telling chilling stories about Scar users to rookies gathered around campfires.\n \n</text>
+    <text>Everyone knows the saying "a sound mind in a sound body". The Zone made it take an artefact form. Back in the day stalkers used to take advantage of Scars to heal their wounds and explore mind-altering anomalies. Unfortunately, over time the artefact showed its more sinister side. People using Scars would behave weirdly and erratically, even more so when recovering from serious damage done to their bodies. Nowadays there are very few brave enough to attach one of these to their belt, as Zone veterans enjoy telling chilling stories about Scar users to rookies gathered around campfires.\n</text>
   </string>
   <string id="st_af_sandstone_name">
     <text>Sandstone</text>
   </string>
   <string id="st_af_sandstone_descr">
-    <text>An artefact sometimes formed in extreme temperature anomalies. To this day no one knows how it's possible, but Sandstone seems to possess some sort of intelligence that allows it to identify a user's weapon. Upon linking itself to it, the artefact will seek out an anomaly to interact with, infusing the most lethal elements with corresponding anomalous properties, making them much more damaging.\n \n</text>
+    <text>An artefact sometimes formed in extreme temperature anomalies. To this day no one knows how it's possible, but Sandstone seems to possess some sort of intelligence that allows it to identify a user's weapon. Upon linking itself to it, the artefact will seek out an anomaly to interact with, infusing the most lethal elements with corresponding anomalous properties, making them much more damaging.\n</text>
   </string>
   <string id="st_af_kislushka_name">
     <text>Sourpuss</text>
   </string>
   <string id="st_af_kislushka_descr">
-    <text>A hollow spherical artefact resembling a transparent parchment of some sorts. Covered with a layer of film, it is pleasant to the touch. Sourpuss activates whenever it gets covered in warm blood, and utilising the user's energy produced from burning calories it starts excreting a stimulant that helps any bleeding wound to clot up and close much faster. This ability gained it a lot of popularity in the medical world, hence the nice price it fetches.\n \n</text>
+    <text>A hollow spherical artefact resembling a transparent parchment of some sorts. Covered with a layer of film, it is pleasant to the touch. Sourpuss activates whenever it gets covered in warm blood, and utilising the user's energy produced from burning calories it starts excreting a stimulant that helps any bleeding wound to clot up and close much faster. This ability gained it a lot of popularity in the medical world, hence the nice price it fetches.\n</text>
   </string>
   <string id="st_af_black_angel_name">
     <text>Black Angel</text>
   </string>
   <string id="st_af_black_angel_descr">
-    <text>An artefact of anomalous minerals that has been twisted into an ominous semi-symmetrical formation. Despite emitting no heat or radiation, it can condense water vapor in nearby air into steam. The artefact seems to have some sort of defense system. When hit by an incoming bullet, it is able to detect where the shot came from and redirect the potential damage back to the person shooting. \n \n</text>
+    <text>An artefact of anomalous minerals that has been twisted into an ominous semi-symmetrical formation. Despite emitting no heat or radiation, it can condense water vapor in nearby air into steam. The artefact seems to have some sort of defense system. When hit by an incoming bullet, it is able to detect where the shot came from and redirect the potential damage back to the person shooting. \n</text>
   </string>
   <string id="st_af_grapes_name">
     <text>Grapes</text>
   </string>
   <string id="st_af_grapes_descr">
-    <text>A heavy artefact sometimes found in gravitational anomalies, it resembles drops of green-tinted amber twisted together. Very recently scientists were able to confirm what was previously considered to be just another one of the Zone's hearsays - when Grapes find themselves nearby an ongoing digestion process of a living organism, they activate, stimulating one's metabolism to heal more effectively. \n \n</text>
+    <text>A heavy artefact sometimes found in gravitational anomalies, it resembles drops of green-tinted amber twisted together. Very recently scientists were able to confirm what was previously considered to be just another one of the Zone's hearsays - when Grapes find themselves nearby an ongoing digestion process of a living organism, they activate, stimulating one's metabolism to heal more effectively. \n</text>
   </string>
   <string id="st_af_skull_miser_name">
     <text>Miser's Skull</text>
   </string>
   <string id="st_af_skull_miser_descr">
-    <text>A light and fragile artefact consisting of interlinked strands of anomalous plant fibers. The artefact is a favourite among various scum that took residence in the Zone and is sometimes referred to as a "small Wish Granter" by them. When the user of this artefact kills someone by damaging their brain, the Zone rewards them by dropping currency around the victim. Some say it's the Zone wanting stalkers to murder each other so it gets left in peace. Others say that it wouldn't be full of riches like that if it didn't want people around. \n \n</text>
+    <text>A light and fragile artefact consisting of interlinked strands of anomalous plant fibers. The artefact is a favourite among various scum that took residence in the Zone and is sometimes referred to as a "small Wish Granter" by them. When the user of this artefact kills someone by damaging their brain, the Zone rewards them by dropping currency around the victim. Some say it's the Zone wanting stalkers to murder each other so it gets left in peace. Others say that it wouldn't be full of riches like that if it didn't want people around. \n</text>
   </string>
   <string id="st_af_star_phantom_name">
     <text>Phantom Star</text>
   </string>
   <string id="st_af_star_phantom_descr">
-    <text>This artefact appears to be a plasma-like substance suspended within a striated transparent shell. Generates a weak gravitational field, making it difficult to hold still or balance. Phantom Star when active seems to be affecting minds of nearby living beings - its user suddenly stops being noticed until some sort of forceful interaction happens. The artefact manipulates the owner as well, preventing them from being able to engage in any sort of hostility.\n \n</text>
+    <text>This artefact appears to be a plasma-like substance suspended within a striated transparent shell. Generates a weak gravitational field, making it difficult to hold still or balance. Phantom Star when active seems to be affecting minds of nearby living beings - its user suddenly stops being noticed until some sort of forceful interaction happens. The artefact manipulates the owner as well, preventing them from being able to engage in any sort of hostility.\n</text>
   </string>
   <string id="st_af_medallion_name">
     <text>Medal</text>
   </string>
   <string id="st_af_medallion_descr">
-    <text>An artefact consisting of a small hoop embedded with four triangular shapes, with a small central sphere embedded in the middle. Medal has successfully dodged any attempts at logically explaining its inner workings. Not only is this artefact able to tell whether the user is a part of a group, it possesses another, much more mysterious ability. Whether it manipulates objects or bodies themselves still remains to be determined, however it is a known fact that when a person using this artefact is about to get hurt, there is a non-insignificant chance that they remain unscathed, as an identical type of damage gets inflicted on someone else from that person's company instead. While such an effect might be desirable in a selfish way, it is not unheard of among stalkers and many of them might not take kindly to the fact that they are being exposed to it. \n \n</text>
+    <text>An artefact consisting of a small hoop embedded with four triangular shapes, with a small central sphere embedded in the middle. Medal has successfully dodged any attempts at logically explaining its inner workings. Not only is this artefact able to tell whether the user is a part of a group, it possesses another, much more mysterious ability. Whether it manipulates objects or bodies themselves still remains to be determined, however it is a known fact that when a person using this artefact is about to get hurt, there is a non-insignificant chance that they remain unscathed, as an identical type of damage gets inflicted on someone else from that person's company instead. While such an effect might be desirable in a selfish way, it is not unheard of among stalkers and many of them might not take kindly to the fact that they are being exposed to it. \n</text>
   </string>
   <string id="st_af_peas_name">
     <text>Moon</text>
   </string>
   <string id="st_af_peas_descr">
-    <text>An artefact shaped like a lunar crescent. The exterior shell continuously generates a very dim light that seems to be stimulating the user. At night, it will make you feel rested and energetic, but reverse effect will happen during daylight.\n \n</text>
+    <text>An artefact shaped like a lunar crescent. The exterior shell continuously generates a very dim light that seems to be stimulating the user. At night, it will make you feel rested and energetic, but reverse effect will happen during daylight.\n</text>
   </string>
   <string id="st_af_generator_name">
     <text>Generator</text>
   </string>
   <string id="st_af_generator_descr">
-    <text>This anomalous disk is not radioactive, but generates a strong, small electromagnetic field. It can easily be made to 'spin' perpetually on its axis, especially when the user is moving fast. When that happens, the energy from the artefact connects itself to nearby drained batteries and devices and, provided they still had some electric charge left in them, restores their power slowly. \n \n</text>
+    <text>This anomalous disk is not radioactive, but generates a strong, small electromagnetic field. It can easily be made to 'spin' perpetually on its axis, especially when the user is moving fast. When that happens, the energy from the artefact connects itself to nearby drained batteries and devices and, provided they still had some electric charge left in them, restores their power slowly. \n</text>
   </string>
   <string id="st_af_ball_name">
     <text>Ball</text>
   </string>
   <string id="st_af_ball_descr">
-    <text>Despite appearing as a mottled ball of dirt and rock, this artefact is unusually light and bouncy, hence its name. It is believed to be a product of electrical anomalies. When worn on the belt the artefact generates a force that can be activated to repel living creatures, for some reason excluding humans. To release said force a fast and strong movement needs to happen between the user and the target, hence why most stalkers using it resort to simply kicking various mutants. Obviously, the practice of getting this close to a Zone inhabitant is not advised. But is that going to stop you? \n \n</text>
+    <text>Despite appearing as a mottled ball of dirt and rock, this artefact is unusually light and bouncy, hence its name. It is believed to be a product of electrical anomalies. When worn on the belt the artefact generates a force that can be activated to repel living creatures, for some reason excluding humans. To release said force a fast and strong movement needs to happen between the user and the target, hence why most stalkers using it resort to simply kicking various mutants. Obviously, the practice of getting this close to a Zone inhabitant is not advised. But is that going to stop you? \n</text>
   </string>
   <string id="st_af_fonar_name">
     <text>Lamp</text>
   </string>
   <string id="st_af_fonar_descr">
-    <text>This light, glassy artefact emits a modest amount of near-ultraviolet light. It reacts weirdly with certain radio waves, making sources of various transmissions glow. Stalkers tend to use this property to search for hidden stashes at night. \n \n</text>
+    <text>This light, glassy artefact emits a modest amount of near-ultraviolet light. It reacts weirdly with certain radio waves, making sources of various transmissions glow. Stalkers tend to use this property to search for hidden stashes at night. \n</text>
   </string>
   <string id="st_af_tapeworm_name">
     <text>Tapeworm</text>
   </string>
   <string id="st_af_tapeworm_descr">
-    <text>This artefact is pure silicon dioxide, twisted into an unusual shape and color by gravitational anomalies. It would be otherwise unremarkable, except for one fact. When activated, it will send strong electric shock towards any living creature that attacks the user via direct contact, effectively stunning them for a short duration of time. And as most things in the Zone, it doesn't distinguish between who attacks the wielder of the artefact, including himself. Very valued by stalkers that hunt mutants for a living.\n \n</text>
+    <text>This artefact is pure silicon dioxide, twisted into an unusual shape and color by gravitational anomalies. It would be otherwise unremarkable, except for one fact. When activated, it will send strong electric shock towards any living creature that attacks the user via direct contact, effectively stunning them for a short duration of time. And as most things in the Zone, it doesn't distinguish between who attacks the wielder of the artefact, including himself. Very valued by stalkers that hunt mutants for a living.\n</text>
   </string>
   <string id="st_af_moh_name">
     <text>Moss</text>
   </string>
   <string id="st_af_moh_descr">
-    <text>An artefact formed in electric anomalies. It has a sharp, jagged appearance but is actually quite soft and pleasing to the touch. Attached to the belt it is able to detect contents of the user's stomach. Once it recognizes any raw meat of the Zone origin within the digestive system, it will activate, using the flesh's energetic value to fuel all sorts of stimulating effects, depending on the type of creature consumed.\n \n</text>
+    <text>An artefact formed in electric anomalies. It has a sharp, jagged appearance but is actually quite soft and pleasing to the touch. Attached to the belt it is able to detect contents of the user's stomach. Once it recognizes any raw meat of the Zone origin within the digestive system, it will activate, using the flesh's energetic value to fuel all sorts of stimulating effects, depending on the type of creature consumed.\n</text>
   </string>
   <string id="st_af_serofim_name">
     <text>Seraphim</text>
   </string>
   <string id="st_af_serofim_descr">
-    <text>Seraphim was for the longest time considered to be nothing but a pretty bauble to be sold. That was until one veteran group of stalkers came back from a deep excursion and shared their story. According to them, at some point during their trip they got ambushed by a sniper. Their leader was taken out instantly and dropped dead with his skull split in half. While sending suppressive fire they noticed his belt lighting up and as he stood up with no sign of scratch on him, with his helmet still having obvious entry and exit holes from the sniper's bullet. They managed to retreat and find out that the Seraphim artefact the leader kept as his lucky charm was gone and left behind only some glowing dust. Ever since then people that heard of this story hold their Seraphims dear, believing that the artefact will bring them back from the dead, should the worst happen. Of course, no one so far was brave enough to test if any of it was indeed true. \n \n</text>
+    <text>Seraphim was for the longest time considered to be nothing but a pretty bauble to be sold. That was until one veteran group of stalkers came back from a deep excursion and shared their story. According to them, at some point during their trip they got ambushed by a sniper. Their leader was taken out instantly and dropped dead with his skull split in half. While sending suppressive fire they noticed his belt lighting up and as he stood up with no sign of scratch on him, with his helmet still having obvious entry and exit holes from the sniper's bullet. They managed to retreat and find out that the Seraphim artefact the leader kept as his lucky charm was gone and left behind only some glowing dust. Ever since then people that heard of this story hold their Seraphims dear, believing that the artefact will bring them back from the dead, should the worst happen. Of course, no one so far was brave enough to test if any of it was indeed true. \n</text>
   </string>
   <string id="st_af_elektron_name">
     <text>Electron</text>
   </string>
   <string id="st_af_elektron_descr">
-    <text>This artefact is a product of electrical anomalies. It is extremely heavy despite its small size. It has one interesting property. It is able to combine the common electro anomalies with other electric charges it finds nearby, using the anomaly as a power source. The most fascinating part of it is that the artefact considers human body to be a battery too, converting the energy into one that can be used by human cells during physical activity. As such, despite being a painful experience, one can enjoy being tireless for a short period of time. Side effects? Well, someone has yet to report them...\n \n</text>
+    <text>This artefact is a product of electrical anomalies. It is extremely heavy despite its small size. It has one interesting property. It is able to combine the common electro anomalies with other electric charges it finds nearby, using the anomaly as a power source. The most fascinating part of it is that the artefact considers human body to be a battery too, converting the energy into one that can be used by human cells during physical activity. As such, despite being a painful experience, one can enjoy being tireless for a short period of time. Side effects? Well, someone has yet to report them...\n</text>
   </string>
   <string id="st_af_kogot_name">
     <text>Claw</text>
   </string>
   <string id="st_af_kogot_descr">
-    <text>A beautiful glass-like artefact occasionally fished out of electrostatic anomalies. When used, it seems to fill its user with a weird combination of rage and desire to attack enemies directly, reinvigorating them for doing so. There's a pretty common story associated with this artefact - of a rookie that found a Claw together with his friend, only for them both to get chased by a pack of hungry dogs moments after. The 'friend' shot the rookie and took off, leaving him to certain death. To everyone's surprise the betrayed stalker came back to his camp, perfectly healthy, despite his clothes being completely torn from dog bites, with only a knife to his side and the artefact hanging by his belt. What happened to the backstabber is better off not being mentioned though.\n \n</text>
+    <text>A beautiful glass-like artefact occasionally fished out of electrostatic anomalies. When used, it seems to fill its user with a weird combination of rage and desire to attack enemies directly, reinvigorating them for doing so. There's a pretty common story associated with this artefact - of a rookie that found a Claw together with his friend, only for them both to get chased by a pack of hungry dogs moments after. The 'friend' shot the rookie and took off, leaving him to certain death. To everyone's surprise the betrayed stalker came back to his camp, perfectly healthy, despite his clothes being completely torn from dog bites, with only a knife to his side and the artefact hanging by his belt. What happened to the backstabber is better off not being mentioned though.\n</text>
+  </string>
+  <string id="st_af_dragon_eye_name">
+    <text>Dragon's eye</text>
+  </string>
+  <string id="st_af_dragon_eye_descr">
+    <text>This artefact is sometimes formed in thermal anomalies and has the appearance of a reptile's eye. It has a very dangerous and volatile property associated with it. In some peculiar way, when the user of this artefact secures a kill, there's a small chance for a violent explosion to happen within the victim's body, killing or hurting anyone and anything nearby. The more superstitious say that it's the Zone ripping out violently the souls of fallen beings. Most just prefer to avoid using the artefact altogether because of the stories of people getting caught in such explosion at an unfortunate distance.\n</text>
   </string>
   <string id="st_af_vaselisk_name">
     <text>Basilisk</text>
@@ -209,12 +215,6 @@
     %c[ui_gray_2]PROPERTIES:\n
     %c[ui_cyan] • %c[ui_gray_2] inert artefact\n
     %c[d_cyan] • %c[ui_gray_2] valuable</text>
-  </string>
-  <string id="st_af_dragon_eye_name">
-    <text>Dragon's eye</text>
-  </string>
-  <string id="st_af_dragon_eye_descr">
-    <text>This artefact is sometimes formed in thermal anomalies and has the appearance of a reptile's eye. It has a very dangerous and volatile property associated with it. In some peculiar way, when the user of this artefact secures a kill, there's a small chance for a violent explosion to happen within the victim's body, killing or hurting anyone and anything nearby. The more superstitious say that it's the Zone ripping out violently the souls of fallen beings. Most just prefer to avoid using the artefact altogether because of the stories of people getting caught in such explosion at an unfortunate distance.\n \n</text>
   </string>
   <string id="st_arty_save">
     <text>Eye of the Noosphere</text>

@@ -12,6 +12,6 @@ ui_item.build_desc_footer = function(obj, sec, str)
 		return str
 	end
 
-	str = str .. "\\n" .. translation
+	str = "\\n" .. str .. "\\n" .. translation
 	return str
 end
