@@ -23,7 +23,7 @@
 			%c[0,192,71,221] -   50%%c[ui_gray_3] reduction of any damage\n
 			%c[0,192,71,221] -   35%%c[ui_gray_3] increase in speed\n
 			%c[0,192,71,221] -   1%/sec%c[ui_gray_3] health regen\n
-			%c[0,192,71,221] -   5%/sec%c[ui_gray_3] psy regen\n
+			%c[0,192,71,221] -   3%/sec%c[ui_gray_3] psy regen\n
 			%c[0,192,71,221] -   +50kg%c[ui_gray_3] of carry weight\n \n
 			%c[0,81,63,22]  • %c[0,209,172,56]Lucifer will always work even from the backpack \n
 			%c[0,81,63,22]  • %c[0,209,172,56]However, your powers are very short-lived (about 4 days) and drain artefact energy\n

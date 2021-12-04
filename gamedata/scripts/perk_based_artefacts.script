@@ -642,7 +642,7 @@ local speed_boosts = { -- Table of speed boosts for different artefacts
 	},
 	af_lucifer = {
 		name = "af_lucifer_boost",
-		boost = 0.2
+		boost = 0.175
 	}
 }
 
@@ -2496,7 +2496,7 @@ local artefact_on_update_functions = {
 		local condition = _self.condition
 
 		local health_boost = 0.001
-		local psy_boost = 0.005
+		local psy_boost = 0.003
 		local power_boost = 0.01
 		local bleeding_cure_boost = 0.0025
 		local speed_boost = 0
@@ -3814,6 +3814,11 @@ local function actor_on_weapon_fired(obj, wpn, ammo_elapsed, grenade_elapsed, am
 end
 
 local function actor_on_before_hit(s_hit, bone_id, flags)
+	if not (s_hit.draftsman and s_hit.draftsman.id) then
+		trace("actor_on_before hit, draftsman not defined")
+		return
+	end
+
 	trace("actor_on_before_hit damage type %s", s_hit.type)
 	last_hit = hit(s_hit)
 
@@ -3821,6 +3826,11 @@ local function actor_on_before_hit(s_hit, bone_id, flags)
 end
 
 local function actor_on_hit_callback(obj, amount, local_direction, who, bone_index)
+	if not (who and who.id) then
+		trace("actor_on_hit_callback not triggered, who not defined")
+		return
+	end
+	
 	trace("actor_on_hit_callback, %s, %s, %s", obj:section(), amount, who:section())
 
 	process_artefacts(artefact_on_hit_functions, obj, amount, who, last_hit)
@@ -3845,6 +3855,11 @@ local function actor_on_item_sell(item)
 end
 
 local function npc_on_before_hit(npc, s_hit, bone_id, flags)
+	if not (s_hit.draftsman and s_hit.draftsman.id) then
+		trace("npc_on_before hit, draftsman not defined")
+		return
+	end
+
 	if s_hit.draftsman:id() ~= AC_ID then
 		trace("npc_on_before_hit not triggered %s, %s", npc:section(), s_hit.draftsman:section())
 		return
@@ -3856,6 +3871,11 @@ local function npc_on_before_hit(npc, s_hit, bone_id, flags)
 end
 
 local function npc_on_hit_callback(npc, amount, local_direction, who, bone_index)
+	if not (who and who.id) then
+		trace("on_hit_callback not triggered, who not defined")
+		return
+	end
+
 	if who:id() ~= AC_ID then
 		trace("npc_on_hit_callback not triggered %s, %s, %s", npc:section(), amount, who:section())
 		return
@@ -3865,6 +3885,11 @@ local function npc_on_hit_callback(npc, amount, local_direction, who, bone_index
 end
 
 local function npc_on_death_callback(npc, who)
+	if not (who and who.id) then
+		trace("on_death_callback not triggered, who not defined")
+		return
+	end
+
 	if who:id() ~= AC_ID then
 		trace("npc_on_death_callback not triggered %s, %s", npc:section(), who:section())
 		return
@@ -3874,6 +3899,11 @@ local function npc_on_death_callback(npc, who)
 end
 
 local function monster_on_before_hit(monster, s_hit, bone_id, flags)
+	if not (s_hit.draftsman and s_hit.draftsman.id) then
+		trace("monster_on_before hit, draftsman not defined")
+		return
+	end
+
 	if s_hit.draftsman:id() ~= AC_ID then
 		trace("monster_on_before_hit not triggered %s, %s", monster:section(), s_hit.draftsman:section())
 		return
@@ -3891,6 +3921,11 @@ local function monster_on_before_hit(monster, s_hit, bone_id, flags)
 end
 
 local function monster_on_hit_callback(monster, amount, local_direction, who, bone_index)
+	if not (who and who.id) then
+		trace("on_hit_callback not triggered, who not defined")
+		return
+	end
+
 	if who:id() ~= AC_ID then
 		trace("monster_on_hit_callback not triggered %s, %s, %s", monster:section(), amount, who:section())
 		return
@@ -3905,6 +3940,11 @@ local function monster_on_hit_callback(monster, amount, local_direction, who, bo
 end
 
 local function monster_on_death_callback(monster, who)
+	if not (who and who.id) then
+		trace("on_death_callback not triggered, who not defined")
+		return
+	end
+
 	if who:id() ~= AC_ID then
 		trace("monster_on_death_callback not triggered %s, %s", monster:section(), who:section())
 		return
