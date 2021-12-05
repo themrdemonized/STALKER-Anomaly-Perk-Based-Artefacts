@@ -1879,6 +1879,12 @@ artefact_props = { -- Special props of artefacts that are used in processing
 				self:hide_all_ui(actor)
 
 				local quick_throw = actor_effects.Hit_GrenadeQuickthrow
+				quick_throw()
+			end,
+			function(self, actor)
+				self:hide_all_ui(actor)
+
+				local quick_throw = actor_effects.Hit_GrenadeQuickthrow
 				play_sound_on_actor("perk_based_artefacts\\mil_crazy4")
 
 				register_callback("actor_on_update", function()
