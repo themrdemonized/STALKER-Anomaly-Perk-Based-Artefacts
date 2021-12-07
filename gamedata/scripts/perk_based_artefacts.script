@@ -2657,7 +2657,7 @@ local artefact_on_update_functions = {
 		local adjust_condition = max(degradation_rate * 0.1, saved_time_elapsed > 0 and degradation_rate * (time_elapsed - saved_time_elapsed) or degradation_rate * 0.1)
 		_self.condition = condition - adjust_condition
 		af_lucifer:set_condition(_self.condition)
-		trace("Lucifer, condition: %s", _self.condition * 100)
+		trace("Lucifer, time %s, last time %s, degradation %s, condition: %s", time_elapsed, saved_time_elapsed, adjust_condition * 100, _self.condition * 100)
 	end,
 
 }
@@ -3959,16 +3959,6 @@ local function monster_on_death_callback(monster, who)
 	process_artefacts(artefact_on_monster_death_functions, monster, who, last_monster_hit, last_monster_hit_bone_index)
 end
 
-local function actor_on_sleep(hours)
-	-- if check_lucifer() then
-	-- 	local af_lucifer = artefact_props.af_lucifer
-	-- 	local degradation_rate = af_lucifer.degradation_rate
-	-- 	local adjust_condition = degradation_rate * 60 * 60 * hours
-	-- 	trace("Lucifer condition after sleep adjusted by %s, slept %s hours", adjust_condition, hours)
-	-- 	af_lucifer:change_condition(-adjust_condition)
-	-- end
-end
-
 local function actor_on_first_update()
 	time_factor = get_time_factor()
 	force_refresh_state()
@@ -3990,21 +3980,9 @@ local function actor_on_first_update()
 		effect.timer = effect.timer + tg_add
 	end
 
-	if saved_time_elapsed > 0 and check_lucifer() then
-		local time_elapsed = get_time_elapsed()
-		local af_lucifer = artefact_props.af_lucifer
-		local degradation_rate = af_lucifer:get_degradation_rate()
-		local adjust_condition = max(degradation_rate * 0.1, degradation_rate * (time_elapsed - saved_time_elapsed))
-		trace("Lucifer condition on first update adjusted by %s, new time %s, old time %s", adjust_condition, time_elapsed, saved_time_elapsed)
-		af_lucifer:change_condition(-adjust_condition)
-	else
-		trace("Lucifer first update ignored, %s, new time %s, old time %s", check_lucifer(), time_elapsed, saved_time_elapsed)
-	end
-
 	RegisterScriptCallback("actor_item_to_slot", refresh_state)
 	RegisterScriptCallback("actor_item_to_belt", refresh_state)
 	RegisterScriptCallback("actor_item_to_ruck", refresh_state)
-	RegisterScriptCallback("actor_on_sleep", actor_on_sleep)
 	RegisterScriptCallback("actor_on_update", actor_on_update)
 	RegisterScriptCallback("actor_on_weapon_fired", actor_on_weapon_fired)
 	RegisterScriptCallback("actor_on_before_hit", actor_on_before_hit)
