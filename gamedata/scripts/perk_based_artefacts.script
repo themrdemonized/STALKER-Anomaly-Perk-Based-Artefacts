@@ -2522,7 +2522,7 @@ local artefact_on_update_functions = {
 			local normal_condition = normalize(condition, 0, 0.5) - 1
 			actor:change_power(power_boost * normal_condition * 0.5)
 			if condition < 0.4 then
-				actor:change_health(health_boost * normal_condition * 0.35)
+				actor:change_health(health_boost * normal_condition * 0.27)
 			end
 			if condition < 0.0001 then
 				condition = 0.011
@@ -2654,7 +2654,7 @@ local artefact_on_update_functions = {
 		add_speed(speed_boosts.af_lucifer.name, 1 + speed_boost, false, true)
 
 		local degradation_rate = _self:get_degradation_rate()
-		local adjust_condition = saved_time_elapsed > 0 and degradation_rate * (time_elapsed - saved_time_elapsed) or degradation_rate
+		local adjust_condition = max(degradation_rate * 0.1, saved_time_elapsed > 0 and degradation_rate * (time_elapsed - saved_time_elapsed) or degradation_rate * 0.1)
 		_self.condition = condition - adjust_condition
 		af_lucifer:set_condition(_self.condition)
 		trace("Lucifer, condition: %s", _self.condition * 100)
@@ -3994,9 +3994,11 @@ local function actor_on_first_update()
 		local time_elapsed = get_time_elapsed()
 		local af_lucifer = artefact_props.af_lucifer
 		local degradation_rate = af_lucifer:get_degradation_rate()
-		local adjust_condition = degradation_rate * (time_elapsed - saved_time_elapsed)
+		local adjust_condition = max(degradation_rate * 0.1, degradation_rate * (time_elapsed - saved_time_elapsed))
 		trace("Lucifer condition on first update adjusted by %s, new time %s, old time %s", adjust_condition, time_elapsed, saved_time_elapsed)
 		af_lucifer:change_condition(-adjust_condition)
+	else
+		trace("Lucifer first update ignored, %s, new time %s, old time %s", check_lucifer(), time_elapsed, saved_time_elapsed)
 	end
 
 	RegisterScriptCallback("actor_item_to_slot", refresh_state)
