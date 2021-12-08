@@ -2657,7 +2657,7 @@ local artefact_on_update_functions = {
 		local adjust_condition = max(degradation_rate * 0.1, saved_time_elapsed > 0 and time_elapsed > 0 and degradation_rate * (time_elapsed - saved_time_elapsed) or degradation_rate * 0.1)
 		_self.condition = condition - adjust_condition
 		af_lucifer:set_condition(_self.condition)
-		trace("Lucifer, time %s, last time %s, degradation %s, last_cond %s, cond: %s", time_elapsed, saved_time_elapsed, adjust_condition * 100, condition * 100, _self.condition * 100)
+		trace("Lucifer, time %s, last time %s, degradation %s, cond %s, new_cond %s", time_elapsed, saved_time_elapsed, adjust_condition, condition, _self.condition)
 	end,
 
 }
