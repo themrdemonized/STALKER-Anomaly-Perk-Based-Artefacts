@@ -100,7 +100,8 @@
     %c[0,209,172,56]Perk: %c[d_orange]Trato con el diablo\n
     %c[0,81,63,22]  • %c[0,209,172,56]Artefacto que cambia las reglas del juego.\n
     %c[0,81,63,22]  • %c[0,209,172,56]Mover el artefacto al cinturon firmara el Pacto con la Zona..\n
-    %c[0,81,63,22]  • %c[0,209,172,56]La Zona da poder a tu Nudo y se convierte en el misterioso artefacto tambien conocido como Lucifer.</text>
+    %c[0,81,63,22]  • %c[0,209,172,56]La Zona da poder a tu Nudo y se convierte en el misterioso artefacto tambien conocido como Lucifer.\n \n
+    Guardar el juego es muy aconsejable</text>
   </string>
   <string id="st_pba_af_zhelch_perk">
     <text>

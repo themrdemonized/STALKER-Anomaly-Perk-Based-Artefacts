@@ -100,7 +100,8 @@
     %c[0,209,172,56]Perk: %c[d_orange]Deal with the Devil\n
     %c[0,81,63,22]  • %c[0,209,172,56]Gamechanger Artefact.\n
     %c[0,81,63,22]  • %c[0,209,172,56]Moving the artefact to belt will sign the Pact with the Zone.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]The Zone empowers your Knot and it becomes the mysterious artefact also known as Lucifer.</text>
+    %c[0,81,63,22]  • %c[0,209,172,56]The Zone empowers your Knot and it becomes the mysterious artefact also known as Lucifer.\n \n
+    Saving the game is highly recommended before activation</text>
   </string>
   <string id="st_pba_af_zhelch_perk">
     <text>

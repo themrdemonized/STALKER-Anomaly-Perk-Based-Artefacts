@@ -2654,10 +2654,12 @@ local artefact_on_update_functions = {
 		add_speed(speed_boosts.af_lucifer.name, 1 + speed_boost, false, true)
 
 		local degradation_rate = _self:get_degradation_rate()
-		local adjust_condition = max(degradation_rate * 0.1, saved_time_elapsed > 0 and time_elapsed > 0 and degradation_rate * (time_elapsed - saved_time_elapsed) or degradation_rate * 0.1)
+		local adjust_condition = max(0, saved_time_elapsed > 0 and time_elapsed > 0 and degradation_rate * (time_elapsed - saved_time_elapsed) or degradation_rate * 0.1)
 		_self.condition = condition - adjust_condition
 		af_lucifer:set_condition(_self.condition)
-		trace("Lucifer, time %s, last time %s, degradation %s, cond %s, new_cond %s", time_elapsed, saved_time_elapsed, adjust_condition, condition, _self.condition)
+		if settings.debug_mode then
+			trace("Lucifer, time %s, last time %s, degradation %s, cond %s, new_cond %s", time_elapsed, saved_time_elapsed, round_idp(adjust_condition, 8), round_idp(condition, 4), round_idp(_self.condition, 4))
+		end
 	end,
 
 }
@@ -4032,7 +4034,7 @@ local function save_state(m_data)
 	m_data.perk_based_artefacts_cooldowns = cooldowns
 	m_data.perk_based_artefacts_status_effects = status_effects
 	m_data.perk_based_artefacts_lucifer_condition = artefact_props.af_lucifer.condition
-	m_data.perk_based_artefacts_last_time = time_elapsed
+	-- m_data.perk_based_artefacts_last_time = time_elapsed
 end
 
 local function load_state(m_data)
@@ -4055,7 +4057,7 @@ local function load_state(m_data)
 	cooldowns = m_data.perk_based_artefacts_cooldowns or {}
 	status_effects = m_data.perk_based_artefacts_status_effects or {}
 	artefact_props.af_lucifer.condition = m_data.perk_based_artefacts_lucifer_condition or 1
-	saved_time_elapsed = m_data.perk_based_artefacts_last_time or 0
+	-- saved_time_elapsed = m_data.perk_based_artefacts_last_time or 0
 end
 
 local function on_option_change()
