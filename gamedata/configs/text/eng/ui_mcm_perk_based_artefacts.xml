@@ -20,5 +20,11 @@
 	<string id="ui_mcm_perk_based_artefacts_allow_arty_containers_desc">
 		<text>Allows perk artefacts in containers to utilize their perks. Perk descriptions will still be only available for container-less artefacts</text>
 	</string>
+	<string id="ui_mcm_perk_based_artefacts_treasure_chance">
+		<text>Artefacts regularity in stashes</text>
+	</string>
+	<string id="ui_mcm_perk_based_artefacts_treasure_chance_desc">
+		<text>The less is number - the rarer perk artefacts will be in the stashes</text>
+	</string>
 	
 </string_table>

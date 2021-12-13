@@ -3176,6 +3176,10 @@ local artefact_on_hit_functions = {
 		if IsStalker(who) then
 			s_hit.power = s_hit.power * 0.5
 
+			if who:id() == AC_ID then
+				s_hit.draftsman = get_object_by_id(artefact_ids[1])
+			end
+
 			local function hit_enemy(time)
 				who_position = who:position()
 

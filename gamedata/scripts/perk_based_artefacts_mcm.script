@@ -1,10 +1,12 @@
-function on_mcm_load()
-    op = {
-    	id = "perk_based_artefacts", sh = true, gr = {
-	    	{id = "banner", type = "slide", text = "ui_mcm_perk_based_artefacts_title", size = {512, 50}, spacing = 20},
-	        {id = "debug_mode", type = "check", val = 1, def = false},
-	        {id = "allow_arty_containers", type = "check", val = 1, def = false},
-	    }
+op = {
+	id = "perk_based_artefacts", sh = true, gr = {
+    	{id = "banner", type = "slide", text = "ui_mcm_perk_based_artefacts_title", size = {512, 50}, spacing = 20},
+        {id = "debug_mode", type = "check", val = 1, def = false},
+        {id = "allow_arty_containers", type = "check", val = 1, def = false},
+    	{id = "treasure_chance", type = "track", val = 2, min = 0, max = 100, step = 10, def = 20},
     }
+}
+
+function on_mcm_load()
     return op
 end

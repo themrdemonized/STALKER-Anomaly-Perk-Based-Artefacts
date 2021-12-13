@@ -1,0 +1,74 @@
+local ipairs = ipairs
+local pairs = pairs
+local SYS_GetParam = SYS_GetParam
+
+local random = math.random
+
+local string_find = string.find
+local string_gsub = string.gsub
+
+-- Load the defaults
+local function load_defaults()
+	local t = {}
+	local op = perk_based_artefacts_mcm.op
+	for i, v in ipairs(op.gr) do
+		if v.def ~= nil then
+			t[v.id] = v.def
+		end
+	end
+	return t
+end
+local settings = load_defaults()
+
+local function get_artefact_from_container(sec)
+	local sec = sec
+	if (string_find(sec, "(lead.-_box)",3)) then
+		sec = sec:gsub("_lead_box", "")		
+	elseif (string_find(sec, "(af.-_iam)",3)) then
+		sec = sec:gsub("_af_iam", "")
+	elseif (string_find(sec, "(af.-_aac)",3)) then
+		sec = sec:gsub("_af_aac", "")
+	elseif (string_find(sec, "(af.-_aam)",3)) then
+		sec = sec:gsub("_af_aam", "")
+	end
+	return sec
+end
+
+local items = {}
+
+try_spawn_treasure = treasure_manager.try_spawn_treasure
+treasure_manager.try_spawn_treasure = function(box)
+	try_spawn_treasure(box)
+
+	local function clean()
+		empty_table(items)
+		box:iterate_inventory_box(function(npc, item)
+			local sec = item:section()
+			local id = item:id()
+			if SYS_GetParam(0, get_artefact_from_container(sec), "kind", "") == "i_arty_junk" then
+				items[id] = {
+					id = id,
+					section = sec,
+					item = item
+				}
+			end
+		end, box)
+
+		if ui_mcm then
+			settings.debug_mode = ui_mcm.get("perk_based_artefacts/debug_mode")
+			settings.spawn_chance = ui_mcm.get("perk_based_artefacts/treasure_chance")
+		end
+
+		for k, v in pairs(items) do
+			if random(100) > settings.spawn_chance then
+				if settings.debug_mode then
+					printf("Perk Based Artefacts, removing item %s, section %s", k, v.section)
+				end
+				alife_release_id(k)
+			end
+		end
+		return true
+	end
+
+	CreateTimeEvent("pba_less_artys", "pba_less_artys", 0, clean)
+end
