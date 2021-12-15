@@ -394,6 +394,20 @@ ui_inventory.UIInventory.remove_override = function(self, slot)
 	self.properties["custom_" .. slot].cont_func[1] = "Cont_Custom"
 end
 
+ui_inventory.UIInventory.get_functor_at_slot = function(self, slot)
+	return function(obj, bag, temp)
+		return self:Name_Custom(obj, bag, temp, slot)
+	end, function(obj, bag, temp)
+		return self:Action_Custom(obj, bag, temp, slot)
+	end
+end
+
+ui_inventory.UIInventory.get_functor_by_name = function(self, name)
+	if self.custom_functor_names[name] then 
+		return self:get_functor_at_slot(self.custom_functor_names[name])
+	end
+end
+
 -- Adding
 local first_update_pending = true
 local functor_queue = {}
@@ -476,6 +490,24 @@ function remove_override(slot)
 	end
 
 	ui_inventory.GUI:remove_override(slot)
+end
+
+function get_functor_at_slot(slot)
+	if first_update_pending then 
+		add_to_queue("get_functor_at_slot", slot)
+		return
+	end
+
+	return ui_inventory.GUI:get_functor_at_slot(slot)
+end
+
+function get_functor_by_name(name)
+	if first_update_pending then 
+		add_to_queue("get_functor_by_name", name)
+		return
+	end
+
+	return ui_inventory.GUI:get_functor_by_name(name)
 end
 
 function print_properties()
