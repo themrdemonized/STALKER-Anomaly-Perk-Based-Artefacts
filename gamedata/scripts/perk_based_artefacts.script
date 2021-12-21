@@ -1085,6 +1085,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 		}
 	},
 	af_serofim = {
+		ironman_death_count = 0, -- Ironman compatibility
 		ignore_all_damage_function = function(s_hit, bone_id, flags) -- "God Mode" function without g_god
 			s_hit.power = 0.001
 			s_hit.impulse = 0.001
@@ -2857,6 +2858,16 @@ local artefact_on_before_death_functions = {
 			set_psy_health(1)
 		end
 
+		-- Ironman patch
+		local ironman = alife_storage_manager.get_state().ironman
+		local new_ironman_death_count = af_serofim.ironman_death_count
+		local function ironman_patch()
+			if ironman and ironman.death_count then
+				trace("ironman is active, death count %s, new_count %s, limit %s", ironman.death_count, new_ironman_death_count, ironman.death_limit)
+				ironman.death_count = new_ironman_death_count
+			end
+		end
+
 		revive()
 		CreateTimeEvent("af_serofim_break_sound", "af_serofim_break_sound", 1.3, function()
 			play_snd(actor, nil, {[1] = "material\\bottle\\collide\\bottle_break_1"})
@@ -2864,13 +2875,15 @@ local artefact_on_before_death_functions = {
 		end)
 		CreateTimeEvent("af_serofim", "af_serofim", 2, function()
 			trace("unregistering callback")
-			UnregisterScriptCallback("on_enemy_eval", af_serofim.ignore_enemy_on_down_function)
+			UnregisterScriptCallback("on_enemy_eval", af_serofim.ignore_enemy_on_down_function)	
+			ironman_patch()
 			add_simple_timed_effect(5, revive, function()
 				remove_pp_effector(c_id_ppe.blur)
 				remove_pp_effector(c_id_ppe.snd_shock)
 				remove_pp_effector(c_id_ppe.actor_death)
 				remove_pp_effector(c_id_ppe.rcom_actor_death_quick)
 				UnregisterScriptCallback("actor_on_before_hit", af_serofim.ignore_all_damage_function)
+				ironman_patch()
 				actor_is_dying = false
 			end)
 			return true
@@ -3507,6 +3520,15 @@ local artefact_on_equip_functions = {
 			for j, monster in ipairs(af_ball.monster_tiers[i]) do
 				af_ball.monsters[monster] = true
 			end
+		end
+	end,
+
+	-- Seraphim, Perk: Rain of Revival
+	af_serofim = function(actor, artefact_count, artefact_ids, artefact_names)
+		local ironman = alife_storage_manager.get_state().ironman
+		if ironman and ironman.death_count then
+			trace("ironman is active, saving death count %s, death limit %s", ironman.death_count, ironman.death_limit)
+			artefact_props.af_serofim.ironman_death_count = ironman.death_count
 		end
 	end,
 
