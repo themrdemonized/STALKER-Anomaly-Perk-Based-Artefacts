@@ -1265,6 +1265,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			play_sound_on_actor("decoder", 1, self.damage_multiplier)
 			
 			self.damage_multiplier = self.damage_multiplier + (is_critical_bone(npc:clsid(), bone_id) and 0.04 + 0.02 * artefact_count or 0.01 + 0.02 * artefact_count)
+			change_psy_health((self.damage_multiplier - 1) * 0.2)
 			self:event_reset()
 		end
 	},
