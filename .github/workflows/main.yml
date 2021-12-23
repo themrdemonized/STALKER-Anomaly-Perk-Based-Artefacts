@@ -46,7 +46,7 @@ jobs:
           for f in $(cd anomaly-demonized-scripts/weight_script/gamedata && find * -name '*.*' ; ); do echo "found $f"; echo "deleting gamedata/$f"; (rm -f "gamedata/$f") || true; done
           cp -r anomaly-demonized-scripts/weight_script/gamedata .
           for f in $(cd anomaly-demonized-scripts/custom_functor_autoinject/gamedata && find * -name '*.*' ; ); do echo "found $f"; echo "deleting gamedata/$f"; (rm -f "gamedata/$f") || true; done
-          cp -r anomaly-demonized-scriptscustom_functor_autoinject/gamedata .
+          cp -r anomaly-demonized-scripts/custom_functor_autoinject/gamedata .
       
       - name: Get current date
         id: date
