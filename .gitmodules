@@ -1,0 +1,3 @@
+[submodule "anomaly-demonized-scripts"]
+	path = anomaly-demonized-scripts
+	url = https://github.com/themrdemonized/anomaly-demonized-scripts.git
