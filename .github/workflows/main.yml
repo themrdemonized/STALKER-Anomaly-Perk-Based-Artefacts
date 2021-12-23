@@ -40,13 +40,18 @@ jobs:
           (git commit -am "Update submodules") || true
           (git push) || true
           
-      - name: Install demonized dependencies
+      - name: Install demonized dependencies and update
         id: dem_dem
         run: |
           for f in $(cd anomaly-demonized-scripts/weight_script/gamedata && find * -name '*.*' ; ); do echo "found $f"; echo "deleting gamedata/$f"; (rm -f "gamedata/$f") || true; done
           cp -r anomaly-demonized-scripts/weight_script/gamedata .
           for f in $(cd anomaly-demonized-scripts/custom_functor_autoinject/gamedata && find * -name '*.*' ; ); do echo "found $f"; echo "deleting gamedata/$f"; (rm -f "gamedata/$f") || true; done
           cp -r anomaly-demonized-scripts/custom_functor_autoinject/gamedata .
+          git config --global core.longpaths true
+          git config --global user.name ${{ secrets.USER_NAME }}
+          git config --global user.email ${{ secrets.USER_EMAIL }}
+          (git commit -am "Update dependencies") || true
+          (git push) || true
       
       - name: Get current date
         id: date
