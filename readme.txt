@@ -95,7 +95,7 @@ So far the perks are
 
   -- Cell, Perk: Disintegrator
   -- Disintegrates part of the bullet coming to you. Unfortunately in the process a lot of radiation is emitted, making you ill
-  -- Reduces bullet damage by 15%
+  -- Reduces bullet damage by 20%
   -- Reduced amount of damage is converted to radiation
   -- Stacks with multiple artefacts
   
