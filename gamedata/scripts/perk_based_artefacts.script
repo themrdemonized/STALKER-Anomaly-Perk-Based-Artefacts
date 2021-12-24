@@ -440,8 +440,8 @@ refresh_artefacts_time_event_func = function(force)
 end
 
 -- Callbacks
-local callbacks = {}
-local function register_callback(callback, callback_function, on_end_function, key)
+callbacks = {}
+function register_callback(callback, callback_function, on_end_function, key)
 	if key and callbacks[key] then
 		UnregisterScriptCallback(callbacks[key].callback, callbacks[key].func)
 	end
@@ -459,11 +459,11 @@ local function register_callback(callback, callback_function, on_end_function, k
 	return key
 end
 
-local function register_on_equip_callback(callback, callback_function, on_end_function, key)
+function register_on_equip_callback(callback, callback_function, on_end_function, key)
 	register_callback(callback, callback_function, on_end_function, key .. "_on_equip")
 end
 
-local function unregister_callback(key)
+function unregister_callback(key)
 	if not callbacks[key] then return end
 	trace("unregistering callback %s, %s", key, callbacks[key].callback)
 	UnregisterScriptCallback(callbacks[key].callback, callbacks[key].func)
@@ -473,13 +473,13 @@ local function unregister_callback(key)
 	callbacks[key] = nil
 end
 
-local function unregister_callbacks()
+function unregister_callbacks()
 	for i, props in pairs(callbacks) do
 		unregister_callback(i)
 	end
 end
 
-local function unregister_on_equip_callbacks()
+function unregister_on_equip_callbacks()
 	for key, props in pairs(callbacks) do
 		if string_find(key, "on_equip") then
 			unregister_callback(key)
@@ -488,13 +488,13 @@ local function unregister_on_equip_callbacks()
 end
 
 -- Effects
-local cooldowns = {} -- Table of cooldowns of artefacts (["artefact"] = time_elapsed + cooldown)
-local function add_cooldown(cooldown, name)
+cooldowns = {} -- Table of cooldowns of artefacts (["artefact"] = time_elapsed + cooldown)
+function add_cooldown(cooldown, name)
 	trace("added cooldown, name %s, time %s, current_time %s", name, time_elapsed + (cooldown or 0), time_elapsed)
 	cooldowns[name] = time_elapsed + (cooldown or 0)
 end
 
-local function check_cooldown(name)
+function check_cooldown(name)
 	if not cooldowns[name] then return true end
 	if time_elapsed >= cooldowns[name] then
 		cooldowns[name] = nil
@@ -508,8 +508,8 @@ function remove_cooldown(name)
 	cooldowns[name] = nil
 end
 
-local status_effects = {} -- Table of status effects of artefacts (["artefact"] = time_elapsed + cooldown)
-local function add_status_effect(timer, effect, key)
+status_effects = {} -- Table of status effects of artefacts (["artefact"] = time_elapsed + cooldown)
+function add_status_effect(timer, effect, key)
 	local t = {
 		timer = time_elapsed + (timer or 0),
 		time_applied = time_elapsed,
@@ -523,7 +523,7 @@ local function add_status_effect(timer, effect, key)
 	trace("added status_effect, key %s, time %s, current_time %s", key, time_elapsed + (timer or 0), time_elapsed)
 end
 
-local function check_status_effect(key)
+function check_status_effect(key)
 	if not status_effects[key] then
 		-- trace("status_effect %s not exist", key)
 		return false
@@ -537,7 +537,7 @@ local function check_status_effect(key)
 	return true
 end
 
-local function get_status_effect_remaining_time(key, normalized)
+function get_status_effect_remaining_time(key, normalized)
 	if not check_status_effect(key) then
 		-- trace("status_effect %s not exist, return time 0", key)
 		return 0
@@ -560,8 +560,8 @@ end
 -- this is the complex function intended to have persistence between saves, moving to different maps and so on, use if needed
 -- no upvalues are allowed in the functions, best to reference globals by _G. lookup
 -- The precision for both cooldown and timed effects is 0.1 or 100ms, making more precise timer or timed effect is pointless
-local timed_effects = {}
-local function add_timed_effect(timer, effect_function, effect_args, on_end_function, on_end_args, key, not_save)
+timed_effects = {}
+function add_timed_effect(timer, effect_function, effect_args, on_end_function, on_end_args, key, not_save)
 	trace("current_time %s, adding effect %s", time_elapsed, time_elapsed + (timer or 0))
 
 	local effect_args = effect_args or {}
@@ -589,7 +589,7 @@ local function add_timed_effect(timer, effect_function, effect_args, on_end_func
 end
 
 -- This is the simpler version of the function above if you do not care about persistence and saving states
-local function add_simple_timed_effect(timer, effect_function, on_end_function, key)
+function add_simple_timed_effect(timer, effect_function, on_end_function, key)
 	trace("current_time %s, adding effect %s", time_elapsed, time_elapsed + (timer or 0))
 
 	local effect = {
@@ -605,7 +605,7 @@ local function add_simple_timed_effect(timer, effect_function, on_end_function, 
 	end
 end
 
-local function remove_timed_effect(key, on_end)
+function remove_timed_effect(key, on_end)
 	if not timed_effects[key] then return end
 	if on_end and timed_effects[key].on_end then
 		timed_effects[key].on_end()
@@ -615,7 +615,7 @@ end
 
 -- Processing the effects
 -- Whatever lowest time is set for effect, it will be processed at least once on process cycle
-local function process_timed_effects()
+function process_timed_effects()
 	for key, props in pairs(timed_effects) do
 		if props.effect then
 			props.effect()
@@ -631,7 +631,7 @@ local function process_timed_effects()
 	end
 end
 
-local speed_boosts = { -- Table of speed boosts for different artefacts
+speed_boosts = { -- Table of speed boosts for different artefacts
 	af_peas = {
 		name = "af_peas_boost",
 		boost = 0.085
@@ -648,7 +648,7 @@ local speed_boosts = { -- Table of speed boosts for different artefacts
 
 local add_speed = speed.add_speed
 local remove_speed = speed.remove_speed
-local function remove_speed_boosts()
+function remove_speed_boosts()
 	for boost, props in pairs(speed_boosts) do
 		remove_speed(props.name)
 	end
@@ -657,7 +657,7 @@ end
 local add_weight = weight.add_weight
 local remove_weight = weight.remove_weight
 
-local artefact_props
+-- local artefact_props
 artefact_props = { -- Special props of artefacts that are used in processing
 	af_black_angel = {
 		dice_roll = 0,
@@ -2289,7 +2289,7 @@ local function check_lucifer()
 end
 
 -- Functions for artefacts which provide perk bonuses continuously
-local artefact_on_update_functions = {
+artefact_on_update_functions = {
 
 	-- Sun, Perk: Solar Powered
 	af_sun = function(actor, artefact_count, artefact_ids, artefact_names)
@@ -2667,7 +2667,7 @@ local artefact_on_update_functions = {
 }
 
 --Functions for artefacts which provide perk bonuses after weapon fired
-local artefact_on_weapon_fired_functions = {
+artefact_on_weapon_fired_functions = {
 
 	-- Knot, Perk: Superhot Deathloop
 	-- Having last bullet in the magazine amplifies your reflexes
@@ -2752,7 +2752,7 @@ local artefact_on_weapon_fired_functions = {
 }
 
 -- Functions for artefacts which provide perk bonuses on item use
-local artefact_on_item_use_functions = {
+artefact_on_item_use_functions = {
 
 	-- Grapes, Perk: Necessary Gluttony
 	af_grapes = function(actor, artefact_count, artefact_ids, artefact_names, obj)
@@ -2805,7 +2805,7 @@ function af_serofim_cheat_death()
 end
 
 -- Functions for artefacts which provide perk bonuses on before actor death
-local artefact_on_before_death_functions = {
+artefact_on_before_death_functions = {
 
 	-- Seraphim, Perk: Rain of Revival
 	af_serofim = function(actor, artefact_count, artefact_ids, artefact_names, whoID, flags)
@@ -2898,7 +2898,7 @@ local artefact_on_before_death_functions = {
 }
 
 -- Functions for artefacts which provide perk bonuses on before actor hit
-local artefact_on_before_hit_functions = {
+artefact_on_before_hit_functions = {
 
 	-- Black Angel, perk: Dodge This
 	af_black_angel = function(actor, artefact_count, artefact_ids, artefact_names, s_hit, bone_id, flags)
@@ -3116,7 +3116,7 @@ local artefact_on_before_hit_functions = {
 }
 
 -- Functions for artefacts which provide perk bonuses on actor hit
-local artefact_on_hit_functions = {
+artefact_on_hit_functions = {
 
 	-- Black Angel, perk: Dodge This
 	af_black_angel = function(actor, artefact_count, artefact_ids, artefact_names, obj, amount, who, last_hit)
@@ -3278,7 +3278,7 @@ local artefact_on_hit_functions = {
 }
 
 -- Functions for artefacts which provide perk bonuses on before npc hit
-local artefact_on_npc_before_hit_functions = {
+artefact_on_npc_before_hit_functions = {
 
 	-- Claw, Perk: Bloodlust
 	af_kogot = function(actor, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
@@ -3308,7 +3308,7 @@ local artefact_on_npc_before_hit_functions = {
 }
 
 -- Functions for artefacts which provide perk bonuses on npc hit
-local artefact_on_npc_hit_functions = {
+artefact_on_npc_hit_functions = {
 
 	-- Thistle, perk: Minor Laceration
 	af_repei = function(actor, artefact_count, artefact_ids, artefact_names, npc, amount, local_direction, who, bone_index, last_npc_hit)
@@ -3318,7 +3318,7 @@ local artefact_on_npc_hit_functions = {
 }
 
 -- Functions for artefacts which provide perk bonuses on npc death
-local artefact_on_npc_death_functions = {
+artefact_on_npc_death_functions = {
 
 	-- Miser's Skull, Perk: Crack the jackpot
 	af_skull_miser = function(actor, artefact_count, artefact_ids, artefact_names, npc, who, last_npc_hit, last_npc_hit_bone_index)
@@ -3382,7 +3382,7 @@ local artefact_on_npc_death_functions = {
 }
 
 -- Functions for artefacts which provide perk bonuses on before monster hit
-local artefact_on_monster_before_hit_functions = {
+artefact_on_monster_before_hit_functions = {
 
 	-- Claw, Perk: Bloodlust
 	af_kogot = function(actor, artefact_count, artefact_ids, artefact_names, monster, s_hit, bone_id, flags)
@@ -3412,7 +3412,7 @@ local artefact_on_monster_before_hit_functions = {
 }
 
 -- Functions for artefacts which provide perk bonuses on monster hit
-local artefact_on_monster_hit_functions = {
+artefact_on_monster_hit_functions = {
 
 	-- Thistle, perk: Minor Laceration
 	af_repei = function(actor, artefact_count, artefact_ids, artefact_names, monster, amount, local_direction, who, bone_index, last_monster_hit)
@@ -3422,7 +3422,7 @@ local artefact_on_monster_hit_functions = {
 }
 
 -- Functions for artefacts which provide perk bonuses on monster death
-local artefact_on_monster_death_functions = {
+artefact_on_monster_death_functions = {
 
 	-- Claw, Perk: Bloodlust
 	af_kogot = function(actor, artefact_count, artefact_ids, artefact_names, monster, who, last_monster_hit, last_monster_hit_bone_index)
@@ -3442,7 +3442,7 @@ local artefact_on_monster_death_functions = {
 }
 
 -- Functions for artefacts which provide perk bonuses on trade
-local artefact_on_trade_functions = {
+artefact_on_trade_functions = {
 
 	-- Fountain, Perk: Letyshops Time
 	af_fountain = function(actor, artefact_count, artefact_ids, artefact_names, item, sell_bye)
@@ -3493,7 +3493,7 @@ local artefact_on_trade_functions = {
 }
 
 -- Functions for artefacts which provide perk bonuses on equip
-local artefact_on_equip_functions = {
+artefact_on_equip_functions = {
 
 	-- Phantom Star, Perk: Phantom Pacifist
 	af_star_phantom = function(actor, artefact_count, artefact_ids, artefact_names)
@@ -3584,7 +3584,7 @@ local artefact_on_equip_functions = {
 -- Special monkey patches for some artefacts to make their effects work
 -- Functors for Bat, Perk: Zone Alchemy
 local add_functor = custom_functor_autoinject.add_functor
-local bat_transmutate_func = {
+bat_transmutate_func = {
 	check_transmutate = function(obj, bag, mode)
 		local modes = {
 			["inventory"] = true,
@@ -3604,7 +3604,7 @@ local bat_transmutate_func = {
 add_functor("pba_bat", bat_transmutate_func.check_transmutate, bat_transmutate_func.transmutate_string, nil, bat_transmutate_func.transmutate_func, true)
 
 -- Functors for Lucifer
-local lucifer_sacrifice_func = {
+lucifer_sacrifice_func = {
 	check_lucifer_condition = function(obj, bag, mode)
 		local modes = {
 			["inventory"] = true,
@@ -3823,13 +3823,13 @@ force_refresh_state = function()
 	return true
 end
 
-local function actor_on_item_use(obj, str)
+function actor_on_item_use(obj, str)
 	trace("actor_on_item_use, item %s", obj:section())
 
 	process_artefacts(artefact_on_item_use_functions, obj)
 end
 
-local function actor_on_update()
+function actor_on_update()
 	tg = floor(time_global() * 0.01)
 	--trace("current tg %s", tg)
 	if tg < actor_on_update_time then return end
@@ -3842,13 +3842,13 @@ local function actor_on_update()
 	saved_time_elapsed = time_elapsed
 end
 
-local function actor_on_weapon_fired(obj, wpn, ammo_elapsed, grenade_elapsed, ammo_type, grenade_type)
+function actor_on_weapon_fired(obj, wpn, ammo_elapsed, grenade_elapsed, ammo_type, grenade_type)
 	trace("weapon fired %s", wpn:section())
 
 	process_artefacts(artefact_on_weapon_fired_functions, obj, wpn, ammo_elapsed, grenade_elapsed, ammo_type, grenade_type)
 end
 
-local function actor_on_before_hit(s_hit, bone_id, flags)
+function actor_on_before_hit(s_hit, bone_id, flags)
 	if not (s_hit.draftsman and s_hit.draftsman.id) then
 		trace("actor_on_before hit, draftsman not defined")
 		return
@@ -3860,7 +3860,7 @@ local function actor_on_before_hit(s_hit, bone_id, flags)
 	process_artefacts(artefact_on_before_hit_functions, s_hit, bone_id, flags)
 end
 
-local function actor_on_hit_callback(obj, amount, local_direction, who, bone_index)
+function actor_on_hit_callback(obj, amount, local_direction, who, bone_index)
 	if not (who and who.id) then
 		trace("actor_on_hit_callback not triggered, who not defined")
 		return
@@ -3871,25 +3871,25 @@ local function actor_on_hit_callback(obj, amount, local_direction, who, bone_ind
 	process_artefacts(artefact_on_hit_functions, obj, amount, who, last_hit)
 end
 
-local function actor_on_before_death(whoID, flags)
+function actor_on_before_death(whoID, flags)
 	trace("actor_on_before_death triggered")
 
 	process_artefacts(artefact_on_before_death_functions, whoID, flags)
 end
 
-local function actor_on_item_buy(item)
+function actor_on_item_buy(item)
 	trace("actor_on_item_buy triggered")
 
 	process_artefacts(artefact_on_trade_functions, item, false)
 end
 
-local function actor_on_item_sell(item)
+function actor_on_item_sell(item)
 	trace("actor_on_item_sell triggered")
 
 	process_artefacts(artefact_on_trade_functions, item, true)
 end
 
-local function npc_on_before_hit(npc, s_hit, bone_id, flags)
+function npc_on_before_hit(npc, s_hit, bone_id, flags)
 	if not (s_hit.draftsman and s_hit.draftsman.id) then
 		trace("npc_on_before hit, draftsman not defined")
 		return
@@ -3905,7 +3905,7 @@ local function npc_on_before_hit(npc, s_hit, bone_id, flags)
 	process_artefacts(artefact_on_npc_before_hit_functions, npc, s_hit, bone_id, flags)
 end
 
-local function npc_on_hit_callback(npc, amount, local_direction, who, bone_index)
+function npc_on_hit_callback(npc, amount, local_direction, who, bone_index)
 	if not (who and who.id) then
 		trace("on_hit_callback not triggered, who not defined")
 		return
@@ -3919,7 +3919,7 @@ local function npc_on_hit_callback(npc, amount, local_direction, who, bone_index
 	process_artefacts(artefact_on_npc_hit_functions, npc, amount, local_direction, who, bone_index, last_npc_hit)
 end
 
-local function npc_on_death_callback(npc, who)
+function npc_on_death_callback(npc, who)
 	if not (who and who.id) then
 		trace("on_death_callback not triggered, who not defined")
 		return
@@ -3933,7 +3933,7 @@ local function npc_on_death_callback(npc, who)
 	process_artefacts(artefact_on_npc_death_functions, npc, who, last_npc_hit, last_npc_hit_bone_index)
 end
 
-local function monster_on_before_hit(monster, s_hit, bone_id, flags)
+function monster_on_before_hit(monster, s_hit, bone_id, flags)
 	if not (s_hit.draftsman and s_hit.draftsman.id) then
 		trace("monster_on_before hit, draftsman not defined")
 		return
@@ -3955,7 +3955,7 @@ local function monster_on_before_hit(monster, s_hit, bone_id, flags)
 	process_artefacts(artefact_on_monster_before_hit_functions, monster, s_hit, bone_id, flags)
 end
 
-local function monster_on_hit_callback(monster, amount, local_direction, who, bone_index)
+function monster_on_hit_callback(monster, amount, local_direction, who, bone_index)
 	if not (who and who.id) then
 		trace("on_hit_callback not triggered, who not defined")
 		return
@@ -3974,7 +3974,7 @@ local function monster_on_hit_callback(monster, amount, local_direction, who, bo
 	process_artefacts(artefact_on_monster_hit_functions, monster, amount, local_direction, who, bone_index, last_monster_hit)
 end
 
-local function monster_on_death_callback(monster, who)
+function monster_on_death_callback(monster, who)
 	if not (who and who.id) then
 		trace("on_death_callback not triggered, who not defined")
 		return
@@ -3988,7 +3988,7 @@ local function monster_on_death_callback(monster, who)
 	process_artefacts(artefact_on_monster_death_functions, monster, who, last_monster_hit, last_monster_hit_bone_index)
 end
 
-local function actor_on_first_update()
+function actor_on_first_update()
 	time_factor = get_time_factor()
 	force_refresh_state()
 	local tg_now = time_global()
@@ -4027,28 +4027,28 @@ local function actor_on_first_update()
 	RegisterScriptCallback("monster_on_death_callback", monster_on_death_callback)
 end
 
-local function on_trade_started_set_values()
+function on_trade_started_set_values()
 	artefact_props.af_fountain.cashback_triggered = false
 	actor_last_money = db.actor:money()
 end
 
-local function on_trade_closed_set_values()
+function on_trade_closed_set_values()
 	artefact_props.af_fountain.cashback_triggered = false
 end
 
-local function ActorMenu_on_trade_started()
+function ActorMenu_on_trade_started()
 	on_trade_started_set_values()
 	RegisterScriptCallback("actor_on_item_take", actor_on_item_buy)
 	RegisterScriptCallback("actor_on_item_drop", actor_on_item_sell)
 end
 
-local function ActorMenu_on_trade_closed()
+function ActorMenu_on_trade_closed()
 	on_trade_closed_set_values()
 	UnregisterScriptCallback("actor_on_item_take", actor_on_item_buy)
 	UnregisterScriptCallback("actor_on_item_drop", actor_on_item_sell)
 end
 
-local function save_state(m_data)
+function save_state(m_data)
 	local t = {}
 	for key, effect in pairs(timed_effects) do
 		if effect.save then
@@ -4065,7 +4065,7 @@ local function save_state(m_data)
 	-- m_data.perk_based_artefacts_last_time = time_elapsed
 end
 
-local function load_state(m_data)
+function load_state(m_data)
 	local t = m_data.perk_based_artefacts_effects or {}
 	for key, effect in pairs(t) do
 		if t[key].effect_function then
@@ -4088,7 +4088,7 @@ local function load_state(m_data)
 	-- saved_time_elapsed = m_data.perk_based_artefacts_last_time or 0
 end
 
-local function on_option_change()
+function on_option_change()
 	if ui_mcm then
 		for k, v in pairs(settings) do
 			settings[k] = ui_mcm.get("perk_based_artefacts/" .. k)
