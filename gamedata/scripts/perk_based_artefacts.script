@@ -615,7 +615,7 @@ end
 
 -- Processing the effects
 -- Whatever lowest time is set for effect, it will be processed at least once on process cycle
-function process_timed_effects()
+local function process_timed_effects()
 	for key, props in pairs(timed_effects) do
 		if props.effect then
 			props.effect()
@@ -4114,4 +4114,3 @@ end
 function set_lucifer_condition(condition)
 	artefact_props.af_lucifer:set_condition(condition)
 end
-
