@@ -34,14 +34,13 @@ local function get_artefact_from_container(sec)
 	return sec
 end
 
-local items = {}
+-- table of already looted boxes
+local boxes = {}
 
-try_spawn_treasure = treasure_manager.try_spawn_treasure
-treasure_manager.try_spawn_treasure = function(box)
-	try_spawn_treasure(box)
+function clean_artys(box)
+	local items = {}
 
 	local function clean()
-		empty_table(items)
 		box:iterate_inventory_box(function(npc, item)
 			local sec = item:section()
 			local id = item:id()
@@ -71,4 +70,39 @@ treasure_manager.try_spawn_treasure = function(box)
 	end
 
 	CreateTimeEvent("pba_less_artys", "pba_less_artys", 0, clean)
+end
+
+-- callback, when opening boxes
+function physic_object_on_use_callback(box)
+    local id = box:id()
+    local player_stashes = alife_storage_manager.get_state().player_created_stashes
+    if (id and boxes and boxes[id]) or (player_stashes and player_stashes[id]) then
+        return
+    end
+    if (IsInvbox(box)) then
+        clean_artys(box)
+        boxes[id] = true
+	end
+end
+
+-- callback, used to write box table to save
+function save_state(data)
+    data.pba_less_artys_boxes = boxes
+end
+
+-- callback, used to load box table from save
+function load_state(data)
+    boxes = data.pba_less_artys_boxes or {}
+end
+
+-- register callback for box opening
+function actor_on_first_update()
+    RegisterScriptCallback("physic_object_on_use_callback", physic_object_on_use_callback)
+end
+
+-- register callbacks for saving/loading
+function on_game_start()
+    RegisterScriptCallback("save_state", save_state)
+    RegisterScriptCallback("load_state", load_state)
+    RegisterScriptCallback("actor_on_first_update", actor_on_first_update)
 end
