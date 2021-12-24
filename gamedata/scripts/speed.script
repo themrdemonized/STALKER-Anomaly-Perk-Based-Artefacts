@@ -20,15 +20,12 @@ local function update_speeds()
     end
     local run_coef = 1
     for k,v in pairs(run_modifiers) do
-        -- printf("run " .. k .. " " .. v)
         run_coef = run_coef * v
     end
     local sprint_coef = 1
     for k,v in pairs(sprint_modifiers) do
-        -- printf("sprint " .. k .. " " .. v)
         sprint_coef = sprint_coef * v
     end
-    -- printf("base speed: "..speeds[0])
     db.actor:set_actor_run_coef(clamp(speeds[0] * run_coef, 1, 10))
     db.actor:set_actor_runback_coef(clamp(speeds[1] * run_coef, 1, 10))
     db.actor:set_actor_sprint_koef(clamp(speeds[2] * sprint_coef, 1, 10))
@@ -55,7 +52,6 @@ function add_speed(speed_key, speed_mult, is_sprint, force)
         end
     else
         if force or not run_modifiers[speed_key] then
-            -- printf("run: " .. speed_key .. " " .. speed_mult)
             run_modifiers[speed_key] = speed_mult
             update_speeds()
             return true
@@ -76,20 +72,4 @@ function remove_speed(speed_key)
         run_modifiers[speed_key] = nil
     end
     update_speeds()
-end
-
-function print()
-    local run_coef = 1
-    for k,v in pairs(run_modifiers) do
-        printf("Run modifier %s, val %s", k, v)
-        run_coef = run_coef * v
-    end
-    printf("final run: %s", run_coef)
-
-    local spr_coef = 1
-    for k,v in pairs(sprint_modifiers) do
-        printf("Sprint modifier %s, val %s", k, v)
-        spr_coef = spr_coef * v
-    end
-    printf("final sprint: %s", spr_coef)
 end
