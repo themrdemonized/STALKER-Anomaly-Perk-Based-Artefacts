@@ -39,6 +39,17 @@ jobs:
           git config --global user.email ${{ secrets.USER_EMAIL }}
           (git commit -am "Update submodules") || true
           (git push) || true
+
+      - name: Install artis dependencies and update
+        id: arti_dep
+        run: |
+          for f in $(cd anomaly-dependencies/speed/gamedata && find * -name '*.*' ; ); do echo "found $f"; echo "deleting gamedata/$f"; (rm -f "gamedata/$f") || true; done
+          cp -r anomaly-dependencies/speed/gamedata .
+          git config --global core.longpaths true
+          git config --global user.name ${{ secrets.USER_NAME }}
+          git config --global user.email ${{ secrets.USER_EMAIL }}
+          (git commit -am "Update dependencies") || true
+          (git push) || true
           
       - name: Install demonized dependencies and update
         id: dem_dem
