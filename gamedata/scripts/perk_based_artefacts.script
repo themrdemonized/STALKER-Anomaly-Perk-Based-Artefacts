@@ -2495,6 +2495,20 @@ artefact_on_update_functions = {
 		add_cooldown(60, "af_zhelch_action")
 	end,
 
+	-- Phantom Star, Perk: Phantom Pacifist
+	af_star_phantom = function(actor, artefact_count, artefact_ids, artefact_names)
+		local af_star_phantom = artefact_props.af_star_phantom
+		for k, v in pairs(artefact_ids) do
+			local obj = get_object_by_id(v)
+			if obj then
+				obj:set_condition(obj:condition() - 0.001 / artefact_count)
+				if obj:condition() < 0.01 then
+					alife_release(obj)
+				end
+			end
+		end
+	end,
+
 	-- Lucifer, Perk: The Lucifer Effect
 	af_lucifer = function(actor, artefact_count, artefact_ids, artefact_names)
 		if not artefact_ids[1] then return end
