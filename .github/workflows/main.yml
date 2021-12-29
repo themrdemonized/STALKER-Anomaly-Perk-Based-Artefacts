@@ -29,8 +29,8 @@ jobs:
           
       - name: Pull & update submodules recursively
         run: |
-          git submodule update --init --recursive
-          git submodule update --recursive --remote --merge --force
+          git submodule update --init --recursive --allow-unrelated-histories
+          git submodule update --recursive --remote --merge --force --allow-unrelated-histories
           
       - name: Commit & push changes
         run: |
