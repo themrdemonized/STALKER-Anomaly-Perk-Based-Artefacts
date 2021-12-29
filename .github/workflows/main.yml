@@ -61,6 +61,10 @@ jobs:
           git config --global user.email ${{ secrets.USER_EMAIL }}
           (git commit -am "Update demonized dependencies") || true
           (git push) || true
+          
+      - name: Checkout submodules
+        run: |
+          git submodule update --init --recursive --remote
       
       - name: Get current date
         id: date
