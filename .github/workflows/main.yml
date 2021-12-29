@@ -55,6 +55,7 @@ jobs:
         run: |
           cp -r anomaly-demonized-scripts/weight_script/gamedata .
           cp -r anomaly-demonized-scripts/custom_functor_autoinject/gamedata .
+          cp -r anomaly-demonized-scripts/artefact_condition/gamedata .
           git config --global core.longpaths true
           git config --global user.name ${{ secrets.USER_NAME }}
           git config --global user.email ${{ secrets.USER_EMAIL }}
