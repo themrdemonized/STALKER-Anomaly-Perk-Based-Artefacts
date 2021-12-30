@@ -150,7 +150,7 @@
   <string id="st_pba_af_star_phantom_perk">
     <text>
     %c[0,209,172,56]Perk: %c[d_orange]Fantasma\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Vuelvete invisible para cualquiera.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Vuelvete invisible para cualquiera durante 5 minutos de uso total.\n
     %c[0,81,63,22]  • %c[0,209,172,56]No puedes sacar un arma, hablar con nadie o interactuar con nada.\n
     %c[0,81,63,22]  • %c[0,209,172,56]No se acumula de ninguna manera.</text>
   </string>

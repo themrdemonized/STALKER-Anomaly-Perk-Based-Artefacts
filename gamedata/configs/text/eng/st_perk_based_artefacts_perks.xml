@@ -150,7 +150,7 @@
   <string id="st_pba_af_star_phantom_perk">
     <text>
     %c[0,209,172,56]Perk: %c[d_orange]Phantom Pacifist\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Become invisible to anybody.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Become invisible to anybody for 5 minutes of total usage.\n
     %c[0,81,63,22]  • %c[0,209,172,56]You can't draw a weapon, talk to anybody or interact with anything.\n
     %c[0,81,63,22]  • %c[0,209,172,56]Does not stack in any way.</text>
   </string>
