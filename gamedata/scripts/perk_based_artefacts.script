@@ -145,6 +145,7 @@ local indoor_levels = {
 local settings = {
 	debug_mode = false,
 	allow_arty_containers = false,
+	timed_degradation = 1,
 }
 
 -- Utils
@@ -358,17 +359,22 @@ local belt = {}
 
 -- Find artefact in a container
 function get_artefact_from_container(sec)
-	local sec = sec
-	if (string_find(sec, "(lead.-_box)",3)) then
-		sec = sec:gsub("_lead_box", "")		
-	elseif (string_find(sec, "(af.-_iam)",3)) then
-		sec = sec:gsub("_af_iam", "")
-	elseif (string_find(sec, "(af.-_aac)",3)) then
-		sec = sec:gsub("_af_aac", "")
-	elseif (string_find(sec, "(af.-_aam)",3)) then
-		sec = sec:gsub("_af_aam", "")
-	end
-	return sec
+    local sec = sec
+    local cont
+    if (string_find(sec, "(lead.-_box)",3)) then
+        sec = sec:gsub("_lead_box", "")
+        cont = "lead_box"
+    elseif (string_find(sec, "(af.-_iam)",3)) then
+        sec = sec:gsub("_af_iam", "")
+        cont = "af_iam"
+    elseif (string_find(sec, "(af.-_aac)",3)) then
+        sec = sec:gsub("_af_aac", "")
+        cont = "af_aac"
+    elseif (string_find(sec, "(af.-_aam)",3)) then
+        sec = sec:gsub("_af_aam", "")
+        cont = "af_aam"
+    end
+    return sec, cont
 end
 
 iterate_belt = function(actor)
@@ -479,6 +485,10 @@ function unregister_callbacks()
 	end
 end
 
+function unregister_on_equip_callback(key)
+	unregister_callback(key .. "_on_equip")
+end
+
 function unregister_on_equip_callbacks()
 	for key, props in pairs(callbacks) do
 		if string_find(key, "on_equip") then
@@ -547,6 +557,13 @@ function get_status_effect_remaining_time(key, normalized)
 	return res > 0 and res or 0
 end
 
+function remove_status_effect(key)
+	if status_effects[key] then
+		trace("removing status effect, key %s, time %s, current_time %s", key, status_effects[key].timer, time_elapsed)
+		status_effects[key] = nil
+	end
+end
+
 -- Table of current active effects, contains tables of these {
 -- timer = time_elapsed + timer in seconds, how long effect will be applied
 -- effect = function(), the function of the effect
@@ -598,6 +615,10 @@ function add_simple_timed_effect(timer, effect_function, on_end_function, key)
 		on_end = on_end_function
 	}
 
+	if effect.on_end then
+		trace("effect has on end function %s", effect.on_end)
+	end
+
 	if key then
 		timed_effects[key] = effect
 	else
@@ -607,7 +628,9 @@ end
 
 function remove_timed_effect(key, on_end)
 	if not timed_effects[key] then return end
+	trace("removing effect, key %s", key)
 	if on_end and timed_effects[key].on_end then
+		trace("removing effect, firing on end, key %s", key)
 		timed_effects[key].on_end()
 	end
 	timed_effects[key] = nil
@@ -723,7 +746,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			trace("Teleporting actor")
 
 			add_pp_effector("black_infinite.ppe", c_id_ppe.black_infinite, true)
-			CreateTimeEvent("af_lighthouse", "af_lighthouse", 0.5, function()
+			CreateTimeEvent("af_lighthouse", "af_lighthouse", 0.33, function()
 				remove_pp_effector(c_id_ppe.black_infinite)
 			end)
 			actor:set_actor_position(npc:position())
@@ -1059,16 +1082,16 @@ artefact_props = { -- Special props of artefacts that are used in processing
 	af_skull_miser = {
 		money_items = (function() -- Money items to choose and spawn
 			local t = {}
-			insert_n_times(t, "roubles", 12)
-			insert_n_times(t, "money_10_50", 7)
-			insert_n_times(t, "money_50_100", 6)
-			insert_n_times(t, "money_100_200", 6)
-			insert_n_times(t, "money_200_300", 5)
-			insert_n_times(t, "money_300_400", 4)
-			insert_n_times(t, "money_400_500", 4)
-			insert_n_times(t, "money_500_600", 3)
-			insert_n_times(t, "money_600_700", 3)
-			insert_n_times(t, "money_700_800", 2)
+			insert_n_times(t, "roubles", 16)
+			insert_n_times(t, "money_10_50", 12)
+			insert_n_times(t, "money_50_100", 10)
+			insert_n_times(t, "money_100_200", 10)
+			insert_n_times(t, "money_200_300", 9)
+			insert_n_times(t, "money_300_400", 7)
+			insert_n_times(t, "money_400_500", 6)
+			insert_n_times(t, "money_500_600", 5)
+			insert_n_times(t, "money_600_700", 4)
+			insert_n_times(t, "money_700_800", 3)
 			insert_n_times(t, "money_800_900", 2)
 			insert_n_times(t, "money_900_1000", 1)
 			insert_n_times(t, "money_1000_5000", 1)
@@ -1252,7 +1275,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 				s_hit.type = hit.shock
 				s_hit.draftsman = db.actor
 				db.actor:hit(s_hit)
-				change_psy_health((self.damage_multiplier - 1) * -0.25)
+				change_psy_health((self.damage_multiplier - 1) * -0.35)
 				play_sound_on_actor("anomaly\\electra_hit1", 1, 1.5)
 			else
 				play_sound_on_actor("decoder", 1, 0.8)
@@ -1362,9 +1385,8 @@ artefact_props = { -- Special props of artefacts that are used in processing
 		protection_stacks = 0,
 		protection_bonus = (function()
 			local t = {}
-			t[0] = 1
-			for stacks = 1, 10 do
-				t[stacks] = 1 - round((10.277777 - 0.277777 * stacks) * stacks) * 0.01 -- 10 -> 75% parabolic curve
+			for stacks = 0, 10 do
+				t[stacks] = 1 - round(0.1875 * stacks * stacks + 4.625 * stacks + 10) * 0.01 -- 10 -> 75% parabolic curve
 			end
 			return t
 		end)(),
@@ -1404,21 +1426,25 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			add_speed("af_moh", 1 + amount, is_sprint, true)
 		end,
 		remove_speed = function(self)
+			trace("af_moh remove speed")
 			remove_speed("af_moh")
 		end,
 		add_effect = function(self, func, on_end)
 			add_simple_timed_effect(60, func, on_end, "af_moh_effect")
 		end,
 		remove_effect = function(self)
-			remove_timed_effect("ah_moh_effect", true)
+			trace("af_moh remove effect")
+			remove_timed_effect("af_moh_effect", true)
 		end,
 		register = function(self, callback, func)
 			register_callback(callback, func, nil, "af_moh")
 		end,
 		unregister = function(self)
+			trace("af_moh unregister callback")
 			unregister_callback("af_moh")
 		end,
 		reset = function(self)
+			trace("af_moh reset")
 			self:remove_effect()
 			self:remove_speed()
 			self:unregister()
@@ -1486,6 +1512,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 
 			local function enable_enemy()
 				UnregisterScriptCallback("on_enemy_eval", ignore_enemy)
+				remove_status_effect("af_moh_invisibility")
 			end
 
 			local function enable_enemy_on_hit(obj, s_hit)
@@ -1498,6 +1525,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			RegisterScriptCallback("actor_on_weapon_fired", enable_enemy)
 			RegisterScriptCallback("monster_on_before_hit", enable_enemy_on_hit)
 			RegisterScriptCallback("npc_on_before_hit", enable_enemy_on_hit)
+			add_status_effect(60, nil, "af_moh_invisibility")
 
 			local bleeding_cure_boost = 0.003
 			self:add_effect(function()
@@ -1506,6 +1534,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 				UnregisterScriptCallback("actor_on_weapon_fired", enable_enemy)
 				UnregisterScriptCallback("monster_on_before_hit", enable_enemy_on_hit)
 				UnregisterScriptCallback("npc_on_before_hit", enable_enemy_on_hit)
+				remove_status_effect("af_moh_invisibility")
 			end)
 		end,
 		mutant_part_psysucker_meat = function(self, actor)
@@ -1520,6 +1549,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 
 			local function enable_enemy()
 				UnregisterScriptCallback("on_enemy_eval", ignore_enemy)
+				remove_status_effect("af_moh_invisibility")
 			end
 
 			local function enable_enemy_on_hit(obj, s_hit)
@@ -1532,6 +1562,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			RegisterScriptCallback("actor_on_weapon_fired", enable_enemy)
 			RegisterScriptCallback("monster_on_before_hit", enable_enemy_on_hit)
 			RegisterScriptCallback("npc_on_before_hit", enable_enemy_on_hit)
+			add_status_effect(60, nil, "af_moh_invisibility")
 
 			self:add_effect(function()
 				change_psy_health(0.005)
@@ -1539,6 +1570,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 				UnregisterScriptCallback("actor_on_weapon_fired", enable_enemy)
 				UnregisterScriptCallback("monster_on_before_hit", enable_enemy_on_hit)
 				UnregisterScriptCallback("npc_on_before_hit", enable_enemy_on_hit)
+				remove_status_effect("af_moh_invisibility")
 			end)
 		end,
 		mutant_part_snork_hand = function(self, actor)
@@ -2456,8 +2488,8 @@ artefact_on_update_functions = {
 			trace("Chain, healing companion %s", heal_companion:id())
 			heal_companion:change_health(0.0015)
 		else
-			local health_boost = 0.0002
-			local power_boost = 0.0025
+			local health_boost = 0.00015
+			local power_boost = 0.0018
 
 			actor:change_health(health_boost)
 			actor:change_power(power_boost)
@@ -2501,9 +2533,10 @@ artefact_on_update_functions = {
 		for k, v in pairs(artefact_ids) do
 			local obj = get_object_by_id(v)
 			if obj then
-				obj:set_condition(obj:condition() - 0.001 / artefact_count)
+				obj:set_condition(obj:condition() - 0.00033 / artefact_count)
 				if obj:condition() < 0.01 then
 					alife_release(obj)
+					CreateTimeEvent("refresh_artefacts", "refresh_artefacts", 0.15, refresh_artefacts_time_event_func, true)
 				end
 			end
 		end
@@ -3784,10 +3817,20 @@ if quickdraw and quickdraw.hit_key then
 	end
 end
 
+-- Patch for crow binder
+local crow_death = bind_crow.crow_binder.death_callback
+bind_crow.crow_binder.death_callback = function(self, victim, who)
+	if artefacts.af_lighthouse and who and who:id() == AC_ID and victim then
+		local props = artefacts.af_lighthouse
+		artefact_props.af_lighthouse:on_death(db.actor, props.count, props.ids, props.names, victim, who, nil, nil)
+	end	
+	crow_death(self, victim, who)
+end
+
 -- Disable talk possibility for Phantom Pacifist
 local process_npc_usability = xr_meet.process_npc_usability
 xr_meet.process_npc_usability = function(npc)
-	if artefacts.af_star_phantom then
+	if artefacts.af_star_phantom or check_status_effect("af_moh_invisibility") then
 		npc:disable_talk()
 		return
 	end
@@ -3797,7 +3840,7 @@ end
 -- Disable npc evaluation for Phantom Pacifist
 local evaluate = xr_meet.evaluator_contact.evaluate
 xr_meet.evaluator_contact.evaluate = function(self)
-	if artefacts.af_star_phantom then return false end
+	if artefacts.af_star_phantom or check_status_effect("af_moh_invisibility") then return false end
 	return evaluate(self)
 end
 
@@ -3843,6 +3886,52 @@ function actor_on_item_use(obj, str)
 	process_artefacts(artefact_on_item_use_functions, obj)
 end
 
+-- Sanity check for unwanted effects
+function sanity_check()
+	check_status_effect("af_moh_invisibility")
+	if not artefacts.af_star_phantom then
+		local af_star_phantom = artefact_props.af_star_phantom
+		af_star_phantom.weapon_hidden = false
+		unregister_on_equip_callback("af_star_phantom")
+	end
+end
+
+local degradation_time = 0
+local degradation_time_interval = 20
+
+degradation_valid_artys = (function()
+	local t = {}
+	ini_sys:section_for_each(function(sec)
+		local s = get_artefact_from_container(sec)
+		if 	SYS_GetParam(0, s, "kind", "") == "i_arty_junk" and
+			not (s == "af_lucifer" or s == "af_star_phantom") then
+			t[sec] = true
+		end
+	end)
+	return t
+end)()
+
+function degradate_artefact(obj, timed_degradation)
+	local sec = obj:section()
+	if degradation_valid_artys[sec] then
+		local cond = obj:condition()
+		local new_cond = cond - timed_degradation * 0.001
+		trace("%s is valid for degradation, cond %s, new_cond %s", sec, cond * 100, new_cond * 100)
+		obj:set_condition(new_cond)
+		if obj:condition() < 0.01 then
+			trace("%s is critical, releasing, cond %s", sec * 100, obj:condition() * 100)
+			alife_release(obj)
+			CreateTimeEvent("refresh_artefacts", "refresh_artefacts", 0.15, refresh_artefacts_time_event_func, true)
+		end
+	end
+end
+
+local function degradate_belt_function(owner, artefact)
+	degradate_artefact(artefact, settings.timed_degradation)
+end
+
+local sanity_time = 0
+local sanity_time_interval = 10
 function actor_on_update()
 	tg = floor(time_global() * 0.01)
 	--trace("current tg %s", tg)
@@ -3853,6 +3942,17 @@ function actor_on_update()
 	--trace("current time_elapsed %s", time_elapsed)
 	process_artefacts(artefact_on_update_functions)
 	process_timed_effects()
+
+	if tg > sanity_time then
+		sanity_check()
+		sanity_time = tg + sanity_time_interval
+	end
+
+	if settings.timed_degradation > 0 and tg > degradation_time then
+		db.actor:iterate_belt(degradate_belt_function)
+		degradation_time = tg + degradation_time_interval
+	end
+
 	saved_time_elapsed = time_elapsed
 end
 

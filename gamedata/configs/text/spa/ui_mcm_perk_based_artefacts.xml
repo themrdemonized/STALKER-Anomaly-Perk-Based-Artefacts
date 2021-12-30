@@ -26,5 +26,11 @@
 	<string id="ui_mcm_perk_based_artefacts_treasure_chance_desc">
 		<text>Cuanto menos sea el numero, mas raros seran los artefactos de ventaja en los alijos</text>
 	</string>
+	<string id="ui_mcm_perk_based_artefacts_timed_degradation">
+		<text>Degradaciùn de la condiciùn</text>
+	</string>
+	<string id="ui_mcm_perk_based_artefacts_timed_degradation_desc">
+		<text>Cada 20 segundos los artefactos de perk perderan su condiciùn en este porcentaje</text>
+	</string>
 	
 </string_table>

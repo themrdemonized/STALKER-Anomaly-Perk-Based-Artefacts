@@ -26,5 +26,11 @@
 	<string id="ui_mcm_perk_based_artefacts_treasure_chance_desc">
 		<text>Чем меньше число - тем реже артефакты будут появляться в тайниках</text>
 	</string>
+	<string id="ui_mcm_perk_based_artefacts_timed_degradation">
+		<text>Деградация артефактов</text>
+	</string>
+	<string id="ui_mcm_perk_based_artefacts_timed_degradation_desc">
+		<text>Каждые 20 секунд перк-артефакты будут терять состояние на данный процент</text>
+	</string>
 	
 </string_table>

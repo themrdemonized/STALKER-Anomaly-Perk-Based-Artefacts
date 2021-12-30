@@ -26,5 +26,11 @@
 	<string id="ui_mcm_perk_based_artefacts_treasure_chance_desc">
 		<text>The less is number - the rarer perk artefacts will be in the stashes</text>
 	</string>
+	<string id="ui_mcm_perk_based_artefacts_timed_degradation">
+		<text>Condition degradation</text>
+	</string>
+	<string id="ui_mcm_perk_based_artefacts_timed_degradation_desc">
+		<text>Each 20 seconds perk artefacts will lose its condition by this percent</text>
+	</string>
 	
 </string_table>
