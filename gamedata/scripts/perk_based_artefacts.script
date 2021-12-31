@@ -1046,12 +1046,12 @@ artefact_props = { -- Special props of artefacts that are used in processing
 						light.type = 1 -- 1 = Point ; 2 = Spot
 						light.range = 5 --1
 						light.lanim = "koster_01_electra"
-						light.lanim_brightness = 0.2
+						light.lanim_brightness = 1
 						light.hud_mode = false
 						light.shadow = true -- Turn on/off
 						light.volumetric = false
 						light.enabled = true
-						light.color = fcolor():set(1, 0.9, 0.2, 0.5)
+						light.color = fcolor():set(0.7, 0.8, 1, 1)
 						light:set_position(obj:position())
 						light:set_direction(obj:direction())
 						light:update()
