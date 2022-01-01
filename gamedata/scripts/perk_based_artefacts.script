@@ -3919,7 +3919,7 @@ function degradate_artefact(obj, timed_degradation)
 		trace("%s is valid for degradation, cond %s, new_cond %s", sec, cond * 100, new_cond * 100)
 		obj:set_condition(new_cond)
 		if obj:condition() < 0.01 then
-			trace("%s is critical, releasing, cond %s", sec * 100, obj:condition() * 100)
+			trace("%s is critical, releasing, cond %s", sec, obj:condition() * 100)
 			alife_release(obj)
 			CreateTimeEvent("refresh_artefacts", "refresh_artefacts", 0.15, refresh_artefacts_time_event_func, true)
 		end
