@@ -1272,7 +1272,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			if self.damage_multiplier > 1 then
 				local s_hit = hit()
 				s_hit.power = 0.005
-				s_hit.type = hit.shock
+				s_hit.type = hit.shock -- possible interference with Elektron and Sandstone, change to hit.telepatic if needed
 				s_hit.draftsman = db.actor
 				db.actor:hit(s_hit)
 				change_psy_health((self.damage_multiplier - 1) * -0.35)
