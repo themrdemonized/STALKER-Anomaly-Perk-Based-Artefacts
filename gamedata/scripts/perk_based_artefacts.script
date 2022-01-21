@@ -746,11 +746,12 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			"perk_based_artefacts\\TELEPRT2",
 			"perk_based_artefacts\\TELEPRT3"
 		},
+		pp_effector_time = 0.33,
 		on_death = function(self, actor, artefact_count, artefact_ids, artefact_names, npc, who, last_npc_hit, last_npc_hit_bone_index)
 			trace("Teleporting actor")
 
 			add_pp_effector("black_infinite.ppe", c_id_ppe.black_infinite, true)
-			CreateTimeEvent("af_lighthouse", "af_lighthouse", 0.33, function()
+			CreateTimeEvent("af_lighthouse", "af_lighthouse", self.pp_effector_time, function()
 				remove_pp_effector(c_id_ppe.black_infinite)
 			end)
 			actor:set_actor_position(npc:position())
@@ -854,6 +855,10 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			end
 			return t
 		end)(),
+		health_boost = 0.00035,
+		power_clear_boost = 0.002,
+		power_partly_boost = 0.001,
+		power_not_clear_penalty = -0.001,
 	},
 	af_peas = {
 		moon_sleep_decrease = { -- Mock item to send to actor_status_sleep to decrease sleep
@@ -902,6 +907,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			[hit.wound] = true
 		},
 		dice_roll = 0,
+		health_boost_coeff = 0.0035,
 		on_before_hit = function(self, actor, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
 			if not self.valid_hits[s_hit.type] then
 				trace("Claw, not a valid hit type %s", s_hit.type)
@@ -912,7 +918,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			local lucifer_bonus = max(1 - normalize(af_lucifer.condition, 0, 0.5), 0)
 
 			s_hit.power = s_hit.power * (1 + artefact_count * 0.1) * (1 + lucifer_bonus)
-			local health_boost = s_hit.power * 0.0035 * artefact_count
+			local health_boost = s_hit.power * self.health_boost_coeff * artefact_count
 
 			add_simple_timed_effect(1, function()
 				actor:change_health(health_boost)
@@ -1088,14 +1094,14 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			local t = {}
 			insert_n_times(t, "roubles", 192)
 			insert_n_times(t, "money_10_50", 12)
-			insert_n_times(t, "money_50_100", 9)
-			insert_n_times(t, "money_100_200", 8)
-			insert_n_times(t, "money_200_300", 7)
-			insert_n_times(t, "money_300_400", 6)
-			insert_n_times(t, "money_400_500", 5)
-			insert_n_times(t, "money_500_600", 4)
-			insert_n_times(t, "money_600_700", 3)
-			insert_n_times(t, "money_700_800", 2)
+			insert_n_times(t, "money_50_100", 8)
+			insert_n_times(t, "money_100_200", 6)
+			insert_n_times(t, "money_200_300", 5)
+			insert_n_times(t, "money_300_400", 4)
+			insert_n_times(t, "money_400_500", 3)
+			insert_n_times(t, "money_500_600", 2)
+			insert_n_times(t, "money_600_700", 1)
+			insert_n_times(t, "money_700_800", 1)
 			insert_n_times(t, "money_800_900", 1)
 			insert_n_times(t, "money_900_1000", 1)
 			return t
@@ -1135,6 +1141,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 	},
 	af_dragon_eye = {
 		dice_roll = 0,
+		chance = 5,
 		on_before_hit = function(self, actor, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
 			self.dice_roll = random() * 100 -- Float chance
 
@@ -1161,7 +1168,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 
 			local pellet_count = max(SYS_GetParam(2, ammo_types[ammo_type], "buck_shot", 1), 1)
 
-			local chance = 5 * artefact_count / pellet_count
+			local chance = self.chance * artefact_count / pellet_count
 			if self.dice_roll > chance then
 				trace("Dragon Eye not triggered, dice roll %s, chance %s", self.dice_roll, chance)
 				return
@@ -1169,7 +1176,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			s_hit.power = 1000
 		end,
 		on_death = function(self, actor, artefact_count, artefact_ids, artefact_names, npc, who, last_npc_hit, last_npc_hit_bone_index)
-			local chance = 10 * artefact_count
+			local chance = self.chance * artefact_count
 			if self.dice_roll > chance then
 				trace("Dragon Eye not triggered, dice roll %s, chance %s", self.dice_roll, chance)
 				return
@@ -1270,14 +1277,19 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			self:event_reset()
 			--trace("Spike, weapon_shot %s", self.weapon_shot)
 		end,
+		psy_health_penalty_coeff = 0.35,
+		psy_health_restore_coeff = 0.05,
+		hit_buff_coeff = 0.01,
+		critical_hit_buff_coeff = 0.04,
+		artefact_count_coeff = 0.02,
 		effect_reset = function(self)
 			if self.damage_multiplier > 1 then
 				local s_hit = hit()
 				s_hit.power = 0.005
-				s_hit.type = hit.shock -- possible interference with Elektron and Sandstone, change to hit.telepatic if needed
+				s_hit.type = hit.telepatic -- possible interference with Elektron and Sandstone, change to hit.telepatic if needed
 				s_hit.draftsman = db.actor
 				db.actor:hit(s_hit)
-				change_psy_health((self.damage_multiplier - 1) * -0.35)
+				change_psy_health((self.damage_multiplier - 1) * -self.psy_health_penalty_coeff)
 				play_sound_on_actor("anomaly\\electra_hit1", 1, 1.5)
 			else
 				play_sound_on_actor("decoder", 1, 0.8)
@@ -1289,8 +1301,8 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			trace("Spike, Final Damage %s, bonus %s", s_hit.power, self.damage_multiplier)
 			play_sound_on_actor("decoder", 1, self.damage_multiplier)
 			
-			self.damage_multiplier = self.damage_multiplier + (is_critical_bone(npc:clsid(), bone_id) and 0.04 + 0.02 * artefact_count or 0.01 + 0.02 * artefact_count)
-			change_psy_health((self.damage_multiplier - 1) * 0.15)
+			self.damage_multiplier = self.damage_multiplier + (is_critical_bone(npc:clsid(), bone_id) and self.critical_hit_buff_coeff + self.artefact_count_coeff * artefact_count or self.hit_buff_coeff + self.artefact_count_coeff * artefact_count)
+			change_psy_health((self.damage_multiplier - 1) * self.psy_health_restore_coeff)
 			self:event_reset()
 		end
 	},
@@ -1331,8 +1343,16 @@ artefact_props = { -- Special props of artefacts that are used in processing
 				"artefact\\artefact_ameba"
 			}
 		},
+		hit_power_coeff = 0.7,
+		elemental_power_coeff = 0.5,
 		on_before_hit = function(self, actor, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
-			local actor_weapon = actor:active_item():name()
+			local actor_weapon = actor:active_item()
+			if not actor_weapon then
+				trace("Sandstone, no active item")
+				return
+			end
+
+			actor_weapon = actor_weapon:name()
 			if not check_status_effect("af_sandstone" .. actor_weapon) then
 				trace("Sandstone, weapon %s not infused", actor_weapon)
 				return
@@ -1340,8 +1360,8 @@ artefact_props = { -- Special props of artefacts that are used in processing
 
 			local effect = status_effects["af_sandstone" .. actor_weapon].effect
 			local elemental_hit = hit(s_hit)
-			s_hit.power = s_hit.power * 0.7
-			elemental_hit.power = elemental_hit.power * 0.5
+			s_hit.power = s_hit.power * self.hit_power_coeff
+			elemental_hit.power = elemental_hit.power * self.elemental_power_coeff
 			elemental_hit.type = effect.hit_type
 			elemental_hit.draftsman = npc
 			npc:hit(elemental_hit)
@@ -1357,8 +1377,9 @@ artefact_props = { -- Special props of artefacts that are used in processing
 	af_repei = {
 		effect_time = 7,
 		bleed_coeff = 0.0014, -- Bigger number => bigger bleeding damage
+		hit_coeff = 0.5,
 		on_before_hit = function(self, actor, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
-			local hit_k = 0.5
+			local hit_k = self.hit_coeff
 			local bleeding_hit = s_hit.power * -self.bleed_coeff * artefact_count
 			s_hit.power = s_hit.power * hit_k
 			
@@ -2329,11 +2350,12 @@ artefact_on_update_functions = {
 	-- Sun, Perk: Solar Powered
 	af_sun = function(actor, artefact_count, artefact_ids, artefact_names)
 		local hours = get_time_hours()
+		local af_sun = artefact_props.af_sun
 
-		local health_boost = 0.00035
-		local power_clear_boost = 0.002
-		local power_partly_boost = 0.001
-		local power_not_clear_penalty = -0.001
+		local health_boost = af_sun.health_boost
+		local power_clear_boost = af_sun.power_clear_boost
+		local power_partly_boost = af_sun.power_partly_boost
+		local power_not_clear_penalty = af_sun.power_not_clear_penalty
 
 		if hours >= 21 or hours <= 5 or indoor_levels[actor_level] then
 			actor:change_power(power_not_clear_penalty * artefact_count)
@@ -3847,6 +3869,16 @@ xr_meet.evaluator_contact.evaluate = function(self)
 	return evaluate(self)
 end
 
+-- Azazel mode patching
+local azazel_on_before_death = gamemode_azazel.actor_on_before_death
+gamemode_azazel.actor_on_before_death = function(whoID,flags)
+	if artefacts.af_serofim then
+		return
+	end
+
+	azazel_on_before_death(whoID, flags)
+end
+
 -- Removing stack effects on refreshing artefacts
 local function remove_stack_effects()
 	if not artefacts.af_spaika then
@@ -4231,4 +4263,3 @@ end
 function set_lucifer_condition(condition)
 	artefact_props.af_lucifer:set_condition(condition)
 end
-
