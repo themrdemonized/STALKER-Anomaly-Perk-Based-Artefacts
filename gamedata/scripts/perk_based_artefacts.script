@@ -1356,7 +1356,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 	},
 	af_repei = {
 		effect_time = 7,
-		bleed_coeff = 0.002, -- Bigger number => bigger bleeding damage
+		bleed_coeff = 0.0014, -- Bigger number => bigger bleeding damage
 		on_before_hit = function(self, actor, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
 			local hit_k = 0.5
 			local bleeding_hit = s_hit.power * -self.bleed_coeff * artefact_count
