@@ -11,7 +11,7 @@ local AC_ID = AC_ID
 local alife_create_item = alife_create_item
 local alife_release_id = alife_release_id
 local CloseAll_UI = CloseAll_UI
-local CreateTimeEvent = CreateTimeEvent
+
 local get_console = get_console
 local has_alife_info = has_alife_info
 local ipairs = ipairs
@@ -26,8 +26,7 @@ local particles_object = particles_object
 local printf = printf
 local random_float = random_float
 local RegisterScriptCallback = RegisterScriptCallback
-local RemoveTimeEvent = RemoveTimeEvent
-local ResetTimeEvent = ResetTimeEvent
+
 local round_100 = round_100
 local script_light = script_light
 local SYS_GetParam = SYS_GetParam
@@ -44,6 +43,10 @@ local dismiss_special_squad = axr_companions.dismiss_special_squad
 local remove_from_actor_squad = axr_companions.remove_from_actor_squad
 
 local get_nearby_campfire = bind_campfire.get_nearby_campfire
+
+local CreateTimeEvent = demonized_time_events.CreateTimeEvent
+local RemoveTimeEvent = demonized_time_events.RemoveTimeEvent
+local ResetTimeEvent = demonized_time_events.ResetTimeEvent
 
 local add_cam_effector = level.add_cam_effector
 local add_pp_effector = level.add_pp_effector
@@ -71,6 +74,7 @@ local is_critical_bone = perk_based_artefacts_bone_mapper.is_critical_bone
 local refresh_health_bar = ui_enemy_health.on_hit
 
 local get_nearest_stalker = utils_obj.get_nearest_stalker
+local safe_bone_pos = utils_obj.safe_bone_pos
 
 local play_snd = xr_effects.play_snd
 
@@ -1082,20 +1086,18 @@ artefact_props = { -- Special props of artefacts that are used in processing
 	af_skull_miser = {
 		money_items = (function() -- Money items to choose and spawn
 			local t = {}
-			insert_n_times(t, "roubles", 24)
+			insert_n_times(t, "roubles", 192)
 			insert_n_times(t, "money_10_50", 12)
-			insert_n_times(t, "money_50_100", 10)
-			insert_n_times(t, "money_100_200", 10)
-			insert_n_times(t, "money_200_300", 9)
-			insert_n_times(t, "money_300_400", 7)
-			insert_n_times(t, "money_400_500", 6)
-			insert_n_times(t, "money_500_600", 5)
-			insert_n_times(t, "money_600_700", 4)
-			insert_n_times(t, "money_700_800", 3)
-			insert_n_times(t, "money_800_900", 2)
+			insert_n_times(t, "money_50_100", 9)
+			insert_n_times(t, "money_100_200", 8)
+			insert_n_times(t, "money_200_300", 7)
+			insert_n_times(t, "money_300_400", 6)
+			insert_n_times(t, "money_400_500", 5)
+			insert_n_times(t, "money_500_600", 4)
+			insert_n_times(t, "money_600_700", 3)
+			insert_n_times(t, "money_700_800", 2)
+			insert_n_times(t, "money_800_900", 1)
 			insert_n_times(t, "money_900_1000", 1)
-			insert_n_times(t, "money_1000_5000", 1)
-			insert_n_times(t, "money_5000_end", 1)
 			return t
 		end)(),
 		head_bones = { -- NPC head bones for Miser's Skull perk
@@ -1354,9 +1356,10 @@ artefact_props = { -- Special props of artefacts that are used in processing
 	},
 	af_repei = {
 		effect_time = 7,
+		bleed_coeff = 0.002, -- Bigger number => bigger bleeding damage
 		on_before_hit = function(self, actor, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
 			local hit_k = 0.5
-			local bleeding_hit = s_hit.power * -0.002 * artefact_count
+			local bleeding_hit = s_hit.power * -self.bleed_coeff * artefact_count
 			s_hit.power = s_hit.power * hit_k
 			
 			add_simple_timed_effect(self.effect_time, function()
