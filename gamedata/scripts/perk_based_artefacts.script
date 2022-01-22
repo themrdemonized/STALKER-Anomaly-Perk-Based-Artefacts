@@ -2254,6 +2254,22 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			-- return has_alife_info("lucifer_active") and db.actor:object("af_lucifer")
 			return artefacts.af_lucifer
 		end,
+		remove_lucifer = function(self)
+			if self:check_lucifer() then
+				local id = id or artefacts.af_lucifer.ids[1]
+				local obj = get_object_by_id(id)
+				if obj then
+					alife_release_id(id)
+				end
+				artefacts.af_lucifer = nil
+				CreateTimeEvent("refresh_artefacts", "refresh_artefacts", 0.15, function()
+					refresh_artefacts_time_event_func(true)
+					self.condition = 1
+					return true
+				end)
+				disable_info("lucifer_active")
+			end
+		end,
 		set_condition = function(self, amount, id)
 			if not self:check_lucifer() then return end
 
@@ -2342,6 +2358,10 @@ artefact_props = { -- Special props of artefacts that are used in processing
 -- Alias for Lucifer Check
 local function check_lucifer()
 	return artefact_props.af_lucifer:check_lucifer()
+end
+
+local function remove_lucifer()
+	return artefact_props.af_lucifer:remove_lucifer()
 end
 
 -- Functions for artefacts which provide perk bonuses continuously
@@ -3881,6 +3901,7 @@ gamemode_azazel.actor_on_before_death = function(whoID,flags)
 	if artefacts.af_serofim then
 		return
 	end
+	remove_lucifer()
 
 	azazel_on_before_death(whoID, flags)
 end
