@@ -55,11 +55,11 @@ function clean_artys(box)
 
 		if ui_mcm then
 			settings.debug_mode = ui_mcm.get("perk_based_artefacts/debug_mode")
-			settings.spawn_chance = ui_mcm.get("perk_based_artefacts/treasure_chance")
+			settings.treasure_chance = ui_mcm.get("perk_based_artefacts/treasure_chance")
 		end
 
 		for k, v in pairs(items) do
-			if random(100) > settings.spawn_chance then
+			if random(100) > settings.treasure_chance then
 				if settings.debug_mode then
 					printf("Perk Based Artefacts, removing item %s, section %s", k, v.section)
 				end
