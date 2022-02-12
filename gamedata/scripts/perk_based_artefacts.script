@@ -2462,7 +2462,7 @@ artefact_on_update_functions = {
 
 	-- Generator, Perk: Godzilla is Approaching
 	af_generator = function(actor, artefact_count, artefact_ids, artefact_names)
-		local charge_boost = 0.0001
+		local charge_boost = 0.00005
 		local charge_threshold = 0.05 -- Below this charge the item has no battery
 
 		--Pda, Detector and NVG slots
