@@ -351,10 +351,6 @@ local function change_sleep(item)
 end
 
 -- Artefacts
-local iterate_belt
-local process_artefacts
-local refresh_artefacts
-local refresh_artefacts_time_event_func
 local refresh_state
 local force_refresh_state
 
@@ -381,6 +377,28 @@ function get_artefact_from_container(sec)
     return sec, cont
 end
 
+function iterate_belt_function(owner, artefact, artefacts, belt)
+	local sec = artefact:section()
+
+	-- Find artefact in a container if its allowed in settings
+	if settings.allow_arty_containers then
+		sec = get_artefact_from_container(sec)
+	end
+
+	if artefacts[sec] then
+		artefacts[sec].count = artefacts[sec].count + 1
+		table_insert(artefacts[sec].ids, artefact:id())
+		table_insert(artefacts[sec].names, artefact:name())
+	else
+		artefacts[sec] = {
+			count = 1,
+			ids = { artefact:id() },
+			names = { artefact:name() }
+		}
+	end
+	table_insert(belt, sec)
+end
+
 iterate_belt = function(actor)
 	local artefacts = {}
 	local belt = {}
@@ -403,29 +421,11 @@ iterate_belt = function(actor)
 		end
 	end
 
-	local function iterate_belt_function(owner, artefact)
-		local sec = artefact:section()
-
-		-- Find artefact in a container if its allowed in settings
-		if settings.allow_arty_containers then
-			sec = get_artefact_from_container(sec)
-		end
-
-		if artefacts[sec] then
-			artefacts[sec].count = artefacts[sec].count + 1
-			table_insert(artefacts[sec].ids, artefact:id())
-			table_insert(artefacts[sec].names, artefact:name())
-		else
-			artefacts[sec] = {
-				count = 1,
-				ids = { artefact:id() },
-				names = { artefact:name() }
-			}
-		end
-		table_insert(belt, sec)
+	local function iterate_belt_f(owner, artefact)
+		iterate_belt_function(owner, artefact, artefacts, belt)
 	end
 
-	actor:iterate_belt(iterate_belt_function)
+	actor:iterate_belt(iterate_belt_f)
 	table_sort(belt)
 	return artefacts, belt
 end
