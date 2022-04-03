@@ -150,7 +150,7 @@
   <string id="st_pba_af_star_phantom_perk">
     <text>
     %c[0,209,172,56]Perk: %c[d_orange]Phantom Pacifist\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Become invisible to anybody for 5 minutes of total usage.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Become invisible to anybody for about 6 minutes of total usage.\n
     %c[0,81,63,22]  • %c[0,209,172,56]You can't draw a weapon, talk to anybody or interact with anything.\n
     %c[0,81,63,22]  • %c[0,209,172,56]Does not stack in any way.</text>
   </string>
@@ -194,7 +194,7 @@
   <string id="st_pba_af_tapeworm_perk">
     <text>
     %c[0,209,172,56]Perk: %c[d_orange]Stunner\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Getting melee hit by enemies will make them stunned for 2.5 seconds.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Getting melee hit by enemies will make them stunned for 3 seconds.\n
     %c[0,81,63,22]  • %c[0,209,172,56]While being stunned the enemy is disabled in fight and won't attack.\n
     %c[0,81,63,22]  • %c[0,209,172,56]Has a cooldown of 2 seconds between uses.\n
     %c[0,81,63,22]  • %c[0,209,172,56]Each extra artefact adds additional 2 seconds to effect.\n

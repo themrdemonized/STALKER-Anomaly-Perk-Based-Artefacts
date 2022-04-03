@@ -7,11 +7,6 @@
 -- Written by demonized
 
 
-local AC_ID = AC_ID
-local alife_create_item = alife_create_item
-local alife_release_id = alife_release_id
-local CloseAll_UI = CloseAll_UI
-
 local get_console = get_console
 local has_alife_info = has_alife_info
 local ipairs = ipairs
@@ -25,19 +20,37 @@ local pairs = pairs
 local particles_object = particles_object
 local printf = printf
 local random_float = random_float
-local RegisterScriptCallback = RegisterScriptCallback
 
 local round_100 = round_100
 local script_light = script_light
 local SYS_GetParam = SYS_GetParam
 local time_global = time_global
-local UnregisterScriptCallback = UnregisterScriptCallback
 local vector_rotate_y = vector_rotate_y
 
-local change_psy_health = arszi_psy.change_psy_health
 local manage_psy_health = arszi_psy.manage_psy_health
 local get_psy_health = arszi_psy.get_psy_health
-local set_psy_health = arszi_psy.set_psy_health
+
+-- Get psy table to manipulate psy health values
+local actor_psy_table = {}
+function get_actor_psy_table()
+	if is_not_empty(actor_psy_table) then return end
+
+	local m_data = alife_storage_manager.get_state()
+	arszi_psy.save_state(m_data) 
+	actor_psy_table = m_data.psy_table
+end
+
+function set_psy_health(amount)
+	if actor_psy_table.actor_psy_health then
+		actor_psy_table.actor_psy_health = amount <= 1 and amount or 1
+	end
+end
+
+function change_psy_health(amount)
+	if actor_psy_table.actor_psy_health then
+		set_psy_health(actor_psy_table.actor_psy_health + amount)
+	end
+end
 
 local dismiss_special_squad = axr_companions.dismiss_special_squad
 local remove_from_actor_squad = axr_companions.remove_from_actor_squad
@@ -2548,7 +2561,7 @@ artefact_on_update_functions = {
 		local psy_drain = -0.0025 * (2 - af_lucifer.condition)
 		local psy_boost = 0.0035 * af_lucifer.condition
 
-		if actor.health < 0.99 then
+		if actor.health < (advanced_stamina_system_ass and advanced_stamina_system_ass.blood_loss_limit - 0.01 or 0.99) then -- ASS compatibility
 			actor:change_health(health_boost)
 			change_psy_health(psy_drain)
 		else
@@ -2578,7 +2591,7 @@ artefact_on_update_functions = {
 		for k, v in pairs(artefact_ids) do
 			local obj = get_object_by_id(v)
 			if obj then
-				obj:set_condition(obj:condition() - 0.00033 / artefact_count)
+				obj:set_condition(obj:condition() - 0.00027 / artefact_count)
 				if obj:condition() < 0.01 then
 					alife_release(obj)
 					CreateTimeEvent("refresh_artefacts", "refresh_artefacts", 0.15, refresh_artefacts_time_event_func, true)
@@ -3268,7 +3281,7 @@ artefact_on_hit_functions = {
 		s_hit.power = 0.01 * artefact_count
 		s_hit.draftsman = who
 
-		local effect_time = 0.5 + 2 * artefact_count
+		local effect_time = 1 + 2 * artefact_count
 
 		local monster_anims = af_tapeworm.monster_animations
 		local monster_cls, monster_kind = get_monster_clsid_and_kind(who)
@@ -4165,6 +4178,8 @@ function monster_on_death_callback(monster, who)
 end
 
 function actor_on_first_update()
+	get_actor_psy_table()
+
 	time_factor = get_time_factor()
 	force_refresh_state()
 	local tg_now = time_global()

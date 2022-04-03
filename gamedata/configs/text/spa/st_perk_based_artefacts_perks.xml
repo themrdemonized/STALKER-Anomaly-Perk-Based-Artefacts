@@ -150,7 +150,7 @@
   <string id="st_pba_af_star_phantom_perk">
     <text>
     %c[0,209,172,56]Perk: %c[d_orange]Fantasma\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Vuelvete invisible para cualquiera durante 5 minutos de uso total.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Vuelvete invisible para cualquiera durante 6 minutos de uso total.\n
     %c[0,81,63,22]  • %c[0,209,172,56]No puedes sacar un arma, hablar con nadie o interactuar con nada.\n
     %c[0,81,63,22]  • %c[0,209,172,56]No se acumula de ninguna manera.</text>
   </string>
@@ -194,7 +194,7 @@
   <string id="st_pba_af_tapeworm_perk">
     <text>
     %c[0,209,172,56]Perk: %c[d_orange]Aturdidor\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Ser golpeado cuerpo a cuerpo por enemigos, provocara que sean aturdidos durante 2,5 segundos.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Ser golpeado cuerpo a cuerpo por enemigos, provocara que sean aturdidos durante 3 segundos.\n
     %c[0,81,63,22]  • %c[0,209,172,56]Mientras esta aturdido, el enemigo queda inhabilitado en la lucha y no podra atacar.\n
     %c[0,81,63,22]  • %c[0,209,172,56]Tiene un tiempo de recarga de 2 segundos entre usos.\n
     %c[0,81,63,22]  • %c[0,209,172,56]Cada artefacto adicional agrega 2 segundos adicionales al efecto.</text>
