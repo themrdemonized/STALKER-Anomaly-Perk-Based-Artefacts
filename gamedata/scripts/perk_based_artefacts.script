@@ -1144,6 +1144,30 @@ artefact_props = { -- Special props of artefacts that are used in processing
 	},
 	af_star_phantom = {
 		weapon_hidden = false, -- Check for weapon is hidden
+		hidden_num = 1,
+		hide_weapon = function(self)
+			self.weapon_hidden = true
+			self.hidden_num = self.hidden_num - 1
+			db.actor:hide_weapon()
+			trace("Phantom Star, weapon hidden, hidden_num %s", self.hidden_num)
+		end,
+		restore_weapon = function(self)
+			self.weapon_hidden = false
+			self.hidden_num = self.hidden_num + 1
+			db.actor:restore_weapon()
+			trace("Phantom Star, weapon restroed, hidden_num %s", self.hidden_num)
+		end,
+		reset_state = function(self)
+			while self.hidden_num ~= 1 do
+				trace("Phantom Star, resetting num, hidden_num %s", self.hidden_num)
+				if self.hidden_num > 1 then
+					self:hide_weapon()
+				else
+					self:restore_weapon()
+				end
+			end
+			self.weapon_hidden = false
+		end,
 		ignore_enemy_function = function(obj, enemy, flags) -- Remove evaluation
 			if (enemy:id() == AC_ID) then
 				flags.override = true
@@ -2495,7 +2519,7 @@ artefact_on_update_functions = {
 	-- Sourpuss, Perk: What Colour Is Your Blood?
 	af_kislushka = function(actor, artefact_count, artefact_ids, artefact_names)
 		local bleeding_cure_boost = 0.00135 * artefact_count
-		local satiety_drain = -0.0025 * artefact_count
+		local satiety_drain = -0.00125 * artefact_count
 
 		if actor.bleeding > 0 then
 			trace("before bleeding %s", actor.bleeding)
@@ -3610,12 +3634,10 @@ artefact_on_equip_functions = {
 	af_star_phantom = function(actor, artefact_count, artefact_ids, artefact_names)
 		local af_star_phantom = artefact_props.af_star_phantom
 		if not af_star_phantom.weapon_hidden then
-			actor:hide_weapon()
-			af_star_phantom.weapon_hidden = true
+			af_star_phantom:hide_weapon()
 		end
 		register_on_equip_callback("on_enemy_eval", af_star_phantom.ignore_enemy_function, function()
-			actor:restore_weapon()
-			af_star_phantom.weapon_hidden = false
+			af_star_phantom:restore_weapon()
 		end, "af_star_phantom")
 	end,
 
@@ -3843,12 +3865,13 @@ end
 -- Patch for Food Drug Drink Animations
 if enhanced_animations and enhanced_animations.use_item and enhanced_animations.call_my_slot_back then
 
-	local fdda_use_item = enhanced_animations.use_item
 	local af_star_phantom = artefact_props.af_star_phantom
+
+	local fdda_use_item = enhanced_animations.use_item
 	enhanced_animations.use_item = function(obj)
 		if artefacts.af_star_phantom then
-			af_star_phantom.weapon_hidden = false
-			db.actor:restore_weapon()
+			trace("restoring item")
+			af_star_phantom:restore_weapon()
 		end
 		fdda_use_item(obj)
 	end
@@ -3857,8 +3880,24 @@ if enhanced_animations and enhanced_animations.use_item and enhanced_animations.
 	enhanced_animations.call_my_slot_back = function()
 		fdda_call_my_slot_back()
 		if artefacts.af_star_phantom then
-			af_star_phantom.weapon_hidden = true
-			db.actor:hide_weapon()
+			trace("hiding item")
+			af_star_phantom:hide_weapon()
+		end
+		return true
+	end
+
+end
+
+-- Patch for FDDA Backpack Animations
+if zzz_ea_addon_backpack and zzz_ea_addon_backpack.call_my_slot_back then
+
+	local af_star_phantom = artefact_props.af_star_phantom
+
+	local call_my_slot_back = zzz_ea_addon_backpack.call_my_slot_back
+	zzz_ea_addon_backpack.call_my_slot_back = function()
+		call_my_slot_back()
+		if artefacts.af_star_phantom then
+			af_star_phantom:hide_weapon()
 		end
 		return true
 	end
@@ -3965,9 +4004,9 @@ end
 function sanity_check()
 	check_status_effect("af_moh_invisibility")
 	if not artefacts.af_star_phantom then
-		local af_star_phantom = artefact_props.af_star_phantom
-		af_star_phantom.weapon_hidden = false
 		unregister_on_equip_callback("af_star_phantom")
+		local af_star_phantom = artefact_props.af_star_phantom
+		af_star_phantom:reset_state()
 	end
 end
 
