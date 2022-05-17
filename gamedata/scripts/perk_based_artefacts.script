@@ -28,7 +28,6 @@ local time_global = time_global
 local vector_rotate_y = vector_rotate_y
 
 local manage_psy_health = arszi_psy.manage_psy_health
-local get_psy_health = arszi_psy.get_psy_health
 
 -- Get psy table to manipulate psy health values
 local actor_psy_table = {}
@@ -38,6 +37,12 @@ function get_actor_psy_table()
 	local m_data = alife_storage_manager.get_state()
 	arszi_psy.save_state(m_data) 
 	actor_psy_table = m_data.psy_table
+end
+
+function get_psy_health()
+	if actor_psy_table.actor_psy_health then
+		return actor_psy_table.actor_psy_health
+	end
 end
 
 function set_psy_health(amount)
