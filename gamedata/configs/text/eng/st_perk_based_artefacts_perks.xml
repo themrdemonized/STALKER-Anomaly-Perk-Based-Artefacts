@@ -6,8 +6,9 @@
   <string id="st_pba_af_cocoon_perk">
     <text>
     %c[0,209,172,56]Perk: %c[d_orange]Stone Skin\n 
+    %c[0,81,63,22]  • %c[0,209,172,56]You get 10% melee damage protection upon equipping the artefact.\n
     %c[0,81,63,22]  • %c[0,209,172,56]Receiving melee damage grants you Stone skin stack.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]With receiving stack you get 10% melee damage protection but receive 10% speed penalty.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]With receiving stack you get additional 10% melee damage protection but receive 10% speed penalty.\n
     %c[0,81,63,22]  • %c[0,209,172,56]Each stack grows protection with diminishing returns and penalize speed more.\n
     %c[0,81,63,22]  • %c[0,209,172,56]Maximum 10 stacks is possible, at which you receive 75% reduction of melee damage but become completely immobilized.\n
     %c[0,81,63,22]  • %c[0,209,172,56]Effect lasts for 10 seconds, after which all stacks are burned.\n
