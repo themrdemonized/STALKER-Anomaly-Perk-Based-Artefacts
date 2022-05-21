@@ -687,7 +687,7 @@ speed_boosts = { -- Table of speed boosts for different artefacts
 	},
 	af_lucifer = {
 		name = "af_lucifer_boost",
-		boost = 0.175
+		boost = 0.160
 	}
 }
 
@@ -2288,7 +2288,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			}
 		},
 		condition = 1,
-		degradation_rate = 0.0000029, --25% per day is 0.0000029
+		degradation_rate = 0.0000033, --25% per day is 0.0000029
 		get_degradation_rate = function(self)
 			return self.degradation_rate * time_factor
 		end,
@@ -4260,6 +4260,7 @@ function actor_on_first_update()
 	RegisterScriptCallback("monster_on_before_hit", monster_on_before_hit)
 	RegisterScriptCallback("monster_on_hit_callback", monster_on_hit_callback)
 	RegisterScriptCallback("monster_on_death_callback", monster_on_death_callback)
+	RegisterScriptCallback("on_before_level_changing", on_before_level_changing)
 end
 
 function on_trade_started_set_values()
@@ -4281,6 +4282,12 @@ function ActorMenu_on_trade_closed()
 	on_trade_closed_set_values()
 	UnregisterScriptCallback("actor_on_item_take", actor_on_item_buy)
 	UnregisterScriptCallback("actor_on_item_drop", actor_on_item_sell)
+end
+
+function on_before_level_changing()
+	if check_lucifer() then
+		artefact_props.af_lucifer:change_condition(random_float(-0.01, -0.015))
+	end
 end
 
 function save_state(m_data)
