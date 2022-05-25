@@ -12,9 +12,6 @@ local has_alife_info = has_alife_info
 local ipairs = ipairs
 local is_empty = is_empty
 local is_not_empty = is_not_empty
-local IsAnomaly = IsAnomaly
-local IsArtefact = IsArtefact
-local IsMoveState = IsMoveState
 local normalize = normalize
 local pairs = pairs
 local particles_object = particles_object
@@ -23,7 +20,6 @@ local random_float = random_float
 
 local round_100 = round_100
 local script_light = script_light
-local SYS_GetParam = SYS_GetParam
 local time_global = time_global
 local vector_rotate_y = vector_rotate_y
 
@@ -2288,7 +2284,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			}
 		},
 		condition = 1,
-		degradation_rate = 0.0000033, --25% per day is 0.0000029
+		degradation_rate = 0.0000038, --25% per day is 0.0000029
 		get_degradation_rate = function(self)
 			return self.degradation_rate * time_factor
 		end,
@@ -4286,7 +4282,7 @@ end
 
 function on_before_level_changing()
 	if check_lucifer() then
-		artefact_props.af_lucifer:change_condition(random_float(-0.01, -0.015))
+		artefact_props.af_lucifer:change_condition(random_float(-0.02, -0.025))
 	end
 end
 
