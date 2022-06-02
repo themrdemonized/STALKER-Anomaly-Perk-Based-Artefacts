@@ -120,6 +120,7 @@
     %c[0,81,63,22]  • %c[0,209,172,56]El arma infundida pierde el 30% de su poder bruto pero gana el 50% del poder de dano elemental segun el tipo de anomalia.\n
     %c[0,81,63,22]  • %c[0,209,172,56]Solo las anomalias electricas, termicas y quimicas son validas para la infusion.\n
     %c[0,81,63,22]  • %c[0,209,172,56]El efecto dura 3 minutos, el artefacto debe estar equipado para que funcione.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Puedes dejar caer el artefacto sobre el arma para infundirle directamente un efecto aleatorio. El efecto durara 10 minutos y el artefacto se destruira\n
     %c[0,81,63,22]  • %c[0,209,172,56]No se acumula de ninguna manera.</text>
   </string>
   <string id="st_pba_af_kislushka_perk">

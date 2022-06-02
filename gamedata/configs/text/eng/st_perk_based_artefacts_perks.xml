@@ -121,6 +121,7 @@
     %c[0,81,63,22]  • %c[0,209,172,56]Infused weapon loses 30% of its raw power but gains 50% of elemental damage power according to the anomaly type.\n
     %c[0,81,63,22]  • %c[0,209,172,56]Only electric, thermal and chemical anomalies are valid for infusion, including fields.\n
     %c[0,81,63,22]  • %c[0,209,172,56]Effect lasts for 3 minutes, the artefact must be equipped for the effect to work.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]You can drop the artefact onto the weapon to infuse it directly with random effect. The effect would last 10 minutes and the artefact would be destroyed after infusion.\n
     %c[0,81,63,22]  • %c[0,209,172,56]Does not stack in any way.</text>
   </string>
   <string id="st_pba_af_kislushka_perk">

@@ -303,6 +303,11 @@ local function get_monster_clsid_and_kind(obj)
 	return obj:clsid(), SYS_GetParam(0, obj:section(), "kind", 0)
 end
 
+local function IsBinoc(sec)
+	return 	SYS_GetParam(0, sec, "ammo_class", "") == "ammo_binoc"
+	or 		SYS_GetParam(0, sec, "class", "") == "WP_BINOC"
+end
+
 local function get_current_weather()
 	return get_weather_manager():get_curr_weather()
 end
@@ -371,6 +376,20 @@ local force_refresh_state
 local artefacts = {}
 local belt = {}
 
+-- Temporal virtual artefacts to add
+-- Only adds if no artefacts of that type is on belt
+virtual_artefacts = {}
+
+function add_virtual_artefact(sec)
+	virtual_artefacts[sec] = true
+	refresh_artefacts(true)
+end
+
+function remove_virtual_artefact(sec)
+	virtual_artefacts[sec] = nil
+	refresh_artefacts(true)
+end
+
 -- Find artefact in a container
 function get_artefact_from_container(sec)
     local sec = sec
@@ -438,8 +457,19 @@ iterate_belt = function(actor)
 	local function iterate_belt_f(owner, artefact)
 		iterate_belt_function(owner, artefact, artefacts, belt)
 	end
-
 	actor:iterate_belt(iterate_belt_f)
+
+	for k, v in pairs(virtual_artefacts) do
+		if not artefacts[k] then
+			artefacts[k] = {
+				count = 1,
+				ids = { },
+				names = { }
+			}
+			table_insert(belt, k)
+		end
+	end
+
 	table_sort(belt)
 	return artefacts, belt
 end
@@ -537,7 +567,29 @@ function remove_cooldown(name)
 end
 
 status_effects = {} -- Table of status effects of artefacts (["artefact"] = time_elapsed + cooldown)
-function add_status_effect(timer, effect, key)
+function add_status_effect(timer, effect, key, check_timer)
+	if check_timer then
+		if type(check_timer) == "number" then
+			check_timer = clamp(check_timer, 0, 2)
+			if check_timer == 0 then
+				check_timer = false
+			end
+		end
+	end
+
+	if check_timer and status_effects[key] then
+		local remaining_time = status_effects[key].timer - time_elapsed
+		if check_timer == 2 then
+			trace("can't add effect, already existing with timer")
+			trace("effect %s, timer %s, remaining_time %s, new timer %s", key, status_effects[key].timer, remaining_time, timer)
+			return
+		elseif remaining_time > timer then
+			trace("can't add effect, already existing with bigger timer")
+			trace("effect %s, timer %s, remaining_time %s, new timer %s", key, status_effects[key].timer, remaining_time, timer)
+			return
+		end
+	end
+
 	local t = {
 		timer = time_elapsed + (timer or 0),
 		time_applied = time_elapsed,
@@ -2190,6 +2242,9 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			CreateTimeEvent("refresh_artefacts", "refresh_artefacts", 0.15, refresh_artefacts_time_event_func, true)
 		end,
 		transmutate_artefact = function(self, obj)
+			-- Set randomseed to current game hour and reset back
+			local seed = ceil(time_elapsed * time_factor / 60 / 60)
+			math.randomseed(seed)
 			local sec = obj:section()
 			local new_sec
 			if self.perk_artefacts[sec] then
@@ -2207,6 +2262,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			end
 			trace("Bat, resulting artefact %s", new_sec)
 			self:transmutate(obj, new_sec)
+			math.randomseed(os.time())
 		end
 	},
 	af_lucifer = {
@@ -2877,7 +2933,7 @@ artefact_on_weapon_fired_functions = {
 
 		local hit_type = status_effects["af_sandstone" .. actor_weapon].effect.hit_type
 		local af_sandstone = artefact_props.af_sandstone
-		play_sound_on_actor(get_random_array_element(af_sandstone.hit_types_sounds[hit_type]), 0.35, random_float(0.95, 1.05))
+		play_sound_on_actor(get_random_array_element(af_sandstone.hit_types_sounds[hit_type]), 0.5, random_float(0.95, 1.05))
 	end
 }
 
@@ -3408,7 +3464,7 @@ artefact_on_hit_functions = {
 		add_status_effect(180, {
 			weapon_name = actor_weapon:name(),
 			hit_type = last_hit.type
-		}, "af_sandstone" .. actor_weapon:name())
+		}, "af_sandstone" .. actor_weapon:name(), true)
 	end,
 
 }
@@ -3626,6 +3682,56 @@ artefact_on_trade_functions = {
 		end
 	end
 
+}
+
+-- Functions for artefacts which provide perk on drag drop
+artefact_on_item_drag_dropped_functions = {
+	-- Sandstone, perk: Zone Infusion
+	af_sandstone = function(actor, obj_1, obj_2, slot_from, slot_to)
+		if not IsWeapon(obj_2) then 
+			trace("Sandstone, target is not weapon, %s", obj_2:section())
+			return
+		end
+
+		-- Reset if melee weapon or binocs
+		if IsMelee(obj_2) or IsItem("fake_ammo_wpn", obj_2:section()) or IsBinoc(obj_2:section()) then
+			trace("Sandstone, target is knife or binocs, %s", obj_2:section())
+			return
+		end
+
+		-- Reset if throwable weapon (grenade, bolt)
+		if IsBolt(obj_2) or IsGrenade(obj_2) then
+			trace("Sandstone, target is throwable, %s", obj_2:section())
+			return
+		end
+
+		local af_sandstone = artefact_props.af_sandstone
+
+		-- Set randomseed to current game hour and reset back
+		local seed = ceil(time_elapsed * time_factor / 60 / 60)
+		math.randomseed(seed)
+		local hit_type = get_random_key(af_sandstone.valid_hits)
+		math.randomseed(os.time())
+
+		add_status_effect(600, {
+			weapon_name = obj_2:name(),
+			hit_type = hit_type
+		}, "af_sandstone" .. obj_2:name())
+		
+		add_virtual_artefact("af_sandstone")
+		add_timed_effect(600, nil, nil, function()
+			perk_based_artefacts.remove_virtual_artefact("af_sandstone")
+		end, nil, "af_sandstone_remove_virtual_artefact")
+		play_sound_on_actor(get_random_array_element(af_sandstone.hit_types_sounds[hit_type]), 0.7, random_float(0.95, 1.05))
+		alife_release(obj_1)
+	end,
+
+	--Bat, Perk: Zone Alchemy
+	af_bat = function(actor, obj_1, obj_2, slot_from, slot_to)
+		if bat_transmutate_func.check_transmutate(obj_2, nil, "inventory") then
+			bat_transmutate_func.transmutate_func(obj_2, nil, "inventory")
+		end
+	end,
 }
 
 -- Functions for artefacts which provide perk bonuses on equip
@@ -4217,6 +4323,19 @@ function monster_on_death_callback(monster, who)
 	process_artefacts(artefact_on_monster_death_functions, monster, who, last_monster_hit, last_monster_hit_bone_index)
 end
 
+function on_item_drag_dropped(obj_1, obj_2, slot_from, slot_to)
+	if not (obj_1 and obj_2) then 
+		trace("No obj_1 or obj_2 found, o1 %s, o2 %s", obj_1 and obj_1:section(), obj_2 and obj_2:section())
+		return
+	end
+
+	if artefact_on_item_drag_dropped_functions[obj_1:section()] then
+		artefact_on_item_drag_dropped_functions[obj_1:section()](db.actor, obj_1, obj_2, slot_from, slot_to)
+	elseif artefact_on_item_drag_dropped_functions[obj_2:section()] then
+		artefact_on_item_drag_dropped_functions[obj_2:section()](db.actor, obj_2, obj_1, slot_to, slot_from)
+	end
+end
+
 function actor_on_first_update()
 	get_actor_psy_table()
 
@@ -4250,6 +4369,7 @@ function actor_on_first_update()
 	RegisterScriptCallback("actor_on_hit_callback", actor_on_hit_callback)
 	RegisterScriptCallback("actor_on_before_death", actor_on_before_death)
 	RegisterScriptCallback("actor_on_item_use", actor_on_item_use)
+	RegisterScriptCallback("ActorMenu_on_item_drag_drop", on_item_drag_dropped)
 	RegisterScriptCallback("npc_on_before_hit", npc_on_before_hit)
 	RegisterScriptCallback("npc_on_hit_callback", npc_on_hit_callback)
 	RegisterScriptCallback("npc_on_death_callback", npc_on_death_callback)
@@ -4300,6 +4420,7 @@ function save_state(m_data)
 	m_data.perk_based_artefacts_cooldowns = cooldowns
 	m_data.perk_based_artefacts_status_effects = status_effects
 	m_data.perk_based_artefacts_lucifer_condition = artefact_props.af_lucifer.condition
+	m_data.perk_based_artefacts_virtual_artefacts = virtual_artefacts
 	-- m_data.perk_based_artefacts_last_time = time_elapsed
 end
 
@@ -4323,6 +4444,7 @@ function load_state(m_data)
 	cooldowns = m_data.perk_based_artefacts_cooldowns or {}
 	status_effects = m_data.perk_based_artefacts_status_effects or {}
 	artefact_props.af_lucifer.condition = m_data.perk_based_artefacts_lucifer_condition or 1
+	virtual_artefacts = m_data.perk_based_artefacts_virtual_artefacts or {}
 	-- saved_time_elapsed = m_data.perk_based_artefacts_last_time or 0
 end
 
