@@ -4037,6 +4037,59 @@ bind_crow.crow_binder.death_callback = function(self, victim, who)
 	crow_death(self, victim, who)
 end
 
+-- Patch to not trigger lighthouse for emission crow kills
+function make_dead_crow(id,powr)
+	local crow = id and level.object_by_id(id)
+	if(crow and crow.alive and crow:alive() and powr) then
+		powr.draftsman = crow
+		crow:hit(powr)
+	end
+	return true
+end
+
+function surge_manager.CSurgeManager:kill_crows_at_pos(pos,delay) -- hit all crows if their pos is bigger than "pos"
+	local h = hit()
+	h.type = hit.fire_wound
+	h.power = 0.9
+	h.impulse = 0.0
+	h.direction = VEC_Z
+--	h.draftsman = db.actor
+	for k,id in pairs(bind_crow.crow_storage) do
+		if delay then
+			CreateTimeEvent("delay_kill_crow", id, random(3), make_dead_crow, id, h)
+		else
+			local crow = level.object_by_id(id)
+			if (crow and crow:alive() and pos < crow:position().z) then
+				h.draftsman = crow
+				crow:hit(h)
+			end
+		end
+	end
+end
+
+function psi_storm_manager.CPsiStormManager:kill_crows_at_pos(pos)
+	--self.crowParticles={}
+	local h = hit()
+	h.type = hit.fire_wound
+	h.power = 1.0
+	h.impulse = 0
+	h.direction = VEC_Z
+--	h.draftsman = db.actor
+	for k,v in pairs(bind_crow.crow_storage) do
+		local obj = alife_object(v)
+		if obj then
+			local crow = level.object_by_id(obj.id)
+			if(crow and crow:alive() and distance_2d(pos, crow:position())<25) then
+				--crow:start_particles("crommcruac\\electrocute_crow","bip01_pelvis")
+				--self.crowParticles[k]=particles_object("crommcruac\\electrocute_crow")
+				--self.crowParticles[k]:play_at_pos(crow:position())
+				h.draftsman = crow
+				crow:hit(h)
+			end
+		end
+	end
+end
+
 -- Disable talk possibility for Phantom Pacifist
 local process_npc_usability = xr_meet.process_npc_usability
 xr_meet.process_npc_usability = function(npc)
