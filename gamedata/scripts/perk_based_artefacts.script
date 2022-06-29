@@ -1403,6 +1403,29 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			[hit.shock] = true,
 			[hit.chemical_burn] = true
 		},
+		valid_hits_table = {}, -- Table of valid hits to choose from, updates each hour
+		valid_hits_table_pointer = 1, -- Current valid hit
+		valid_hits_table_update_time = 0, -- Update time of valid_hits_table
+		update_valid_hits_table = function(self)
+			-- Set randomseed to current game hour and reset back later
+			local seed = ceil(time_elapsed * time_factor / 60 / 60)
+			if seed ~= self.valid_hits_table_update_time or is_empty(self.valid_hits_table) then
+				empty_table(self.valid_hits_table)
+				math.randomseed(seed)
+				for i = 1, 100 do
+					self.valid_hits_table[i] = get_random_key(self.valid_hits)
+				end
+				self.valid_hits_table_pointer = 1
+				self.valid_hits_table_update_time = seed
+				math.randomseed(os.time())
+			end
+		end,
+		get_valid_hit_type = function(self)
+			self:update_valid_hits_table()
+			local res = self.valid_hits_table[self.valid_hits_table_pointer]
+			self.valid_hits_table_pointer = (self.valid_hits_table_pointer % #self.valid_hits_table) + 1
+			return res
+		end,
 		hit_types_sounds = { -- Hit type to sounds associations
 			[hit.light_burn] = {
 				"perk_based_artefacts\\flamer2",
@@ -2275,10 +2298,19 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			alife_create_item(new_artefact, actor)
 			CreateTimeEvent("refresh_artefacts", "refresh_artefacts", 0.15, refresh_artefacts_time_event_func, true)
 		end,
+		randomseed = 0,
+		randomseed_update_time = 0,
 		transmutate_artefact = function(self, obj)
 			-- Set randomseed to current game hour and reset back
 			local seed = ceil(time_elapsed * time_factor / 60 / 60)
-			math.randomseed(seed)
+			if self.randomseed_update_time ~= seed then
+				self.randomseed = seed
+				self.randomseed_update_time = seed
+			else
+				math.randomseed(self.randomseed)
+				self.randomseed = self.randomseed + math.random(100, 200)
+			end
+			math.randomseed(self.randomseed)
 			local sec = obj:section()
 			local new_sec
 			if self.perk_artefacts[sec] then
@@ -3740,12 +3772,7 @@ artefact_on_item_drag_dropped_functions = {
 		end
 
 		local af_sandstone = artefact_props.af_sandstone
-
-		-- Set randomseed to current game hour and reset back
-		local seed = ceil(time_elapsed * time_factor / 60 / 60)
-		math.randomseed(seed)
-		local hit_type = get_random_key(af_sandstone.valid_hits)
-		math.randomseed(os.time())
+		local hit_type = af_sandstone:get_valid_hit_type()
 
 		add_status_effect(600, {
 			weapon_name = obj_2:name(),
