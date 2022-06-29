@@ -73,10 +73,11 @@ function clean_artys(box)
 end
 
 -- callback, when opening boxes
+-- ignore player stashes and fanat box
 function physic_object_on_use_callback(box)
     local id = box:id()
     local player_stashes = alife_storage_manager.get_state().player_created_stashes
-    if (id and boxes and boxes[id]) or (player_stashes and player_stashes[id]) then
+    if (id and boxes and boxes[id]) or (player_stashes and player_stashes[id]) or (box:name() == "secret_fanat") then
         return
     end
     if (IsInvbox(box)) then
