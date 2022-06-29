@@ -2068,21 +2068,55 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			t["af_lucifer"] = true -- Can't mutate Lucifer
 
 			-- Can't mutate unique artefacts
+			t["af_ameba_mica"] = true
+			t["af_ameba_slime"] = true
+			t["af_ameba_slug"] = true
 			t["af_base_mlr"] = true
 			t["af_black"] = true
 			t["af_compass"] = true
 			t["af_control"] = true
 			t["af_death_lamp"] = true
+			t["af_dummy_pellicle"] = true
+			t["af_dummy_spring"] = true
 			t["af_geliy"] = true
 			t["af_gimlet"] = true
 			t["af_misery_bread"] = true
 			t["af_monolith"] = true
 			t["af_oasis_heart"] = true
 			t["af_quest_b14_twisted"] = true
+			t["af_rusty_kristall"] = true
+			t["af_rusty_sea"] = true
+			t["af_rusty_thorn"] = true
 			t["af_vaselisk"] = true
 			t["monolith_shard"] = true
 			t["jup_b1_half_artifact"] = true
 			t["marker"] = true
+
+			-- Multiplayer items
+			t["mp_af_electra_flash"] = true
+			t["mp_zone_witches_galantine"] = true
+			t["mp_af_cta_green"] = true
+			t["mp_af_cta_blue"] = true
+			t["mp_medkit"] = true
+			t["mp_medkit_scientic"] = true
+			t["mp_medkit_army"] = true
+			t["mp_energy_drink"] = true
+			t["mp_bandage"] = true
+			t["mp_antirad"] = true
+			t["mp_drug_coagulant"] = true
+			t["mp_drug_radioprotector"] = true
+			t["mp_medkit_old"] = true
+			t["mp_antirad_old"] = true
+			t["mp_detector_advanced"] = true
+			t["mp_device_torch"] = true
+			t["mp_players_rukzak"] = true
+			t["mp_wood_stolb_fixed"] = true
+			t["mp_wood_stolb_fixed_immunities"] = true
+			t["mp_explosive_fuelcan"] = true
+			t["mp_explosive_tank"] = true
+			t["mp_explosive_barrel"] = true
+
+
 			ini_sys:section_for_each(function(sec)
 				if SYS_GetParam(0, sec, "kind", "") == "i_arty_cont" then -- Exclude artefacts in containers
 					t[sec] = true
