@@ -906,7 +906,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			-- 	131, -- Bibliotekar
 			-- }
 		},
-		iterate_func_radius = 2.5,
+		iterate_func_radius = 2,
 		iterate_func = function(self, actor, artefact_count, artefact_ids, artefact_names, obj) -- Function to find nearest monster to trigger
 			if IsMonster(obj) and obj.alive and obj:alive() and obj:position():distance_to_sqr(actor:position()) <= self.iterate_func_radius * self.iterate_func_radius then
 				trace("Monster %s near Tapeworm, stun", obj:name())
@@ -2724,7 +2724,7 @@ artefact_on_update_functions = {
 	-- Atom, Perk: Arszi's Blessing
 	af_atom = function(actor, artefact_count, artefact_ids, artefact_names)
 		local power_boost = 0.02
-		local radiation_cure = -0.00006
+		local radiation_cure = -0.00005
 
 		local radiation = actor.radiation
 		actor:change_power(radiation * power_boost * artefact_count)
