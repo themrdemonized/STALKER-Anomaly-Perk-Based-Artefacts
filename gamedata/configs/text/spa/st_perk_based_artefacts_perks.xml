@@ -7,7 +7,7 @@
     <text>
     %c[0,209,172,56]Ventaja: %c[d_orange]Piel de Piedra\n 
     %c[0,81,63,22]  • %c[0,209,172,56]Recibir dano cuerpo a cuerpo te otorga acumulacion bonus de Piel de Piedra.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Con cada acumulacion, obtienes un 10% de proteccion contra danos cuerpo a cuerpo, pero recibes una penalizacion de velocidad de un 10%.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Con cada acumulacion, obtienes un 15% de proteccion contra danos cuerpo a cuerpo, pero recibes una penalizacion de velocidad de un 10%.\n
     %c[0,81,63,22]  • %c[0,209,172,56]Cada acumulacion aumenta la proteccion pero penaliza mas la velocidad.\n
     %c[0,81,63,22]  • %c[0,209,172,56]Es posible un maximo de 10 acumulaciones, en las que recibes un 75% de reduccion del dano cuerpo a cuerpo pero quedas completamente inmovilizado en el lugar.\n
     %c[0,81,63,22]  • %c[0,209,172,56]El efecto dura hasta 10 segundos, despues de los cuales se eliminan todas las acumulaciones..\n
@@ -197,7 +197,7 @@
     %c[0,209,172,56]Perk: %c[d_orange]Aturdidor\n
     %c[0,81,63,22]  • %c[0,209,172,56]Ser golpeado cuerpo a cuerpo por enemigos, provocara que sean aturdidos durante 3 segundos.\n
     %c[0,81,63,22]  • %c[0,209,172,56]Mientras esta aturdido, el enemigo queda inhabilitado en la lucha y no podra atacar.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Tiene un tiempo de recarga de 2 segundos entre usos.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Tiene un tiempo de recarga de 6 segundos entre usos.\n
     %c[0,81,63,22]  • %c[0,209,172,56]Cada artefacto adicional agrega 2 segundos adicionales al efecto.</text>
   </string>
   <string id="st_pba_af_moh_perk">
