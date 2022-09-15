@@ -826,12 +826,12 @@ artefact_props = { -- Special props of artefacts that are used in processing
 		end
 	},
 	af_cell = {
-		reduction_coeff = (function() -- LUT with chances to trigger by artefact count
+		reduction_coeff = (function() -- LUT with reduction coeffs by artefact count
 			local t = {}
 			for artefact_count = 1, 5 do
 				-- Parabolic curve
-				-- Progression is 20 -> 35 -> 48 -> 60 -> 70
-				t[artefact_count] = round((17.5 - 0.8333333 * artefact_count) * artefact_count + 3.3333333) * 0.01
+				-- Progression is 15 -> 29 -> 42 -> 54 -> 65
+				t[artefact_count] = round(-0.5 * artefact_count ^ 2 + 15.5 * artefact_count) * 0.01
 			end
 			return t
 		end)(),
@@ -1255,7 +1255,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 	af_skull_miser = {
 		money_items = (function() -- Money items to choose and spawn
 			local t = {}
-			insert_n_times(t, "roubles", 192)
+			insert_n_times(t, "roubles", 100)
 			insert_n_times(t, "money_10_50", 12)
 			insert_n_times(t, "money_50_100", 8)
 			insert_n_times(t, "money_100_200", 6)
@@ -1466,9 +1466,9 @@ artefact_props = { -- Special props of artefacts that are used in processing
 		end,
 		psy_health_penalty_coeff = 0.35,
 		psy_health_restore_coeff = 0.05,
-		hit_buff_coeff = 0.01,
-		critical_hit_buff_coeff = 0.04,
-		artefact_count_coeff = 0.02,
+		hit_buff_coeff = 0.025,
+		critical_hit_buff_coeff = 0.075,
+		artefact_count_coeff = 0.025,
 		effect_reset = function(self)
 			if self.damage_multiplier > 1 then
 				local s_hit = hit()
@@ -2708,12 +2708,13 @@ artefact_on_update_functions = {
 
 	-- Signet, Perk: Light of Tranquility
 	af_signet = function(actor, artefact_count, artefact_ids, artefact_names)
-		local health_boost = 0.0005
+		local health_boost = 0.0007
 
 		local nearby_camp = get_nearby_campfire(5, true)
 		if nearby_camp and nearby_camp:is_on() then
 			for i = 1, artefact_count do
 				actor:change_health(health_boost)
+				manage_psy_health()
 				manage_psy_health()
 				manage_psy_health()
 			end
@@ -2770,7 +2771,7 @@ artefact_on_update_functions = {
 		local af_chelust = artefact_props.af_chelust
 
 		if af_chelust.valid_communities[actor_community] then
-			local health_boost = 0.0006
+			local health_boost = 0.0004
 			local power_boost = 0.006
 			actor:change_health(health_boost)
 			actor:change_power(power_boost)
@@ -2804,8 +2805,8 @@ artefact_on_update_functions = {
 			trace("Chain, healing companion %s", heal_companion:id())
 			heal_companion:change_health(0.0015)
 		else
-			local health_boost = 0.00015
-			local power_boost = 0.0018
+			local health_boost = 0.000075
+			local power_boost = 0.0011
 
 			actor:change_health(health_boost)
 			actor:change_power(power_boost)
@@ -3746,7 +3747,7 @@ artefact_on_trade_functions = {
 			local function cashback()
 				local money = actor:money()
 				trace("Actor last money %s, actor current money %s", actor_last_money, money)
-				local cashback = round((actor_last_money - money) * 0.02 * artefact_count)
+				local cashback = round((actor_last_money - money) * 0.04 * artefact_count)
 				if cashback < 1 then
 					trace("Fountain not fired, not enough money")
 					actor_last_money = money

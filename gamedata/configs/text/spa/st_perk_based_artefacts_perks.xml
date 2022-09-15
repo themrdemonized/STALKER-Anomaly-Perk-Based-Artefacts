@@ -17,24 +17,24 @@
     <text>
     %c[0,209,172,56]Ventaja: %c[d_orange]Desintegrador\n
     %c[0,81,63,22]  • %c[0,209,172,56]Desintegra parte de la bala que viene hacia ti. Desafortunadamente, en el proceso se emite mucha radiacion, lo que lleva al usuario a sufrir enfermedad por radiacion.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Reduce el dano por balas en un 20%.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Reduce el dano por balas en un 15%.\n
     %c[0,81,63,22]  • %c[0,209,172,56]La cantidad recibida de dano se convierte en radiacion.\n
     %c[0,81,63,22]  • %c[0,209,172,56]Se acumula con varios artefactos del mismo tipo.</text>
   </string>
   <string id="st_pba_af_fountain_perk">
     <text>
     %c[0,209,172,56]Ventaja: %c[d_orange]Hora de Letyshops\n
-    %c[0,81,63,22]  • %c[0,209,172,56]El usuario recibe un reembolso del 2% en cada compra.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]El usuario recibe un reembolso del 4% en cada compra.\n
     %c[0,81,63,22]  • %c[0,209,172,56]Se acumula con varios artefactos del mismo tipo.</text>
   </string>
   <string id="st_pba_af_spaika_perk">
     <text>
     %c[0,209,172,56]Ventaja: %c[d_orange]Ascension critica\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Los golpes consecutivos otorgan una bonificacion del 3% de dano a tu proximo disparo.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Golpear al enemigo en el lugar critico otorga una bonificacion del 6%.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Los golpes consecutivos otorgan una bonificacion del 5% de dano a tu proximo disparo.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Golpear al enemigo en el lugar critico otorga una bonificacion del 10%.\n
     %c[0,81,63,22]  • %c[0,209,172,56]Fallar el disparo restablece la acumulacion de la bonificacion y otorga una penalizacion de dano psiquico proporcional a la acumulacion que tenias.\n
     %c[0,81,63,22]  • %c[0,209,172,56]La bonificacion se puede acumular infinitamente siempre que no erres un disparo.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Cada artefacto adicional agrega un 2% a los golpes normales y criticos.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Cada artefacto adicional agrega un 2.5% a los golpes normales y criticos.\n
     %c[0,81,63,22]  • %c[0,209,172,56]Desequipar todos los artefactos Spike eliminara las acumulaciones sin ninguna penalizacion.</text>
   </string>
   <string id="st_pba_af_signet_perk">

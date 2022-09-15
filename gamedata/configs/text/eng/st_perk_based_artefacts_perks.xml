@@ -18,24 +18,24 @@
     <text>
     %c[0,209,172,56]Perk: %c[d_orange]Disintegrator\n
     %c[0,81,63,22]  • %c[0,209,172,56]Disintegrates part of the bullet coming to you. Unfortunately in the process a lot of radiation is emitted, making you ill.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Reduces bullet damage by 20%.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Reduces bullet damage by 15%.\n
     %c[0,81,63,22]  • %c[0,209,172,56]Reduced amount of damage is converted to radiation.\n
     %c[0,81,63,22]  • %c[0,209,172,56]Stacks with multiple artefacts with diminishing returns.</text>
   </string>
   <string id="st_pba_af_fountain_perk">
     <text>
     %c[0,209,172,56]Perk: %c[d_orange]Letyshops Time\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Receive 2% cashback on each buy.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Receive 4% cashback on each buy.\n
     %c[0,81,63,22]  • %c[0,209,172,56]Stacks with multiple artefacts.</text>
   </string>
   <string id="st_pba_af_spaika_perk">
     <text>
     %c[0,209,172,56]Perk: %c[d_orange]Critical Ascensi0n\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Consecutive hits give 3% bonus to damage of your next shot.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Hitting enemy in the critical place gives 6% bonus.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Consecutive hits give 5% bonus to damage of your next shot.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Hitting enemy in the critical place gives 10% bonus.\n
     %c[0,81,63,22]  • %c[0,209,172,56]Missing the shot resets the bonus stack and gives psy damage penalty proportional to the stack you had.\n
     %c[0,81,63,22]  • %c[0,209,172,56]Bonus can be stacked infinitely as long as you don't miss.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Each extra artefact adds 2% to both normal and critical hits.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Each extra artefact adds 2.5% to both normal and critical hits.\n
     %c[0,81,63,22]  • %c[0,209,172,56]Unequipping all Spike artefacts will remove the stack without penalties.</text>
   </string>
   <string id="st_pba_af_signet_perk">
