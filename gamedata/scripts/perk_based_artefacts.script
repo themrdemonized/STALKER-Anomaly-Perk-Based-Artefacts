@@ -2119,6 +2119,9 @@ artefact_props = { -- Special props of artefacts that are used in processing
 				self:hurt_psy(actor, 0.3, nil, nil, 5, 0.006)
 			end,
 			function(self, actor)
+				self:hurt_psy(actor, 0.3, nil, nil, 5, 0.006)
+			end,
+			function(self, actor)
 				self:hurt_psy(actor, 0.5, {1, 2, 3, 4, 5}, 2, 10, 0.0075)
 			end,
 			function(self, actor)
@@ -2817,7 +2820,7 @@ artefact_on_update_functions = {
 	af_zhelch = function(actor, artefact_count, artefact_ids, artefact_names)
 		local af_lucifer = artefact_props.af_lucifer
 		local health_boost = 0.003
-		local psy_drain = -0.0025 * (2 - af_lucifer.condition)
+		local psy_drain = -0.00125 * (2 - af_lucifer.condition)
 		local psy_boost = 0.0035 * af_lucifer.condition
 
 		if actor.health < (advanced_stamina_system_ass and advanced_stamina_system_ass.blood_loss_limit - 0.03 or 0.97) then -- ASS compatibility
@@ -2833,7 +2836,7 @@ artefact_on_update_functions = {
 		end
 
 		local dice_roll = random() * 100
-		local chance = 0.5 + 5 * (1 - get_psy_health())
+		local chance = 0.25 + 2.5 * (1 - get_psy_health())
 		if dice_roll > chance then
 			trace("Scar, action not triggered, dice roll %s, chance %s", dice_roll, chance)
 			return
