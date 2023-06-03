@@ -363,16 +363,14 @@ local smoothed_values = {}
 
 --EMA smoothing for changing values
 local default_smoothing = 300
-local smoothing_alpha = 2.0 / (default_smoothing + 1)
+local function ema(key, value, def, steps, delta)
+	local steps = steps or default_smoothing
+	local delta = delta or steps
+	local smoothing_alpha = 2.0 / (steps + 1)
 
-local function set_smoothing(n)
-	local n = max(n, 1)
-	smoothing_alpha = 2.0 / (n + 1)
-end
+	smoothed_values[key] = smoothed_values[key] and smoothed_values[key] + min(smoothing_alpha * (delta / steps), 1) * (value - smoothed_values[key]) or def or value
 
-local function ema(key, value, def)
-	smoothed_values[key] = smoothed_values[key] and smoothed_values[key] + smoothing_alpha * (value - smoothed_values[key]) or def or value
-	--trace("EMA fired, key %s, target %s, current %s, going %s", key, value, smoothed_values[key], (value > smoothed_values[key] and "up" or "down"))
+	--printf("EMA fired, key %s, target %s, current %s, going %s", key, value, smoothed_values[key], (value > smoothed_values[key] and "up" or "down"))
 	return smoothed_values[key]
 end
 
@@ -387,9 +385,9 @@ local function look_at_nearest_npc(npc, actor)
 		local look_distance = actor_position:distance_to(npc_position)
 		local look_position = vector():set(actor_position):add(actor_direction:mul(look_distance))
 
-		look_position.x = ema("look_x", npc_position.x, look_position.x)
-		look_position.y = ema("look_y", npc_position.y, look_position.y)
-		look_position.z = ema("look_z", npc_position.z, look_position.z)
+		look_position.x = ema("look_x", npc_position.x, look_position.x, 50, device().time_delta)
+		look_position.y = ema("look_y", npc_position.y, look_position.y, 50, device().time_delta)
+		look_position.z = ema("look_z", npc_position.z, look_position.z, 50, device().time_delta)
 
 		actor:actor_look_at_point(look_position)
 	end
@@ -546,7 +544,7 @@ end
 -- Callbacks
 callbacks = {}
 function register_callback(callback, callback_function, on_end_function, key)
-	if key and callbacks[key] then
+	if key and callbacks[key] and callbacks[key].func then
 		UnregisterScriptCallback(callbacks[key].callback, callbacks[key].func)
 	end
 
@@ -559,7 +557,11 @@ function register_callback(callback, callback_function, on_end_function, key)
 	local key = key or (#callbacks + 1)
 	callbacks[key] = t
 	trace("registering callback %s, key %s", callback, key)
-	RegisterScriptCallback(callbacks[key].callback, callbacks[key].func)
+
+	if callbacks[key].func then
+		RegisterScriptCallback(callbacks[key].callback, callbacks[key].func)
+	end
+
 	return key
 end
 
@@ -570,10 +572,15 @@ end
 function unregister_callback(key)
 	if not callbacks[key] then return end
 	trace("unregistering callback %s, %s", key, callbacks[key].callback)
-	UnregisterScriptCallback(callbacks[key].callback, callbacks[key].func)
+
+	if callbacks[key].func then
+		UnregisterScriptCallback(callbacks[key].callback, callbacks[key].func)
+	end
+
 	if callbacks[key].on_end then
 		callbacks[key].on_end()
 	end
+
 	callbacks[key] = nil
 end
 
@@ -589,7 +596,7 @@ end
 
 function unregister_on_equip_callbacks()
 	for key, props in pairs(callbacks) do
-		if string_find(key, "on_equip") then
+		if string_find(key, "_on_equip$") then
 			unregister_callback(key)
 		end
 	end
@@ -696,6 +703,7 @@ end
 -- not_save - boolean, do not save in mdata }
 -- this is the complex function intended to have persistence between saves, moving to different maps and so on, use if needed
 -- no upvalues are allowed in the functions, best to reference globals by _G. lookup
+-- good practice is to make a wrapper function that calls actual function by its global path, that way all variables will be accessible normally
 -- The precision for both cooldown and timed effects is 0.1 or 100ms, making more precise timer or timed effect is pointless
 timed_effects = {}
 function add_timed_effect(timer, effect_function, effect_args, on_end_function, on_end_args, key, not_save)
@@ -781,7 +789,7 @@ speed_boosts = { -- Table of speed boosts for different artefacts
 	},
 	af_generator = {
 		name = "af_generator_boost",
-		boost = 0.115
+		boost = 0.095
 	},
 	af_kogot = {
 		name = "af_kogot_boost",
@@ -931,7 +939,141 @@ artefact_props = { -- Special props of artefacts that are used in processing
 	af_elektron = {
 		valid_hits = { -- Valid hit types to trigger
 			[hit.shock] = true
-		}
+		},
+		saved_weapons = {},
+		rpm_coeff = 0.25,
+		min_rpm_coeff = 0.25,
+		max_rpm_coeff = 2,
+		buff_time = 600,
+		buff_time_rare = 1200,
+		callbacks_registered = false,
+		weapon_fired = false,
+		sound_idle = get_safe_sound_object("perk_based_artefacts\\VIOLLOOP"),
+		on_hud_animation_play = function(anm_table, obj)
+			local af_elektron = artefact_props.af_elektron
+			if not anm_table.anm_name:find("^anm_idle") then
+				anm_table.anm_speed = anm_table.anm_speed * (1 + af_elektron.rpm_coeff)
+			end
+		end,
+		on_weapon_before_fire = function(flags)
+			local wpn = db.actor:active_item()
+			local af_elektron = artefact_props.af_elektron
+			local c_obj = wpn:cast_Weapon()
+			if not c_obj.RealRPM then
+				trace("Can't change RPM of weapon, install modded exes")
+				return
+			end 
+			if not af_elektron.saved_weapons[wpn:id()] then
+				local rpm = c_obj:RealRPM()
+				local mode_rpm = c_obj:ModeRealRPM()
+				af_elektron.saved_weapons[wpn:id()] = {
+					rpm = rpm,
+					mode_rpm = mode_rpm,
+				}
+			end
+
+			local last_k = af_elektron.rpm_coeff
+			local steps = max(1, (af_elektron.saved_weapons[wpn:id()].rpm / 22) ^ 1.5)
+			af_elektron.rpm_coeff = ema("af_elektron_rpm_coeff", af_elektron.max_rpm_coeff, nil, steps)
+
+			local rpm = af_elektron.saved_weapons[wpn:id()].rpm
+			local mode_rpm = af_elektron.saved_weapons[wpn:id()].mode_rpm
+			local k = af_elektron.rpm_coeff
+			local new_rpm = rpm * (1 + k)
+			local new_mode_rpm = mode_rpm * (1 + k)
+
+			trace("Electron, new rpm for %s: %s, %s", wpn:name(), new_rpm, new_mode_rpm)
+			c_obj:SetRealRPM(new_rpm)
+			c_obj:SetModeRealRPM(new_mode_rpm)
+			local should_fire = c_obj:GetAmmoElapsed() > 0 
+			CreateTimeEvent("af_elektron_next_tick_reset", 0, 0, function()
+				if not should_fire or not flags.ret_value or not af_elektron.weapon_fired then
+					af_elektron.rpm_coeff = ema("af_elektron_rpm_coeff", last_k, nil, 1)
+				end
+				af_elektron.weapon_fired = false
+				return true
+			end)
+		end,
+		on_weapon_fired = function(obj, wpn, ammo_elapsed, grenade_elapsed, ammo_type, grenade_type)
+			local af_elektron = artefact_props.af_elektron
+			af_elektron.weapon_fired = true
+		end,
+		buff_func = function(self)
+			db.actor:change_power(1)
+			local speed_k = 1 + 0.3 * lerp(0.25, 1, normalize(self.rpm_coeff, self.min_rpm_coeff, self.max_rpm_coeff))
+			add_speed("af_elektron_rpm_coeff", speed_k, false, true)
+			add_speed("af_elektron_rpm_coeff", speed_k, true, true)
+
+			-- Electron, reduce powerup
+			self.rpm_coeff = ema("af_elektron_rpm_coeff", self.min_rpm_coeff, self.rpm_coeff, 100)
+			trace("Electron, new coeff %s", self.rpm_coeff)
+
+			if not self.callbacks_registered then
+				self.callbacks_registered = true
+				trace("Electron, registering callbacks")
+				RegisterScriptCallback("actor_on_weapon_before_fire", self.on_weapon_before_fire)
+				RegisterScriptCallback("actor_on_weapon_fired", self.on_weapon_fired)
+				RegisterScriptCallback("actor_on_hud_animation_play", self.on_hud_animation_play)
+
+				RemoveTimeEvent("af_elektron_sound_stop", 0)
+				smoothed_values.af_elektron_rpm_coeff = nil
+				smoothed_values.af_elektron_sound_stop = nil
+				self.sound_idle:play(db.actor, 0, sound_object.s2d + sound_object.looped)
+			end
+
+			self.sound_idle.volume = lerp(0.25, 0.5, normalize(self.rpm_coeff, self.min_rpm_coeff, self.max_rpm_coeff))
+			self.sound_idle.frequency = lerp(0.5, 1.5, normalize(self.rpm_coeff, self.min_rpm_coeff, self.max_rpm_coeff))
+
+			for id, v in pairs(self.saved_weapons) do
+				local obj = get_object_by_id(id)
+				if obj then
+					local p = obj:parent()
+					if not (p and p:id() == AC_ID) then
+						local c_obj = obj:cast_Weapon()
+						c_obj:SetRealRPM(v.rpm)
+						c_obj:SetModeRealRPM(v.mode_rpm)
+						self.saved_weapons[id] = nil
+					end
+				end
+			end
+		end,
+		buff_func_reset = function(self)
+			self.callbacks_registered = false
+			UnregisterScriptCallback("actor_on_weapon_fired", self.on_weapon_fired)
+			UnregisterScriptCallback("actor_on_weapon_before_fire", self.on_weapon_before_fire)
+			UnregisterScriptCallback("actor_on_hud_animation_play", self.on_hud_animation_play)
+			trace("Electron, unregistering callbacks")
+
+			CreateTimeEvent("af_elektron_sound_stop", 0, 0, function()
+				self.sound_idle.volume = 0.25
+				local f = ema("af_elektron_sound_stop", 0.001, self.sound_idle.frequency, 50, device().time_delta)
+				self.sound_idle.frequency = f
+				if f < 0.02 then
+					trace("Electron, stop sound")
+					self.sound_idle:stop()
+					return true
+				end
+			end)
+
+			for id, v in pairs(self.saved_weapons) do
+				local wpn = get_object_by_id(id)
+				if wpn then
+					local c_obj = wpn:cast_Weapon()
+					if not c_obj.RealRPM then
+						trace("Can't change RPM of weapon, install modded exes")
+						return
+					end 
+					c_obj:SetRealRPM(v.rpm)
+					c_obj:SetModeRealRPM(v.mode_rpm)
+				end
+			end
+		end,
+		buff_func_time_effect = function()
+			perk_based_artefacts.artefact_props.af_elektron:buff_func()
+		end,
+		buff_func_time_effect_reset = function()
+			perk_based_artefacts.artefact_props.af_elektron:buff_func_reset()
+		end,
 	},
 	af_tapeworm = {
 		valid_hits = { -- Valid hit types to trigger
@@ -1736,7 +1878,9 @@ artefact_props = { -- Special props of artefacts that are used in processing
 		hit_coeff_min = 0.1,
 		on_before_hit = function(self, actor, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
 			local bleeding_hit = s_hit.power * -self.bleed_coeff * artefact_count
-			s_hit.power = s_hit.power * lerp(self.hit_coeff_min, self.hit_coeff_max, npc.health)
+			local k = lerp(self.hit_coeff_min, self.hit_coeff_max, npc.health)
+			trace("Thistle coeff %s", k)
+			s_hit.power = s_hit.power * k
 
 			-- Make him panic
 			if IsStalker(npc) then
@@ -2077,6 +2221,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 				end, nil, "af_zhelch_look_at_npc")
 
 				CreateTimeEvent("af_zhelch_look_at_npc", "af_zhelch_look_at_npc", time, function()
+					actor:actor_stop_look_at_point()
 					unregister_callback("af_zhelch_look_at_npc")
 					return true
 				end)
@@ -2260,17 +2405,12 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			function(self, actor)
 				self:hide_all_ui(actor)
 				
-				set_smoothing(35)
 				local time = 1.5
 				local t = self:fire_weapon(actor, time)
 				time = time + t
 				self:look_at_npc(actor, time)
 				CreateTimeEvent("af_zhelch_fire_weapon_sound", "af_zhelch_fire_weapon_sound", max(t - 0.5, 0), function()
 					play_sound_on_actor("perk_based_artefacts\\mil_crazy" .. random(3))
-					return true
-				end)
-				CreateTimeEvent("af_zhelch_return_smoothing", "af_zhelch_return_smoothing", time, function()
-					set_smoothing(default_smoothing)
 					return true
 				end)
 			end,
@@ -2905,7 +3045,7 @@ artefact_on_update_functions = {
 
 	-- Generator, Perk: Godzilla is Approaching
 	af_generator = function(actor, artefact_count, artefact_ids, artefact_names)
-		local charge_boost = 0.00004
+		local charge_boost = 0.00003
 		local charge_threshold = 0.05 -- Below this charge the item has no battery
 
 		--Pda, Detector and NVG slots
@@ -3587,17 +3727,21 @@ artefact_on_before_hit_functions = {
 			end
 		end, actor)
 
-		local function infinite_sprint()
-			db.actor:change_power(1)
+		local time
+		if random() * 100 < 2 then
+			time = af_elektron.buff_time_rare
+			play_sound_on_actor("perk_based_artefacts\\lyutii", 0.6)
+		else
+			time = af_elektron.buff_time
+			play_sound_on_actor("perk_based_artefacts\\rnd_scr3", 1)
+		end
+		local key = "af_elektron"
+
+		if not (timed_effects[key] and timed_effects[key].timer > (time_elapsed + time)) then
+			add_timed_effect(time, af_elektron.buff_func_time_effect, nil, af_elektron.buff_func_time_effect_reset, nil, "af_elektron")
 		end
 
-		if random(100) < 5 then
-			play_sound_on_actor("perk_based_artefacts\\lyutii", 0.6)
-			add_timed_effect(1200, infinite_sprint)
-		else
-			play_sound_on_actor("perk_based_artefacts\\rnd_scr3", 1)
-			add_timed_effect(600, infinite_sprint)
-		end
+		add_status_effect(time, nil, "af_elektron", 1)
 	end,
 
 	-- Cell, Perk: Disintegrator
@@ -4038,9 +4182,15 @@ artefact_on_equip_functions = {
 			af_star_phantom:hide_weapon()
 		end
 		af_star_phantom:add_pp_effector()
-		register_on_equip_callback("on_enemy_eval", af_star_phantom.ignore_enemy_function, function()
+
+		RemoveTimeEvent("af_star_phantom_on_enemy_eval_unreg", 0)
+		register_callback("on_enemy_eval", af_star_phantom.ignore_enemy_function, nil, "af_star_phantom")
+		register_on_equip_callback("actor_on_first_update", nil, function()
 			af_star_phantom:restore_weapon()
 			af_star_phantom:remove_pp_effector()
+			CreateTimeEvent("af_star_phantom_on_enemy_eval_unreg", 0, 1.5, function()
+				unregister_callback("af_star_phantom")
+			end)
 		end, "af_star_phantom")
 	end,
 
@@ -4126,6 +4276,11 @@ artefact_on_hud_animation_play_functions = {
 			anm_table.anm_speed = anm_table.anm_speed * (1 + 0.5 * artefact_count)
 		end
 	end,
+}
+
+-- Functions for artefacts which provide perk bonuses for bullet impacts
+artefacts_bullet_on_impact_functions = {
+
 }
 
 -- Special monkey patches for some artefacts to make their effects work
@@ -4699,6 +4854,10 @@ function on_item_drag_dropped(obj_1, obj_2, slot_from, slot_to)
 end
 
 function bullet_on_impact(bullet)
+
+	if bullet.parent_id == AC_ID then
+		process_artefacts(artefacts_bullet_on_impact_functions, bullet)
+	end
 
 	-- Add particles to bullets
 	local weapon = bullet.weapon_id and level.object_by_id(bullet.weapon_id)
