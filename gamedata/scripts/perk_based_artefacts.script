@@ -140,7 +140,8 @@ local c_id_ppe = {
 	blur = 5600,
 	rcom_actor_death_quick = 446,
 	snd_shock = 5607,
-	transmutate = 69420
+	transmutate = 69420,
+	phantom_star = 69421,
 }
 
 local last_hit
@@ -276,6 +277,36 @@ local function get_random_element(t)
 	return t[get_random_key(t)]
 end
 
+-- Linear inter/extrapolation
+local function lerp(a, b, f)
+    if a and b and f then
+        return a + f * (b - a)
+    else
+        return a or b or 0
+    end
+end
+
+-- Wrapper for AddUniqueCall that checks for time_global update before executing function
+local function throttle(func, tg_throttle)
+	local tg = 0
+	if not tg_throttle or tg_throttle == 0 then
+		return function(...)
+			local t = time_global()
+			if t ~= tg then
+				tg = t
+				return func(...)
+			end
+		end
+	else
+		return function(...)
+			local t = time_global()
+			if t < tg then return end
+			tg = t + tg_throttle
+			return func(...)
+		end
+	end
+end
+
 local function get_time_elapsed()
 	--trace(time_factor)
 	return floor(get_game_time():diffSec(get_start_time()) / time_factor * 10) * 0.1
@@ -313,7 +344,7 @@ local function get_current_weather()
 	return get_weather_manager():get_curr_weather()
 end
 
-local function play_sound_on_actor(snd, volume, frequency)
+local function play_sound_on_actor(snd, volume, frequency, looped)
 	if not snd then
 		trace("snd is nil")
 		return
@@ -321,7 +352,7 @@ local function play_sound_on_actor(snd, volume, frequency)
 	local actor = db.actor
 	local snd = get_safe_sound_object(snd)
 	if snd then
-		snd:play(actor, 0, sound_object.s2d)
+		snd:play(actor, 0, looped and (sound_object.s2d + sound_object.looped) or sound_object.s2d)
 		snd.volume = volume or 1
 		snd.frequency = frequency or 1
 		return snd
@@ -368,6 +399,24 @@ local function change_sleep(item)
 	if get_game_factor("sleep") then
 		actor_status_sleep.actor_on_item_use(item)
 	end
+end
+
+local function add_pp_effector_const_smooth(ppfile, id, looped, time)
+	add_pp_effector(ppfile, id, looped)
+	local factor = 0.0001
+	local inc_per_update = 0.001 * (1 / time)
+	level.set_pp_effector_factor(id, 0.005)
+	CreateTimeEvent(ppfile, id, 0, function()
+		factor = math.min(1, factor + inc_per_update * device().time_delta)
+		trace("%s, %s, factor %s", ppfile, id, factor)
+		level.set_pp_effector_factor(id, factor)
+		return factor == 1
+	end)
+end
+
+local function remove_pp_effector_const_smooth(ppfile, id)
+	RemoveTimeEvent(ppfile, id)
+	remove_pp_effector(id)
 end
 
 -- Artefacts
@@ -734,10 +783,21 @@ speed_boosts = { -- Table of speed boosts for different artefacts
 		name = "af_generator_boost",
 		boost = 0.115
 	},
+	af_kogot = {
+		name = "af_kogot_boost",
+		boost = 0.16
+	},
 	af_lucifer = {
 		name = "af_lucifer_boost",
 		boost = 0.160
 	}
+}
+
+jump_boosts = { -- Table of jump boosts for different artefacts
+	af_peas = {
+		name = "af_peas_boost",
+		boost = 0.12
+	},
 }
 
 local add_speed = speed.add_speed
@@ -751,16 +811,40 @@ end
 local add_weight = weight.add_weight
 local remove_weight = weight.remove_weight
 
+local add_jump = jump.add_jump
+local remove_jump = jump.remove_jump
+function remove_jump_boosts()
+	for boost, props in pairs(jump_boosts) do
+		remove_jump(props.name)
+	end
+end
+
 -- local artefact_props
 artefact_props = { -- Special props of artefacts that are used in processing
+	af_ear = {
+		sound = get_safe_sound_object("perk_based_artefacts\\heartbeat_pulse_loop"),
+		sound_play = function(self)
+			self.sound:play(db.actor, 0, sound_object.s2d + sound_object.looped)
+		end,
+		sound_stop = function(self)
+			self.sound:stop()
+		end,
+		health_threshold = (function()
+			local t = {}
+			for artefact_count = 1, 5 do
+				t[artefact_count] = 0.27 + 0.03 * artefact_count
+			end
+			return t
+		end)(),
+	},
 	af_black_angel = {
 		dice_roll = 0,
 		reflect_chance = (function() -- LUT with chances to trigger by artefact count
 			local t = {}
 			for artefact_count = 1, 5 do
 				-- Parabolic curve
-				-- Progression is 20 -> 37.5 -> 50 -> 57.5 -> 60
-				t[artefact_count] = (25 - 2.5 * artefact_count) * artefact_count - 2.5
+				-- Progression is 25 -> 40 -> 55 -> 65 -> 70
+				t[artefact_count] = -1.875 * artefact_count^2 + 22.5 * artefact_count + 4.375
 			end
 			return t
 		end)(),
@@ -799,7 +883,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			for artefact_count = 1, 5 do
 				-- Parabolic curve
 				-- Progression is 35 -> 50 -> 62 -> 70 -> 75
-				t[artefact_count] = round((20 - 1.66667 * artefact_count) * artefact_count + 16.6667)
+				t[artefact_count] = round((20 - 1.66667 * artefact_count) * artefact_count + 16.6667) + 5
 			end
 			return t
 		end)(),
@@ -813,8 +897,12 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			"perk_based_artefacts\\TELEPRT2",
 			"perk_based_artefacts\\TELEPRT3"
 		},
-		pp_effector_time = 0.33,
+		pp_effector_time = 0.2,
 		on_death = function(self, actor, artefact_count, artefact_ids, artefact_names, npc, who, last_npc_hit, last_npc_hit_bone_index)
+			if not check_cooldown("af_lighthouse") then
+				trace("Lighthouse, on cooldown")
+				return
+			end
 			trace("Teleporting actor")
 
 			add_pp_effector("black_infinite.ppe", c_id_ppe.black_infinite, true)
@@ -823,6 +911,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			end)
 			actor:set_actor_position(npc:position())
 			play_sound_on_actor(get_random_array_element(self.sounds), 0.7, random_float(0.95, 1.05))
+			add_cooldown(15, "af_lighthouse")
 		end
 	},
 	af_cell = {
@@ -1070,7 +1159,16 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			[hit.wound] = true
 		},
 		dice_roll = 0,
-		health_boost_coeff = 0.0035,
+		health_boost_coeff = 0.003,
+		anims_to_accelerate = {
+			anm_attack       = true,
+			anm_attack2      = true,
+			anm_attack2_e    = true,
+			anm_attack_e     = true,
+			anm_hide         = true,
+			anm_show         = true,
+			anm_show_empty   = true,
+		},
 		on_before_hit = function(self, actor, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
 			if not self.valid_hits[s_hit.type] then
 				trace("Claw, not a valid hit type %s", s_hit.type)
@@ -1080,12 +1178,20 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			local af_lucifer = artefact_props.af_lucifer
 			local lucifer_bonus = max(1 - normalize(af_lucifer.condition, 0, 0.5), 0)
 
-			s_hit.power = s_hit.power * (1 + artefact_count * 0.1) * (1 + lucifer_bonus)
+			s_hit.power = s_hit.power * (1 + artefact_count * 0.5) * (1 + lucifer_bonus)
 			local health_boost = s_hit.power * self.health_boost_coeff * artefact_count
 
 			add_simple_timed_effect(1, function()
 				actor:change_health(health_boost)
 			end)
+			play_sound_on_actor("perk_based_artefacts\\HEADBRK" .. random(2), 0.3, random_float(0.8, 1.2))
+
+			add_speed(speed_boosts.af_kogot.name, 1 + speed_boosts.af_kogot.boost * artefact_count, false, true)
+			add_speed(speed_boosts.af_kogot.name, 1 + speed_boosts.af_kogot.boost * artefact_count, true, true)
+			remove_timed_effect("af_kogot_boost", true)
+			add_simple_timed_effect(4 + 1 * artefact_count, nil, function()
+				remove_speed(speed_boosts.af_kogot.name)
+			end, "af_kogot_boost")
 
 			self.dice_roll = random()
 			if af_lucifer:check_lucifer() and self.dice_roll < (lucifer_bonus * lucifer_bonus) then -- Squared chance to have less proc on better condition
@@ -1295,6 +1401,38 @@ artefact_props = { -- Special props of artefacts that are used in processing
 	af_star_phantom = {
 		weapon_hidden = false, -- Check for weapon is hidden
 		hidden_num = 1,
+		sound_start = get_safe_sound_object("perk_based_artefacts\\CTIMSTRT"),
+		sound_idle = get_safe_sound_object("perk_based_artefacts\\CTIMLOOP"),
+		sound_stop = get_safe_sound_object("perk_based_artefacts\\CTIMSTOP"),
+		saved_volume_snd = 1,
+		saved_volume_music = 1,
+		add_pp_effector = function(self)
+			add_pp_effector_const_smooth("phantom_star.ppe", c_id_ppe.phantom_star, true, 0.7)
+			self.sound_stop:stop()
+			self.sound_start:play(db.actor, 0, sound_object.s2d)
+			self.sound_start.volume = 1
+			self.sound_idle:play(db.actor, 0, sound_object.s2d + sound_object.looped)
+			self.sound_idle.volume = 1
+
+			self.saved_volume_snd = level.get_snd_volume()
+			level.set_snd_volume(self.saved_volume_snd * 0.33)
+
+			if level.set_music_volume then
+				self.saved_volume_music = level.get_music_volume()
+				level.set_music_volume(self.saved_volume_music * 0.33)
+			end
+		end,
+		remove_pp_effector = function(self)
+			remove_pp_effector_const_smooth("phantom_star.ppe", c_id_ppe.phantom_star)
+			self.sound_stop:play(db.actor, 0, sound_object.s2d)
+			self.sound_stop.volume = 0.5
+			self.sound_start:stop()
+			self.sound_idle:stop()
+			level.set_snd_volume(self.saved_volume_snd)
+			if level.set_music_volume then
+				level.set_music_volume(self.saved_volume_music)
+			end
+		end,
 		hide_weapon = function(self)
 			self.weapon_hidden = true
 			self.hidden_num = self.hidden_num - 1
@@ -1327,10 +1465,12 @@ artefact_props = { -- Special props of artefacts that are used in processing
 		end
 	},
 	af_dragon_eye = {
-		dice_roll = 0,
-		chance = 5,
+		trigger = false,
 		on_before_hit = function(self, actor, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
-			self.dice_roll = random() * 100 -- Float chance
+			if not check_cooldown("af_dragon_eye") then
+				trace("Dragon's Eye, on the cooldown")
+				return
+			end
 
 			local current_weapon = actor:active_item()
 			if not current_weapon then
@@ -1355,19 +1495,18 @@ artefact_props = { -- Special props of artefacts that are used in processing
 
 			local pellet_count = max(SYS_GetParam(2, ammo_types[ammo_type], "buck_shot", 1), 1)
 
-			local chance = self.chance * artefact_count / pellet_count
-			if self.dice_roll > chance then
-				trace("Dragon Eye not triggered, dice roll %s, chance %s", self.dice_roll, chance)
-				return
-			end
 			s_hit.power = 1000
+
+			local next_time = (60 * 2) / (3 ^ (artefact_count - 1))
+			add_cooldown(next_time, "af_dragon_eye")
+			self.trigger = true
 		end,
 		on_death = function(self, actor, artefact_count, artefact_ids, artefact_names, npc, who, last_npc_hit, last_npc_hit_bone_index)
-			local chance = self.chance * artefact_count
-			if self.dice_roll > chance then
-				trace("Dragon Eye not triggered, dice roll %s, chance %s", self.dice_roll, chance)
+			if not self.trigger then
+				trace("Dragon Eye not triggered, on cooldown")
 				return
 			end
+			self.trigger = false
 
 			local npc_id = npc:id()
 			trace("Victim's id: %s", npc_id)
@@ -1413,6 +1552,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 		monster_tiers = { -- Monster Tiers opening by artefact count
 			[1] = {
 				clsid.zombie_s,
+				clsid.fracture_s,
 				clsid.cat_s,
 				clsid.dog_s,
 				"SM_PIRANHA",
@@ -1420,32 +1560,32 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			[2] = {
 				clsid.boar_s,
 				clsid.flesh_s,
-				clsid.fracture_s,
 				clsid.pseudodog_s,
 				clsid.psy_dog_s,
+				clsid.snork_s,
+				clsid.bloodsucker_s,
+				"SM_PSYSUCKER",
 			},
 			[3] = {
-				clsid.bloodsucker_s,
-				clsid.snork_s,
+				clsid.burer_s,
+				clsid.controller_s,
 				"SM_KARLIK",
-				"SM_PSYSUCKER",
 				"SM_LURKER",
 				"SM_VOLK",
 				"SM_POLTER_CORP",
 				135, -- Borya
 			},
 			[4] = {
-				clsid.burer_s,
-				clsid.controller_s,
-				"SM_TARK",
-			},
-			[5] = {
 				clsid.chimera_s,
 				clsid.gigant_s,
 				"SM_MEDVED",
 				"SM_MONSTER_BOAR",
 				"SM_VENDIGO",
 				131, -- Bibliotekar
+				"SM_TARK",
+			},
+			[5] = {
+				
 			}
 		},
 		monsters = {} -- Generated table to check if current monster is allowed to be kick
@@ -1479,14 +1619,14 @@ artefact_props = { -- Special props of artefacts that are used in processing
 				change_psy_health((self.damage_multiplier - 1) * -self.psy_health_penalty_coeff)
 				play_sound_on_actor("anomaly\\electra_hit1", 1, 1.5)
 			else
-				play_sound_on_actor("decoder", 1, 0.8)
+				play_sound_on_actor("perk_based_artefacts\\quake3_hitsound", 0.75, 0.8)
 			end
 			self:stack_reset()
 		end,
 		on_before_hit = function(self, actor, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
 			s_hit.power = s_hit.power * self.damage_multiplier
 			trace("Spike, Final Damage %s, bonus %s", s_hit.power, self.damage_multiplier)
-			play_sound_on_actor("decoder", 1, self.damage_multiplier)
+			play_sound_on_actor("perk_based_artefacts\\quake3_hitsound", 0.75, 1 + (self.damage_multiplier - 1) * 0.5)
 			
 			self.damage_multiplier = self.damage_multiplier + (is_critical_bone(npc:clsid(), bone_id) and self.critical_hit_buff_coeff + self.artefact_count_coeff * artefact_count or self.hit_buff_coeff + self.artefact_count_coeff * artefact_count)
 			change_psy_health((self.damage_multiplier - 1) * self.psy_health_restore_coeff)
@@ -1554,7 +1694,17 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			}
 		},
 		hit_power_coeff = 0.7,
-		elemental_power_coeff = 0.5,
+		elemental_power_coeff = 0.7,
+		play_particles = function(self, effect, position)
+			local gibs = particles_object(get_random_array_element(self.hit_types_particles[effect.hit_type]))
+
+			local npc_position = vector():set(position)
+			npc_position.y = npc_position.y + 0.5
+
+			if gibs and not gibs:playing() then
+				gibs:play_at_pos(npc_position)
+			end
+		end,
 		on_before_hit = function(self, actor, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
 			local actor_weapon = actor:active_item()
 			if not actor_weapon then
@@ -1576,22 +1726,28 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			elemental_hit.draftsman = npc
 			npc:hit(elemental_hit)
 			trace("Sandstone, effect power %s, hit_type %s", elemental_hit.power, elemental_hit.type)
-			local gibs = particles_object(get_random_array_element(self.hit_types_particles[effect.hit_type]))
-			local npc_position = npc:position()
-			npc_position.y = npc_position.y + 0.5
-			if gibs and not gibs:playing() then
-				gibs:play_at_pos(npc_position)
-			end
+			self:play_particles(effect, npc:position())
 		end
 	},
 	af_repei = {
-		effect_time = 7,
-		bleed_coeff = 0.0014, -- Bigger number => bigger bleeding damage
-		hit_coeff = 0.5,
+		effect_time = 6,
+		bleed_coeff = 0.0023, -- Bigger number => bigger bleeding damage
+		hit_coeff_max = 0.4,
+		hit_coeff_min = 0.1,
 		on_before_hit = function(self, actor, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
-			local hit_k = self.hit_coeff
 			local bleeding_hit = s_hit.power * -self.bleed_coeff * artefact_count
-			s_hit.power = s_hit.power * hit_k
+			s_hit.power = s_hit.power * lerp(self.hit_coeff_min, self.hit_coeff_max, npc.health)
+
+			-- Make him panic
+			if IsStalker(npc) then
+				local panic_time = 4
+				demonized_stalker_aoe_panic.npc_add_aoe_panic(npc:id(), "af_repei", panic_time)
+				add_simple_timed_effect(panic_time, throttle(function()
+					if not npc:alive() then return end
+					xr_sound.set_sound_play(npc:id(), get_random_array_element({"panic_monster", "panic_human"}))
+					trace("Thistle, play panic %s", npc:name())
+				end, 2000), nil, "af_repei_panic" .. npc:id())
+			end
 			
 			add_simple_timed_effect(self.effect_time, function()
 				if not npc:alive() then return end
@@ -1604,7 +1760,9 @@ artefact_props = { -- Special props of artefacts that are used in processing
 				if not npc:alive() then return end
 				if npc.health > 0 then
 					CreateTimeEvent("af_thistle_hud", "af_thistle_hud", 0, function()
-						refresh_health_bar(npc, nil, local_direction, who, bone_index)
+						if npc.health > 0 then
+							refresh_health_bar(npc, nil, local_direction, who, bone_index)
+						end
 						return true
 					end)
 				end
@@ -1620,7 +1778,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 		protection_bonus = (function()
 			local t = {}
 			for stacks = 0, 10 do
-				t[stacks] = 1 - round(-0.6 * stacks ^ 2 + 12 * stacks + 15) * 0.01 -- 15 -> 75% parabolic curve
+				t[stacks] = 1 - round(-0.6 * stacks ^ 2 + 12 * stacks + 25) * 0.01 -- 25 -> 85% parabolic curve
 			end
 			return t
 		end)(),
@@ -1688,7 +1846,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 				[hit.fire_wound] = true
 			}
 
-			local health_boost = 0.001
+			local health_boost = 0.003
 			self:add_effect(function()
 				actor:change_health(health_boost)
 			end)
@@ -1702,17 +1860,18 @@ artefact_props = { -- Special props of artefacts that are used in processing
 		mutant_part_boar_chop = function(self, actor)
 			local valid_hits = { -- Valid hit types to trigger
 				[hit.strike] = true,
-				[hit.wound] = true
+				[hit.wound] = true,
+				[hit.fire_wound] = true
 			}
 			
 			self:register("actor_on_before_hit", function(s_hit, bone_id, flags)
 				if valid_hits[s_hit.type] then
-					s_hit.power = s_hit.power * 0.75
+					s_hit.power = s_hit.power * 0.5
 				end
 			end)
 		end,
 		mutant_part_dog_meat = function(self, actor)
-			local bleeding_cure_boost = 0.0015
+			local bleeding_cure_boost = 0.003
 			self:add_effect(function()
 				actor.bleeding = bleeding_cure_boost
 				change_psy_health(0.001)
@@ -1724,13 +1883,13 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			}
 
 			self:add_effect(function()
-				change_psy_health(0.002)
+				change_psy_health(0.003)
 			end)
 
 			self:register("actor_on_before_hit", function(s_hit, bone_id, flags)
 				if valid_hits[s_hit.type] then
 					trace("pseudodog hit %s", hit.telepatic)
-					s_hit.power = s_hit.power * 0.75
+					s_hit.power = s_hit.power * 0.5
 				end
 			end)
 		end,
@@ -1761,7 +1920,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			RegisterScriptCallback("npc_on_before_hit", enable_enemy_on_hit)
 			add_status_effect(60, nil, "af_moh_invisibility")
 
-			local bleeding_cure_boost = 0.003
+			local bleeding_cure_boost = 0.006
 			self:add_effect(function()
 				actor.bleeding = bleeding_cure_boost
 			end, function()
@@ -1799,7 +1958,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			add_status_effect(60, nil, "af_moh_invisibility")
 
 			self:add_effect(function()
-				change_psy_health(0.005)
+				change_psy_health(0.008)
 			end, function()
 				UnregisterScriptCallback("actor_on_weapon_fired", enable_enemy)
 				UnregisterScriptCallback("monster_on_before_hit", enable_enemy_on_hit)
@@ -1813,9 +1972,9 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			}
 
 			self:add_effect(function()
-				actor:change_power(0.005)
+				actor:change_power(0.01)
 				actor:change_satiety(-0.001)
-				actor:change_radiation(-0.00024)
+				actor:change_radiation(-0.00036)
 			end)
 
 			self:register("actor_on_before_hit", function(s_hit, bone_id, flags)
@@ -1831,8 +1990,8 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			}
 
 			self:add_effect(function()
-				actor:change_health(0.002)
-				actor:change_power(0.01)
+				actor:change_health(0.008)
+				actor:change_power(0.015)
 			end)
 
 			self:register("actor_on_before_hit", function(s_hit, bone_id, flags)
@@ -1852,12 +2011,12 @@ artefact_props = { -- Special props of artefacts that are used in processing
 
 			self:register("actor_on_before_hit", function(s_hit, bone_id, flags)
 				if valid_hits[s_hit.type] then
-					s_hit.power = s_hit.power * 0.66
+					s_hit.power = s_hit.power * 0.33
 				end
 			end)
 		end,
 		mutant_part_tushkano_meat = function(self, actor)
-			self:add_speed(0.2, false)
+			self:add_speed(0.3, false)
 
 			local valid_hits = { -- Valid hit types to trigger
 				[hit.wound] = true,
@@ -2678,12 +2837,18 @@ artefact_on_update_functions = {
 
 	-- Heart, Perk: Will to Live
 	af_ear = function(actor, artefact_count, artefact_ids, artefact_names)
-		local health_threshold = 0.22 + 0.03 * artefact_count
+		local af_ear = artefact_props.af_ear
+		local health_threshold = af_ear.health_threshold[min(5, artefact_count)]
 
 		local actor_health = round_100(actor.health)
 		local af_lucifer = artefact_props.af_lucifer
+
+		local k = 1 - math.min(1, normalize(actor_health, 0, health_threshold))
+		af_ear.sound.volume = k
+		af_ear.sound.frequency = 1 + 0.4 * k
+
 		if actor_health < health_threshold then
-			local health = (health_threshold - actor_health) * 0.0042 * artefact_count * (af_lucifer:check_lucifer() and min(normalize(af_lucifer.condition, -0.25, 0.5), 1) or 1) --66% of reduction at 0 Lucifer condition
+			local health = (health_threshold - actor_health) * 0.0047 * artefact_count * (af_lucifer:check_lucifer() and min(normalize(af_lucifer.condition, -0.4, 0.5), 1) or 1) --66% of reduction at 0 Lucifer condition
 			actor:change_health(health)
 			trace("firing Will to Live, health %s", health)
 		end
@@ -2698,25 +2863,28 @@ artefact_on_update_functions = {
 			actor.bleeding = bleeding_cure_boost
 
 			add_speed(speed_boosts.af_peas.name, 1 + speed_boosts.af_peas.boost * artefact_count, false, true)
+			add_jump(jump_boosts.af_peas.name, 1 + jump_boosts.af_peas.boost * artefact_count, true)
 			for i = 1, artefact_count do
 				af_peas:change_sleep(false)
 			end
 		else
+			remove_speed(speed_boosts.af_peas.name)
+			remove_jump(jump_boosts.af_peas.name)
 			for i = 1, artefact_count do
 				af_peas:change_sleep(true)
-				remove_speed(speed_boosts.af_peas.name)
 			end
 		end
 	end,
 
 	-- Signet, Perk: Light of Tranquility
 	af_signet = function(actor, artefact_count, artefact_ids, artefact_names)
-		local health_boost = 0.0007
+		local health_boost = 0.001
 
 		local nearby_camp = get_nearby_campfire(5, true)
 		if nearby_camp and nearby_camp:is_on() then
 			for i = 1, artefact_count do
 				actor:change_health(health_boost)
+				manage_psy_health()
 				manage_psy_health()
 				manage_psy_health()
 				manage_psy_health()
@@ -2737,7 +2905,7 @@ artefact_on_update_functions = {
 
 	-- Generator, Perk: Godzilla is Approaching
 	af_generator = function(actor, artefact_count, artefact_ids, artefact_names)
-		local charge_boost = 0.00005
+		local charge_boost = 0.00004
 		local charge_threshold = 0.05 -- Below this charge the item has no battery
 
 		--Pda, Detector and NVG slots
@@ -2781,8 +2949,18 @@ artefact_on_update_functions = {
 			manage_psy_health()
 			manage_psy_health()
 
+			--get all companions
+			local c = dup_table(axr_companions.non_task_companions)
+			for id,squad in pairs(axr_companions.companion_squads) do
+		        if (squad and squad.commander_id) then
+		            for k in squad:squad_members() do
+		            	c[k.id] = true
+		            end
+		        end
+		    end
+
 			--heal nearby companions
-			local non_task_companions = axr_companions.non_task_companions
+			local non_task_companions = c
 			if is_empty(non_task_companions) then
 				trace("Chain, no companions alive")
 				return
@@ -2792,11 +2970,13 @@ artefact_on_update_functions = {
 			local heal_companion_min_health = 1
 			for id, v in pairs(non_task_companions) do
 				local obj = get_object_by_id(id)
-				local obj_community = obj:character_community()
-				if af_chelust.valid_companion_communities[obj_community] and obj.health < heal_companion_min_health then
-					heal_companion_min_health = obj.health
-					heal_companion = obj
-					trace("found companion %s, community %s, health %s", id, obj_community, heal_companion_min_health)
+				if obj and obj:alive() then
+					local obj_community = obj:character_community()
+					if af_chelust.valid_companion_communities[obj_community] and obj.health < heal_companion_min_health then
+						heal_companion_min_health = obj.health
+						heal_companion = obj
+						trace("found companion %s, community %s, health %s", id, obj_community, heal_companion_min_health)
+					end
 				end
 			end
 
@@ -3133,7 +3313,7 @@ artefact_on_item_use_functions = {
 		local sec = obj:section()
 		local satiety_increase = SYS_GetParam(2, sec, "eat_satiety", 0) * health_boost
 		if satiety_increase > 0 then
-			add_timed_effect(1 * artefact_count, function(satiety_increase)
+			add_timed_effect(5 * artefact_count, function(satiety_increase)
 				db.actor:change_health(satiety_increase)
 				_G.printf("health increased by %s", satiety_increase)
 			end, {satiety_increase})
@@ -3267,6 +3447,17 @@ artefact_on_before_death_functions = {
 -- Functions for artefacts which provide perk bonuses on before actor hit
 artefact_on_before_hit_functions = {
 
+	-- Heart, Perk: Will to Live
+	af_ear = function(actor, artefact_count, artefact_ids, artefact_names, s_hit, bone_id, flags)
+		local af_ear = artefact_props.af_ear
+		local health_threshold = af_ear.health_threshold[min(5, artefact_count)]
+		local actor_health = round_100(actor.health)
+		local k = min(normalize(actor_health, 0.1, health_threshold), 1)
+		local new_k = lerp(0.6 - 0.1 * artefact_count, 1, k)
+		trace("af_ear, hit power k %s", new_k)
+		s_hit.power = s_hit.power * new_k
+	end,
+
 	-- Black Angel, perk: Dodge This
 	af_black_angel = function(actor, artefact_count, artefact_ids, artefact_names, s_hit, bone_id, flags)
 		local af_black_angel = artefact_props.af_black_angel
@@ -3276,7 +3467,7 @@ artefact_on_before_hit_functions = {
 		end
 
 		af_black_angel.dice_roll = random(100)
-		if af_black_angel.dice_roll <= af_black_angel.reflect_chance[artefact_count] then
+		if af_black_angel.dice_roll <= af_black_angel.reflect_chance[min(5, artefact_count)] then
 			s_hit.power = 0.001
 		end
 	end,
@@ -3290,8 +3481,8 @@ artefact_on_before_hit_functions = {
 		end
 
 		local dice_roll = random(100)
-		if dice_roll > af_medallion.reflect_chance[artefact_count] then
-			trace("Medallion, perk not triggered, dice_roll %s, chance %s", dice_roll, af_medallion.reflect_chance[artefact_count])
+		if dice_roll > af_medallion.reflect_chance[min(5, artefact_count)] then
+			trace("Medallion, perk not triggered, dice_roll %s, chance %s", dice_roll, af_medallion.reflect_chance[min(5, artefact_count)])
 			return
 		end
 
@@ -3380,6 +3571,9 @@ artefact_on_before_hit_functions = {
 			return
 		end
 
+		-- 50% reduction
+		s_hit.power = s_hit.power * 0.5
+
 		for i = 8, 10 do
 			local item = actor:item_in_slot(i)
 			if item then
@@ -3397,12 +3591,12 @@ artefact_on_before_hit_functions = {
 			db.actor:change_power(1)
 		end
 
-		if random(100) < 10 then
-			play_sound_on_actor("perk_based_artefacts\\lyutii", 0.7)
-			add_timed_effect(60, infinite_sprint)
+		if random(100) < 5 then
+			play_sound_on_actor("perk_based_artefacts\\lyutii", 0.6)
+			add_timed_effect(1200, infinite_sprint)
 		else
 			play_sound_on_actor("perk_based_artefacts\\rnd_scr3", 1)
-			add_timed_effect(25, infinite_sprint)
+			add_timed_effect(600, infinite_sprint)
 		end
 	end,
 
@@ -3414,7 +3608,7 @@ artefact_on_before_hit_functions = {
 			return
 		end
 
-		local rad_k = af_cell.reduction_coeff[artefact_count]
+		local rad_k = af_cell.reduction_coeff[min(5, artefact_count)]
 		local power = s_hit.power
 		s_hit.power = s_hit.power * (1 - rad_k)
 		power = power - s_hit.power
@@ -3468,7 +3662,7 @@ artefact_on_before_hit_functions = {
 			return
 		end
 		
-		local fire_damage = af_sun.fire_damage[artefact_count]
+		local fire_damage = af_sun.fire_damage[min(5, artefact_count)]
 		local fire_hit = hit(s_hit)
 		fire_hit.type = hit.burn
 		fire_hit.power = fire_hit.power * fire_damage
@@ -3494,8 +3688,8 @@ artefact_on_hit_functions = {
 	-- Black Angel, perk: Dodge This
 	af_black_angel = function(actor, artefact_count, artefact_ids, artefact_names, obj, amount, who, last_hit)
 		local af_black_angel = artefact_props.af_black_angel
-		if af_black_angel.dice_roll > af_black_angel.reflect_chance[artefact_count] then
-			trace("Black Angel not triggered, dice roll %s, chance %s", af_black_angel.dice_roll, af_black_angel.reflect_chance[artefact_count])
+		if af_black_angel.dice_roll > af_black_angel.reflect_chance[min(5, artefact_count)] then
+			trace("Black Angel not triggered, dice roll %s, chance %s", af_black_angel.dice_roll, af_black_angel.reflect_chance[min(5, artefact_count)])
 			return
 		end
 		if not (
@@ -3828,14 +4022,25 @@ artefact_on_item_drag_dropped_functions = {
 -- Functions for artefacts which provide perk bonuses on equip
 artefact_on_equip_functions = {
 
+	-- Heart, Perk: Will to Live
+	af_ear = function(actor, artefact_count, artefact_ids, artefact_names)
+		local af_ear = artefact_props.af_ear
+		af_ear:sound_play()
+		register_on_equip_callback("actor_on_first_update", function() end, function()
+			af_ear:sound_stop()
+		end, "af_ear")
+	end,
+
 	-- Phantom Star, Perk: Phantom Pacifist
 	af_star_phantom = function(actor, artefact_count, artefact_ids, artefact_names)
 		local af_star_phantom = artefact_props.af_star_phantom
 		if not af_star_phantom.weapon_hidden then
 			af_star_phantom:hide_weapon()
 		end
+		af_star_phantom:add_pp_effector()
 		register_on_equip_callback("on_enemy_eval", af_star_phantom.ignore_enemy_function, function()
 			af_star_phantom:restore_weapon()
+			af_star_phantom:remove_pp_effector()
 		end, "af_star_phantom")
 	end,
 
@@ -3910,6 +4115,17 @@ artefact_on_equip_functions = {
 		end
 	end
 
+}
+
+-- Functions for artefacts which provide perk bonuses for animations
+artefact_on_hud_animation_play_functions = {
+	-- Claw, Perk: Bloodlust
+	af_kogot = function(actor, artefact_count, artefact_ids, artefact_names, anm_table, obj)
+		local af_kogot = artefact_props.af_kogot
+		if IsMelee(obj) and af_kogot.anims_to_accelerate[anm_table.anm_name] then
+			anm_table.anm_speed = anm_table.anm_speed * (1 + 0.5 * artefact_count)
+		end
+	end,
 }
 
 -- Special monkey patches for some artefacts to make their effects work
@@ -4230,6 +4446,7 @@ end
 refresh_state = function()
 	if refresh_artefacts() then
 		remove_speed_boosts()
+		remove_jump_boosts()
 		remove_stack_effects()
 		unregister_on_equip_callbacks()
 		process_artefacts(artefact_on_equip_functions)
@@ -4239,6 +4456,7 @@ end
 force_refresh_state = function()
 	refresh_artefacts(true)
 	remove_speed_boosts()
+	remove_jump_boosts()
 	remove_stack_effects()
 	unregister_on_equip_callbacks()
 	process_artefacts(artefact_on_equip_functions)
@@ -4375,7 +4593,7 @@ function npc_on_before_hit(npc, s_hit, bone_id, flags)
 	end
 
 	if s_hit.draftsman:id() ~= AC_ID then
-		trace("npc_on_before_hit not triggered %s, %s", npc:section(), s_hit.draftsman:section())
+		-- trace("npc_on_before_hit not triggered %s, %s", npc:section(), s_hit.draftsman:section())
 		return
 	end
 	last_npc_hit = hit(s_hit)
@@ -4391,7 +4609,7 @@ function npc_on_hit_callback(npc, amount, local_direction, who, bone_index)
 	end
 
 	if who:id() ~= AC_ID then
-		trace("npc_on_hit_callback not triggered %s, %s, %s", npc:section(), amount, who:section())
+		-- trace("npc_on_hit_callback not triggered %s, %s, %s", npc:section(), amount, who:section())
 		return
 	end
 
@@ -4405,7 +4623,7 @@ function npc_on_death_callback(npc, who)
 	end
 
 	if who:id() ~= AC_ID then
-		trace("npc_on_death_callback not triggered %s, %s", npc:section(), who:section())
+		-- trace("npc_on_death_callback not triggered %s, %s", npc:section(), who:section())
 		return
 	end
 
@@ -4419,7 +4637,7 @@ function monster_on_before_hit(monster, s_hit, bone_id, flags)
 	end
 
 	if s_hit.draftsman:id() ~= AC_ID then
-		trace("monster_on_before_hit not triggered %s, %s", monster:section(), s_hit.draftsman:section())
+		-- trace("monster_on_before_hit not triggered %s, %s", monster:section(), s_hit.draftsman:section())
 		return
 	end
 
@@ -4441,7 +4659,7 @@ function monster_on_hit_callback(monster, amount, local_direction, who, bone_ind
 	end
 
 	if who:id() ~= AC_ID then
-		trace("monster_on_hit_callback not triggered %s, %s, %s", monster:section(), amount, who:section())
+		-- trace("monster_on_hit_callback not triggered %s, %s, %s", monster:section(), amount, who:section())
 		return
 	end
 
@@ -4460,7 +4678,7 @@ function monster_on_death_callback(monster, who)
 	end
 
 	if who:id() ~= AC_ID then
-		trace("monster_on_death_callback not triggered %s, %s", monster:section(), who:section())
+		-- trace("monster_on_death_callback not triggered %s, %s", monster:section(), who:section())
 		return
 	end
 
@@ -4480,8 +4698,30 @@ function on_item_drag_dropped(obj_1, obj_2, slot_from, slot_to)
 	end
 end
 
+function bullet_on_impact(bullet)
+
+	-- Add particles to bullets
+	local weapon = bullet.weapon_id and level.object_by_id(bullet.weapon_id)
+	if not weapon then return end
+
+	local actor_weapon = weapon:name()
+	if not check_status_effect("af_sandstone" .. actor_weapon) then
+		-- trace("Sandstone, weapon %s not infused", actor_weapon)
+		return
+	end
+
+	local effect = status_effects["af_sandstone" .. actor_weapon].effect
+	artefact_props.af_sandstone:play_particles(effect, vector():set(bullet.position):mad(bullet.direction, -0.3))
+end
+
+function actor_on_hud_animation_play(anm_table, obj)
+	process_artefacts(artefact_on_hud_animation_play_functions, anm_table, obj)
+end
+
 function actor_on_first_update()
 	get_actor_psy_table()
+	level.set_snd_volume(1)
+	if level.set_music_volume then level.set_music_volume(1) end
 
 	time_factor = get_time_factor()
 	force_refresh_state()
@@ -4521,6 +4761,16 @@ function actor_on_first_update()
 	RegisterScriptCallback("monster_on_hit_callback", monster_on_hit_callback)
 	RegisterScriptCallback("monster_on_death_callback", monster_on_death_callback)
 	RegisterScriptCallback("on_before_level_changing", on_before_level_changing)
+
+	-- 1.5.2
+	if _G.CHudItem__PlayHUDMotion then
+		RegisterScriptCallback("actor_on_hud_animation_play", actor_on_hud_animation_play)
+	end
+
+	-- Modded exes
+	if _G.CBulletOnImpact then
+		RegisterScriptCallback("bullet_on_impact", bullet_on_impact)
+	end
 end
 
 function on_trade_started_set_values()
