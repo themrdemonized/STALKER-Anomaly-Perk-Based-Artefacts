@@ -64,6 +64,7 @@ local ResetTimeEvent = demonized_time_events.ResetTimeEvent
 
 local add_cam_effector = level.add_cam_effector
 local add_pp_effector = level.add_pp_effector
+local set_pp_effector_factor = level.set_pp_effector_factor
 local disable_input = level.disable_input
 local enable_input = level.enable_input
 local get_start_time = level.get_start_time
@@ -297,6 +298,24 @@ local function throttle(func, tg_throttle)
 				return func(...)
 			end
 		end
+	elseif type(tg_throttle) == "function" then
+		return function(...)
+			-- If true - fire immediately
+			if tg_throttle(tg) == true then
+				return func(...)
+			end
+
+			-- If false/nil - don't fire
+			if not tg_throttle(tg) then
+				return
+			end
+
+			-- If number - throttle by that number
+			local t = time_global()
+			if t < tg then return end
+			tg = t + tg_throttle(tg)
+			return func(...)
+		end
 	else
 		return function(...)
 			local t = time_global()
@@ -329,6 +348,22 @@ local function get_object_by_id(id) -- same as _g.script one but without spammin
 		return
 	end
 	return obj
+end
+
+function se_clear_vars(id)
+	local m_data = alife_storage_manager.get_state()
+	if m_data.se_object[id] then
+		m_data.se_object[id] = nil
+		-- empty_table(m_data.se_object[id])
+	end
+end
+
+local function table2vec(t)
+	return vector():set(t.x, t.y, t.z)
+end
+
+local function vec2table(v)
+	return {x = v.x, y = v.y, z = v.z}
 end
 
 local function get_monster_clsid_and_kind(obj)
@@ -403,11 +438,11 @@ local function add_pp_effector_const_smooth(ppfile, id, looped, time)
 	add_pp_effector(ppfile, id, looped)
 	local factor = 0.0001
 	local inc_per_update = 0.001 * (1 / time)
-	level.set_pp_effector_factor(id, 0.005)
+	set_pp_effector_factor(id, 0.005)
 	CreateTimeEvent(ppfile, id, 0, function()
 		factor = math.min(1, factor + inc_per_update * device().time_delta)
 		trace("%s, %s, factor %s", ppfile, id, factor)
-		level.set_pp_effector_factor(id, factor)
+		set_pp_effector_factor(id, factor)
 		return factor == 1
 	end)
 end
@@ -827,6 +862,8 @@ function remove_jump_boosts()
 	end
 end
 
+local weapon_modifiers = demonized_weapon_modifiers
+
 -- local artefact_props
 artefact_props = { -- Special props of artefacts that are used in processing
 	af_ear = {
@@ -905,7 +942,28 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			"perk_based_artefacts\\TELEPRT2",
 			"perk_based_artefacts\\TELEPRT3"
 		},
-		pp_effector_time = 0.2,
+		max_fov = 150,
+		min_tf = 0.5,
+		init_time = 0.2,
+		restore_time = 3.5,
+		active = false,
+		cooldown_time = 30,
+		npc_stun_radius = 5,
+		npc_stun_anims = {
+		    "norm_2_critical_hit_torso_0", -- good
+		    "norm_1_critical_hit_head_0", -- good
+		},
+		npc_stun = function(self, pos)
+			level.iterate_nearest(pos, self.npc_stun_radius, function(npc)
+				if IsStalker(npc) and npc:position():distance_to(pos) < self.npc_stun_radius and xr_combat_ignore.is_enemy(npc, db.actor) then
+					if npc:movement_type() == move.walk or npc:movement_type() == move.run then
+				        npc:set_movement_type(move.stand)
+				    end
+				    npc:play_cycle(get_random_array_element(self.npc_stun_anims), true)
+				    state_mgr.set_state(npc, "idle")
+				end
+			end)
+		end,
 		on_death = function(self, actor, artefact_count, artefact_ids, artefact_names, npc, who, last_npc_hit, last_npc_hit_bone_index)
 			if not check_cooldown("af_lighthouse") then
 				trace("Lighthouse, on cooldown")
@@ -913,13 +971,71 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			end
 			trace("Teleporting actor")
 
-			add_pp_effector("black_infinite.ppe", c_id_ppe.black_infinite, true)
-			CreateTimeEvent("af_lighthouse", "af_lighthouse", self.pp_effector_time, function()
-				remove_pp_effector(c_id_ppe.black_infinite)
+			-- Time event hell
+			-- Put everything in next frame TE so if that fails, nothing will happen
+			CreateTimeEvent("af_lighthouse", "af_lighthouse_0", 0, function()
+				local fov = get_console_cmd(2, "fov")
+				local hud_fov = get_console_cmd(2, "hud_fov")
+				local mult = self.max_fov / fov
+				local start_tg = time_global()
+				local init_tg = time_global() + self.init_time * 1000
+				local restore_tg = init_tg + self.restore_time * 1000
+
+				add_pp_effector("black_infinite.ppe", c_id_ppe.black_infinite, true)
+				set_pp_effector_factor(c_id_ppe.black_infinite, 0.005)
+
+				self.active = true
+
+				CreateTimeEvent("af_lighthouse", "af_lighthouse_1", 0, function()
+					local tg = time_global()
+					local k = min(1, normalize(tg, start_tg, init_tg))
+					local new_fov = lerp(fov, self.max_fov, k)
+					local new_hud_fov = clamp(hud_fov * (new_fov / fov), 0.1, 1)
+
+					exec_console_cmd("fov " .. new_fov)
+					exec_console_cmd("hud_fov " .. new_hud_fov)
+					set_pp_effector_factor(c_id_ppe.black_infinite, k ^ 2.5)
+
+					if k == 1 then
+						actor:set_actor_position(npc:position())
+						add_cooldown(self.cooldown_time, "af_lighthouse")
+						exec_console_cmd("time_factor " .. self.min_tf)
+						play_sound_on_actor(get_random_array_element(self.sounds), 0.7, random_float(0.95, 1.05))
+						self:npc_stun(npc:position())
+
+						CreateTimeEvent("af_lighthouse", "af_lighthouse_2", 0, function()
+							local tg = time_global()
+							local k = min(1, normalize(tg, init_tg, restore_tg))
+							local new_fov = lerp(fov, self.max_fov, (1 - k) ^ 4)
+							local new_hud_fov = clamp(hud_fov * (new_fov / fov), 0.1, 1)
+							local tf = lerp(self.min_tf, 1, k ^ 2)
+
+							local weapon_modifier_k = 1 / tf
+							weapon_modifiers.add_modifier("af_lighthouse", {
+								SetRealRPM = weapon_modifier_k,
+								SetModeRealRPM = weapon_modifier_k,
+								anm_speed = weapon_modifier_k
+							})
+
+							exec_console_cmd("fov " .. new_fov)
+							exec_console_cmd("hud_fov " .. new_hud_fov)
+							set_pp_effector_factor(c_id_ppe.black_infinite, (1 - k) ^ 8)
+							exec_console_cmd("time_factor " .. tf)
+
+							if k == 1 then
+								self.active = false
+								remove_pp_effector(c_id_ppe.black_infinite)
+								weapon_modifiers.remove_modifier("af_lighthouse")
+								return true
+							end
+						end)
+
+						return true
+					end
+				end)
+
+				return true
 			end)
-			actor:set_actor_position(npc:position())
-			play_sound_on_actor(get_random_array_element(self.sounds), 0.7, random_float(0.95, 1.05))
-			add_cooldown(15, "af_lighthouse")
 		end
 	},
 	af_cell = {
@@ -940,54 +1056,37 @@ artefact_props = { -- Special props of artefacts that are used in processing
 		valid_hits = { -- Valid hit types to trigger
 			[hit.shock] = true
 		},
-		saved_weapons = {},
-		rpm_coeff = 0.25,
-		min_rpm_coeff = 0.25,
-		max_rpm_coeff = 2,
+		sound_idle = get_safe_sound_object("perk_based_artefacts\\VIOLLOOP"),
+		rpm_coeff = 1.25,
+		min_rpm_coeff = 1.25,
+		max_rpm_coeff = 3,
+		max_speed_buff = 0.3,
 		buff_time = 600,
 		buff_time_rare = 1200,
 		callbacks_registered = false,
 		weapon_fired = false,
-		sound_idle = get_safe_sound_object("perk_based_artefacts\\VIOLLOOP"),
-		on_hud_animation_play = function(anm_table, obj)
-			local af_elektron = artefact_props.af_elektron
-			if not anm_table.anm_name:find("^anm_idle") then
-				anm_table.anm_speed = anm_table.anm_speed * (1 + af_elektron.rpm_coeff)
-			end
-		end,
 		on_weapon_before_fire = function(flags)
 			local wpn = db.actor:active_item()
+			local id = wpn:id()
 			local af_elektron = artefact_props.af_elektron
 			local c_obj = wpn:cast_Weapon()
-			if not c_obj.RealRPM then
-				trace("Can't change RPM of weapon, install modded exes")
-				return
-			end 
-			if not af_elektron.saved_weapons[wpn:id()] then
-				local rpm = c_obj:RealRPM()
-				local mode_rpm = c_obj:ModeRealRPM()
-				af_elektron.saved_weapons[wpn:id()] = {
-					rpm = rpm,
-					mode_rpm = mode_rpm,
-				}
-			end
 
 			local last_k = af_elektron.rpm_coeff
-			local steps = max(1, (af_elektron.saved_weapons[wpn:id()].rpm / 22) ^ 1.5)
+			local weapon_params = weapon_modifiers.get_saved_weapon_params(id)
+			local steps = max(1, (weapon_params.RealRPM / 10) ^ 1.5)
 			af_elektron.rpm_coeff = ema("af_elektron_rpm_coeff", af_elektron.max_rpm_coeff, nil, steps)
 
-			local rpm = af_elektron.saved_weapons[wpn:id()].rpm
-			local mode_rpm = af_elektron.saved_weapons[wpn:id()].mode_rpm
-			local k = af_elektron.rpm_coeff
-			local new_rpm = rpm * (1 + k)
-			local new_mode_rpm = mode_rpm * (1 + k)
+			weapon_modifiers.add_modifier("af_elektron", {
+				SetRealRPM = af_elektron.rpm_coeff,
+				SetModeRealRPM = af_elektron.rpm_coeff,
+				anm_speed = af_elektron.rpm_coeff
+			})
 
-			trace("Electron, new rpm for %s: %s, %s", wpn:name(), new_rpm, new_mode_rpm)
-			c_obj:SetRealRPM(new_rpm)
-			c_obj:SetModeRealRPM(new_mode_rpm)
-			local should_fire = c_obj:GetAmmoElapsed() > 0 
+			local should_fire = c_obj:GetAmmoElapsed() > 0
+			
 			CreateTimeEvent("af_elektron_next_tick_reset", 0, 0, function()
-				if not should_fire or not flags.ret_value or not af_elektron.weapon_fired then
+				if not (should_fire and flags.ret_value) then
+					trace("Electron, restore coeff, should_fire %s, flags.ret_value %s, weapon_fired %s", should_fire, flags.ret_value, af_elektron.weapon_fired)
 					af_elektron.rpm_coeff = ema("af_elektron_rpm_coeff", last_k, nil, 1)
 				end
 				af_elektron.weapon_fired = false
@@ -1005,15 +1104,15 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			add_speed("af_elektron_rpm_coeff", speed_k, true, true)
 
 			-- Electron, reduce powerup
-			self.rpm_coeff = ema("af_elektron_rpm_coeff", self.min_rpm_coeff, self.rpm_coeff, 100)
+			self.rpm_coeff = ema("af_elektron_rpm_coeff", self.min_rpm_coeff, self.rpm_coeff, 120)
 			trace("Electron, new coeff %s", self.rpm_coeff)
 
 			if not self.callbacks_registered then
 				self.callbacks_registered = true
 				trace("Electron, registering callbacks")
+
 				RegisterScriptCallback("actor_on_weapon_before_fire", self.on_weapon_before_fire)
 				RegisterScriptCallback("actor_on_weapon_fired", self.on_weapon_fired)
-				RegisterScriptCallback("actor_on_hud_animation_play", self.on_hud_animation_play)
 
 				RemoveTimeEvent("af_elektron_sound_stop", 0)
 				smoothed_values.af_elektron_rpm_coeff = nil
@@ -1023,26 +1122,15 @@ artefact_props = { -- Special props of artefacts that are used in processing
 
 			self.sound_idle.volume = lerp(0.25, 0.5, normalize(self.rpm_coeff, self.min_rpm_coeff, self.max_rpm_coeff))
 			self.sound_idle.frequency = lerp(0.5, 1.5, normalize(self.rpm_coeff, self.min_rpm_coeff, self.max_rpm_coeff))
-
-			for id, v in pairs(self.saved_weapons) do
-				local obj = get_object_by_id(id)
-				if obj then
-					local p = obj:parent()
-					if not (p and p:id() == AC_ID) then
-						local c_obj = obj:cast_Weapon()
-						c_obj:SetRealRPM(v.rpm)
-						c_obj:SetModeRealRPM(v.mode_rpm)
-						self.saved_weapons[id] = nil
-					end
-				end
-			end
 		end,
 		buff_func_reset = function(self)
+			trace("Electron, unregistering callbacks")
+
 			self.callbacks_registered = false
 			UnregisterScriptCallback("actor_on_weapon_fired", self.on_weapon_fired)
 			UnregisterScriptCallback("actor_on_weapon_before_fire", self.on_weapon_before_fire)
-			UnregisterScriptCallback("actor_on_hud_animation_play", self.on_hud_animation_play)
-			trace("Electron, unregistering callbacks")
+			weapon_modifiers.remove_modifier("af_elektron")
+			remove_speed("af_elektron_rpm_coeff")			
 
 			CreateTimeEvent("af_elektron_sound_stop", 0, 0, function()
 				self.sound_idle.volume = 0.25
@@ -1054,19 +1142,6 @@ artefact_props = { -- Special props of artefacts that are used in processing
 					return true
 				end
 			end)
-
-			for id, v in pairs(self.saved_weapons) do
-				local wpn = get_object_by_id(id)
-				if wpn then
-					local c_obj = wpn:cast_Weapon()
-					if not c_obj.RealRPM then
-						trace("Can't change RPM of weapon, install modded exes")
-						return
-					end 
-					c_obj:SetRealRPM(v.rpm)
-					c_obj:SetModeRealRPM(v.mode_rpm)
-				end
-			end
 		end,
 		buff_func_time_effect = function()
 			perk_based_artefacts.artefact_props.af_elektron:buff_func()
@@ -1885,12 +1960,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			-- Make him panic
 			if IsStalker(npc) then
 				local panic_time = 4
-				demonized_stalker_aoe_panic.npc_add_aoe_panic(npc:id(), "af_repei", panic_time)
-				add_simple_timed_effect(panic_time, throttle(function()
-					if not npc:alive() then return end
-					xr_sound.set_sound_play(npc:id(), get_random_array_element({"panic_monster", "panic_human"}))
-					trace("Thistle, play panic %s", npc:name())
-				end, 2000), nil, "af_repei_panic" .. npc:id())
+				demonized_stalker_aoe_panic.npc_add_aoe_panic(npc:id(), "af_repei", panic_time, nil, nil, 2)
 			end
 			
 			add_simple_timed_effect(self.effect_time, function()
@@ -2988,7 +3058,7 @@ artefact_on_update_functions = {
 		af_ear.sound.frequency = 1 + 0.4 * k
 
 		if actor_health < health_threshold then
-			local health = (health_threshold - actor_health) * 0.0047 * artefact_count * (af_lucifer:check_lucifer() and min(normalize(af_lucifer.condition, -0.4, 0.5), 1) or 1) --66% of reduction at 0 Lucifer condition
+			local health = (health_threshold - actor_health) * 0.0041 * artefact_count * (af_lucifer:check_lucifer() and min(normalize(af_lucifer.condition, -0.4, 0.5), 1) or 1) --66% of reduction at 0 Lucifer condition
 			actor:change_health(health)
 			trace("firing Will to Live, health %s", health)
 		end
@@ -3613,90 +3683,90 @@ artefact_on_before_hit_functions = {
 	end,
 
 	-- Medallion, Perk: The (Un)lucky charm
-	af_medallion = function(actor, artefact_count, artefact_ids, artefact_names, s_hit, bone_id, flags)
-		local af_medallion = artefact_props.af_medallion
-		if not af_medallion.valid_hits[s_hit.type] then
-			trace("Medallion, not a valid hit type %s", s_hit.type)
-			return
-		end
+	-- af_medallion = function(actor, artefact_count, artefact_ids, artefact_names, s_hit, bone_id, flags)
+	-- 	local af_medallion = artefact_props.af_medallion
+	-- 	if not af_medallion.valid_hits[s_hit.type] then
+	-- 		trace("Medallion, not a valid hit type %s", s_hit.type)
+	-- 		return
+	-- 	end
 
-		local dice_roll = random(100)
-		if dice_roll > af_medallion.reflect_chance[min(5, artefact_count)] then
-			trace("Medallion, perk not triggered, dice_roll %s, chance %s", dice_roll, af_medallion.reflect_chance[min(5, artefact_count)])
-			return
-		end
+	-- 	local dice_roll = random(100)
+	-- 	if dice_roll > af_medallion.reflect_chance[min(5, artefact_count)] then
+	-- 		trace("Medallion, perk not triggered, dice_roll %s, chance %s", dice_roll, af_medallion.reflect_chance[min(5, artefact_count)])
+	-- 		return
+	-- 	end
 
-		local companion, squad, squad_member_count, squad_id, squad_member_ids = (function()
-			local companion_squads = axr_companions.companion_squads
-			local non_task_companions = axr_companions.non_task_companions
-			if is_not_empty(non_task_companions) then
-				trace("Medallion, has non_task_companions")
-				return alife_object(get_random_key(non_task_companions))
-			elseif is_not_empty(companion_squads) then
-				trace("Medallion, has companion_squads")
-				for k, squad in pairs(companion_squads) do
-					if squad then
-						local m
-						local squad_ids = {}
-						for sm in squad:squad_members() do
-							if not m then
-								m = sm
-							end
-							squad_ids[sm.id] = true
-						end
-						return m, squad, squad:npc_count(), k, squad_ids
-					end
-				end
-			else
-				trace("Medallion, doesn't have both companion_squads, non_task_companions")
-				return nil
-			end
-		end)()
-		if not companion then
-			trace("Medallion, no companion found")
-			return
-		end
+	-- 	local companion, squad, squad_member_count, squad_id, squad_member_ids = (function()
+	-- 		local companion_squads = axr_companions.companion_squads
+	-- 		local non_task_companions = axr_companions.non_task_companions
+	-- 		if is_not_empty(non_task_companions) then
+	-- 			trace("Medallion, has non_task_companions")
+	-- 			return alife_object(get_random_key(non_task_companions))
+	-- 		elseif is_not_empty(companion_squads) then
+	-- 			trace("Medallion, has companion_squads")
+	-- 			for k, squad in pairs(companion_squads) do
+	-- 				if squad then
+	-- 					local m
+	-- 					local squad_ids = {}
+	-- 					for sm in squad:squad_members() do
+	-- 						if not m then
+	-- 							m = sm
+	-- 						end
+	-- 						squad_ids[sm.id] = true
+	-- 					end
+	-- 					return m, squad, squad:npc_count(), k, squad_ids
+	-- 				end
+	-- 			end
+	-- 		else
+	-- 			trace("Medallion, doesn't have both companion_squads, non_task_companions")
+	-- 			return nil
+	-- 		end
+	-- 	end)()
+	-- 	if not companion then
+	-- 		trace("Medallion, no companion found")
+	-- 		return
+	-- 	end
 
-		trace("Medallion, current companion %s", companion.id)
+	-- 	trace("Medallion, current companion %s", companion.id)
 
-		local member = get_object_by_id(companion.id)
-		if member and member:alive() then
-			local redirect_hit = hit(s_hit)
-			redirect_hit.power = redirect_hit.power * 0.5
-			member:hit(redirect_hit)
-			trace("Medallion, hitting companion %s, power %s", member:name(), redirect_hit.power)
+	-- 	local member = get_object_by_id(companion.id)
+	-- 	if member and member:alive() then
+	-- 		local redirect_hit = hit(s_hit)
+	-- 		redirect_hit.power = redirect_hit.power * 0.5
+	-- 		member:hit(redirect_hit)
+	-- 		trace("Medallion, hitting companion %s, power %s", member:name(), redirect_hit.power)
 			
-			if squad then
-				if random(100) < (10 / squad_member_count) then
-					trace("Medallion, squad %s became enemy", squad_id)
-					squad:set_squad_relation("enemy")
-					dismiss_special_squad(squad)
-					for k, v in pairs(squad_member_ids) do
-						local obj = get_object_by_id(k)
-						if obj and obj:alive() then
-							trace("Medallion, squad companion %s became enemy", k)
-							obj:set_relation(game_object.enemy, actor)
-							af_medallion.enemy_squad_member_ids[k] = true
-						end
-					end
-				end
-			else
-				if random(100) < 10 then
-					trace("Medallion, companion became enemy")
-					remove_from_actor_squad(member)
+	-- 		if squad then
+	-- 			if random(100) < (10 / squad_member_count) then
+	-- 				trace("Medallion, squad %s became enemy", squad_id)
+	-- 				squad:set_squad_relation("enemy")
+	-- 				dismiss_special_squad(squad)
+	-- 				for k, v in pairs(squad_member_ids) do
+	-- 					local obj = get_object_by_id(k)
+	-- 					if obj and obj:alive() then
+	-- 						trace("Medallion, squad companion %s became enemy", k)
+	-- 						obj:set_relation(game_object.enemy, actor)
+	-- 						af_medallion.enemy_squad_member_ids[k] = true
+	-- 					end
+	-- 				end
+	-- 			end
+	-- 		else
+	-- 			if random(100) < 10 then
+	-- 				trace("Medallion, companion became enemy")
+	-- 				remove_from_actor_squad(member)
 
-					if member:alive() then
-						trace("Medallion, member %s became enemy", member:id())
-						member:set_relation(game_object.enemy, actor)
-						af_medallion.enemy_squad_member_ids[member:id()] = true
-					end
-				end
-			end
-			af_medallion:register()
+	-- 				if member:alive() then
+	-- 					trace("Medallion, member %s became enemy", member:id())
+	-- 					member:set_relation(game_object.enemy, actor)
+	-- 					af_medallion.enemy_squad_member_ids[member:id()] = true
+	-- 				end
+	-- 			end
+	-- 		end
+	-- 		af_medallion:register()
 
-			s_hit.power = 0.001
-		end
-	end,
+	-- 		s_hit.power = 0.001
+	-- 	end
+	-- end,
 
 	-- Electron, Perk: Crank High Voltage
 	af_elektron = function(actor, artefact_count, artefact_ids, artefact_names, s_hit, bone_id, flags)
@@ -4269,6 +4339,7 @@ artefact_on_equip_functions = {
 
 -- Functions for artefacts which provide perk bonuses for animations
 artefact_on_hud_animation_play_functions = {
+
 	-- Claw, Perk: Bloodlust
 	af_kogot = function(actor, artefact_count, artefact_ids, artefact_names, anm_table, obj)
 		local af_kogot = artefact_props.af_kogot
@@ -4279,10 +4350,159 @@ artefact_on_hud_animation_play_functions = {
 }
 
 -- Functions for artefacts which provide perk bonuses for bullet impacts
-artefacts_bullet_on_impact_functions = {
+artefact_bullet_on_impact_functions = {
 
 }
 
+artefact_binder_on_update_functions = {
+	-- Medal, Perk: Hacksaw
+	af_medallion = function(binder)
+		local obj = binder.object
+		local id = obj:id()
+		
+		local props = se_load_var(id, nil, "af_medallion")
+		if not props then
+			return true
+		end
+
+		if obj:parent() then
+			return true
+		end
+
+		if not binder.first_update_done then
+			binder.first_update_done = true
+			binder.target_current_id = nil
+			binder.target_list = {}
+			binder.target_radius = 25
+			binder.target_radius_sqr = binder.target_radius ^ 2
+			binder.attack_radius = 0.5
+			binder.attack_radius_sqr = binder.attack_radius ^ 2
+			binder.panic_radius = 5
+			binder.panic_radius_sqr = binder.panic_radius ^ 2
+			binder.panic_time = 1
+			binder.attack_time = 60
+
+			binder.fly_direction = table2vec(props.fly_direction)
+			binder.start_time = props.start_time
+			binder.stop_time = props.start_time + binder.attack_time
+			binder.return_home = props.return_home
+
+			binder.sound_idle = get_safe_sound_object("perk_based_artefacts\\FUNGFLY")
+			binder.sound_idle:play_at_pos(obj, obj:position(), 0, sound_object.s3d + sound_object.looped)
+
+			local closest_distance = math.huge
+			binder.target_list_func = function(target)
+				if (IsMonster(target) or (
+						IsStalker(target) 
+						and xr_combat_ignore.is_enemy(target, db.actor)
+						)
+					)
+				and target:id() ~= AC_ID 
+				and target:alive()
+				then
+					local distance = obj:position():distance_to_sqr(target:position())
+					if distance <= binder.target_radius_sqr and distance < closest_distance then
+						closest_distance = distance
+						binder.target_current_id = target:id()
+					end
+				end
+			end
+			binder.target_update_func = throttle(function()
+				if binder.return_home then
+					binder.target_current_id = AC_ID
+					return
+				end
+
+				if binder.target_current_id then
+					return
+				end
+				closest_distance = math.huge
+				level.iterate_nearest(obj:position(), binder.target_radius, binder.target_list_func)
+			end, 400)
+
+			binder.target_attack_func = throttle(function()
+				if binder.return_home then
+					local distance = obj:position():distance_to_sqr(db.actor:position())
+					if distance < 1 then
+						db.actor:take_item(obj)
+					end
+					return
+				end
+
+				if not binder.target_current_id then return end
+
+				local target = get_object_by_id(binder.target_current_id)
+				if not (target and target:alive()) then
+					binder.target_current_id = nil
+					return
+				end
+
+				local distance = obj:position():distance_to_sqr(target:position())
+
+				if distance < binder.panic_radius_sqr and IsStalker(target) then
+					demonized_stalker_aoe_panic.npc_add_aoe_panic(target:id(), "af_medallion_panic", binder.panic_time, obj:position(), nil, 1.5)
+				end
+
+				if distance > binder.attack_radius_sqr then
+					return
+				end
+
+				local s_hit = hit()
+				s_hit.power = 0.1
+				s_hit.type = hit.wound
+				s_hit.impulse = 1
+				s_hit.direction = _G.VEC_Y
+				s_hit.draftsman = db.actor
+
+				target:hit(s_hit)
+			end, 100)
+
+			binder.target_homing_func = throttle(function()
+				if not binder.target_current_id then return end
+
+				local target = get_object_by_id(binder.target_current_id)
+				if not target then
+					return
+				end
+
+				local target_pos = utils_obj.safe_bone_pos(target, "bip01_spine") or utils_obj.safe_bone_pos(target, "bip01_head") or target:position():add(vector():set(0, 0.5, 0))
+				local pos = obj:position()
+				local dir = target_pos:sub(pos):normalize()
+				local delta = device().time_delta
+
+				binder.fly_direction.x = ema("af_medallion_fly_x", dir.x, binder.fly_direction.x, 15, delta)
+				binder.fly_direction.y = ema("af_medallion_fly_y", dir.y, binder.fly_direction.y, 15, delta)
+				binder.fly_direction.z = ema("af_medallion_fly_z", dir.z, binder.fly_direction.z, 15, delta)
+
+				obj:set_const_force(vector():set(binder.fly_direction), 50, 500)
+			end)
+		end
+
+		binder.target_update_func()
+		binder.target_attack_func()
+		binder.target_homing_func()
+		binder.sound_idle:set_position(obj:position())
+
+		if time_elapsed > binder.stop_time then
+			binder.return_home = true
+		end
+
+		props.fly_direction = vec2table(binder.fly_direction)
+		props.return_home = binder.return_home
+		se_save_var(id, nil, "af_medallion", props)
+	end,
+}
+
+artefact_binder_on_destroy_functions = {
+	-- Medal, Perk: Hacksaw
+	af_medallion = function(binder)
+		if binder.first_update_done then
+			binder.sound_idle:stop()
+		end
+	end
+}
+
+-------------------------------------------------------------------------
 -- Special monkey patches for some artefacts to make their effects work
 -- Functors for Bat, Perk: Zone Alchemy
 local add_functor = custom_functor_autoinject.add_functor
@@ -4856,7 +5076,7 @@ end
 function bullet_on_impact(bullet)
 
 	if bullet.parent_id == AC_ID then
-		process_artefacts(artefacts_bullet_on_impact_functions, bullet)
+		process_artefacts(artefact_bullet_on_impact_functions, bullet)
 	end
 
 	-- Add particles to bullets
@@ -4877,9 +5097,34 @@ function actor_on_hud_animation_play(anm_table, obj)
 	process_artefacts(artefact_on_hud_animation_play_functions, anm_table, obj)
 end
 
+-- Binder patching
+artefact_net_spawn = item_artefact.artefact_binder.net_spawn
+item_artefact.artefact_binder.net_spawn = function(self, se_abstract)
+	local res = artefact_net_spawn(self, se_abstract)
+	if not res then
+		return res
+	end
+
+	self.section = self.object:section()
+	self.id = self.object:id()
+	if artefact_binder_on_update_functions[self.section] then
+		AddUniqueCall(throttle(function()
+			if not get_object_by_id(self.id) then
+				if artefact_binder_on_destroy_functions[self.section] then
+					artefact_binder_on_destroy_functions[self.section](self)
+				end
+				return true
+			end
+			return artefact_binder_on_update_functions[self.section](self)
+		end))
+	end
+	return res
+end
+
 function actor_on_first_update()
 	get_actor_psy_table()
 	level.set_snd_volume(1)
+	exec_console_cmd("time_factor 1")
 	if level.set_music_volume then level.set_music_volume(1) end
 
 	time_factor = get_time_factor()

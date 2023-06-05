@@ -1,0 +1,125 @@
+arte_to_grenades = {
+	["af_medallion"] = "af_medallion_grenade",
+}
+grenades_to_arte = invert_table(arte_to_grenades)
+grenades_to_arte_items = {}
+
+enabled = true
+
+function se_clear_vars(id)
+	local m_data = alife_storage_manager.get_state()
+	if m_data.se_object[id] then
+		m_data.se_object[id] = nil
+		-- empty_table(m_data.se_object[id])
+	end
+end
+
+function add_to_grenades_to_arte_items(se_obj)
+	if grenades_to_arte[se_obj:section_name()] then
+		printf("adding %s grenade", se_obj:name())
+		grenades_to_arte_items[se_obj:name()] = {
+			section = se_obj:section_name(),
+			id = se_obj.id,
+			name = se_obj:name(),
+		}
+	end
+end
+
+function remove_from_grenades_to_arte_items(se_obj)
+	grenades_to_arte_items[se_obj:section_name()] = nil
+end
+
+function convert(obj, destination)
+	local se_obj = alife_object(obj:id())
+	local new_sec = grenades_to_arte[obj:section()]
+	remove_from_grenades_to_arte_items(se_obj)
+	alife_release(se_obj)
+	local new_se_obj = alife_create_item(new_sec, destination)
+	zz_item_artefact.copyArtefactState(se_obj, new_se_obj)
+end
+
+function convert_grenades_to_arte(obj)
+	if not obj then return end
+	if not grenades_to_arte[obj:section()] then return end
+
+	local parent = obj:parent()
+	if parent then
+		return convert(obj, parent)
+	end
+
+	local pos = obj:position()
+	local lvid = obj:level_vertex_id()
+	local gvid = obj:game_vertex_id()
+	return convert(obj, {pos, lvid, gvid})
+end
+
+function check_grenade_to_arte(name, item)
+	if not grenades_to_arte[item.section] then
+		grenades_to_arte_items[name] = nil
+		return true
+	end
+
+	local obj = level.object_by_id(item.id)
+	if not obj then return end
+
+	local parent = obj:parent()
+	if not parent then
+		convert_grenades_to_arte(obj)
+		return true
+	end
+
+	if parent:id() ~= AC_ID then
+		convert_grenades_to_arte(obj)
+		return true
+	end
+
+	local item_in_slot = db.actor:item_in_slot(5)
+	if not item_in_slot then
+		convert_grenades_to_arte(obj)
+		return true
+	end
+
+	if item_in_slot:name() ~= name then
+		convert_grenades_to_arte(obj)
+		return true
+	end
+end
+
+function check_grenades_to_arte()
+	for k, value in pairs(grenades_to_arte_items) do
+		check_grenade_to_arte(k, value)
+	end
+end
+
+local tg = 0
+local tg_interval = 100
+function check_grenades_update()
+	local t = time_global()
+	if t < tg then return end
+	tg = t + tg_interval
+
+	if not enabled then return end
+
+	check_grenades_to_arte()
+end
+
+-- Get all grenade arte items
+function actor_on_first_update()
+	for i = 1, 65534 do
+		local se_obj = alife_object(i)
+		if se_obj then
+			add_to_grenades_to_arte_items(se_obj)
+		end
+	end
+	RegisterScriptCallback("actor_on_update", actor_on_update)
+	RegisterScriptCallback("actor_on_update", check_grenades_update)
+	RegisterScriptCallback("server_entity_on_register", server_entity_on_register)
+end
+
+function server_entity_on_register(se_obj)
+	add_to_grenades_to_arte_items(se_obj)
+end
+
+function on_game_start()
+	RegisterScriptCallback("actor_on_first_update", actor_on_first_update)
+end

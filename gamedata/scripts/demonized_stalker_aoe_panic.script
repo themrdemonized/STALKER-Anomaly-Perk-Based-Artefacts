@@ -52,8 +52,13 @@ function npc_update_panic_state(obj_id)
 	print_tip("npc %s panic %s", obj_id, db.storage[obj_id].aoe_panic)
 end
 
-function npc_add_aoe_panic(obj_id, AOE_class, time, danger_dir, danger_pos)
+function npc_add_aoe_panic(obj_id, AOE_class, time, danger_dir, danger_pos, panic_sound_interval)
 	if not npc_init_aoe_tables(obj_id) then return end
+
+	if panic_sound_interval == nil then
+		panic_sound_interval = true
+	end
+	
 	local lifetime = time_global() + (time or 0) * 1000
 	if db.storage[obj_id].active_aoe_panic[AOE_class] then
 		if time and not db.storage[obj_id].active_aoe_panic[AOE_class].time then
@@ -62,6 +67,7 @@ function npc_add_aoe_panic(obj_id, AOE_class, time, danger_dir, danger_pos)
 		db.storage[obj_id].active_aoe_panic[AOE_class].time = time and lifetime
 		db.storage[obj_id].danger_dir = danger_dir
 		db.storage[obj_id].danger_pos = danger_pos
+		db.storage[obj_id].panic_sound_interval = panic_sound_interval == true and 2 or panic_sound_interval
 		return
 	end
 
@@ -70,6 +76,7 @@ function npc_add_aoe_panic(obj_id, AOE_class, time, danger_dir, danger_pos)
 	}
 	db.storage[obj_id].danger_dir = danger_dir
 	db.storage[obj_id].danger_pos = danger_pos
+	db.storage[obj_id].panic_sound_interval = panic_sound_interval == true and 2 or panic_sound_interval
 	npc_update_panic_state(obj_id)
 	if time then npc_remove_aoe_panic_deferred(obj_id, AOE_class) end
 end
@@ -262,7 +269,8 @@ function action_stalker_aoe_panic:execute()
 		return
 	end
 
-	local npc = self.object	
+	local npc = self.object
+	local id = npc:id()	
 	--printf("enemy = %s",enemy and enemy:name())
 	
 	-- ensure and enforce path type
@@ -301,6 +309,17 @@ function action_stalker_aoe_panic:execute()
 		fast_set = true,
 		animation = false,
 	})
+
+	if db.storage[id].panic_sound_interval then
+		local tg = time_global()
+		local ptg = db.storage[id].panic_sound_tg or 0
+		local interval = db.storage[id].panic_sound_interval * 1000
+		if tg - ptg > interval then
+			local t = {"panic_monster", "panic_human"}
+			xr_sound.set_sound_play(id, t[math.random(#t)])
+			db.storage[id].panic_sound_tg = tg + interval
+		end
+	end
 
 	-- First update force movement 
 	if self.first_update then

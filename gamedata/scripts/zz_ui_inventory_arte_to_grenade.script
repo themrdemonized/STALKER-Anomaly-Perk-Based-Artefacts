@@ -1,0 +1,193 @@
+local CreateTimeEvent = demonized_time_events.CreateTimeEvent
+local enable_feature        = true
+local enable_item_picker	= true
+
+local is_shift_pressed = false
+
+local weight_unit = game.translate_string("st_kg")
+local snd_open         = sound_object([[interface\inv_open]])
+local snd_close        = sound_object([[interface\inv_close]])
+local snd_item_to_slot = sound_object([[interface\inv_slot]])
+local snd_item_to_belt = sound_object([[interface\inv_belt]])
+local snd_item_to_ruck = sound_object([[interface\inv_ruck]])
+local snd_properties   = sound_object([[interface\inv_properties_2]])
+local snd_drop_item    = sound_object([[interface\inv_drop]])
+local snd_attach_addon = sound_object([[interface\inv_attach_addon]])
+local snd_detach_addon = sound_object([[interface\inv_detach_addon]])
+local snd_item_use     = sound_object([[interface\inv_none]])
+
+scopes_to_binocs = scopes_as_binocs and scopes_as_binocs.scopes_to_binocs
+artefacts_to_grenades = arte_to_grenades and arte_to_grenades.arte_to_grenades
+
+-- Callbacks - UI
+On_CC_DragDrop = ui_inventory.UIInventory.On_CC_DragDrop
+function ui_inventory.UIInventory:On_CC_DragDrop(bag_from, idx_from)
+	local obj_from = self.CC[bag_from]:GetObj(idx_from)
+	if (not obj_from) then
+		return
+	end
+	
+	-- When interacting with item picker, get parent cell bag and index
+	bag_from, idx_from = self:Picker_Ownership(bag_from, idx_from, obj_from)
+	
+	self:Print(nil, "Callback On_CC_DragDrop | bag: %s - idx: %s", bag_from, idx_from)
+	
+	-- Throw items outside
+	if self.trash:IsShown() and self.trash:IsCursorOverWindow() then
+		if self:Item_On_Mode("drop", bag_from) and self:Cond_NotQuest(obj_from, bag_from) then
+			self:Action_Drop(obj_from, bag_from)
+			return
+		end
+		
+	-- Drag Drop item on other item
+	else
+	
+		-- Get hovered container and cell
+		local bag_to, idx_to, obj_to
+		for name,cc in pairs(self.CC) do
+			bag_to, idx_to, obj_to = cc:GetCell_Focused()
+			if bag_to then
+				break
+			end
+		end
+		
+		-- When interacting with item picker, get parent cell bag and index
+		if obj_to then
+			bag_to, idx_to = self:Picker_Ownership(bag_to, idx_to, obj_to)
+		end
+		
+		self:Print(nil, "Callback On_CC_DragDrop | obj_f: %s - bag_f: %s - idx_f: %s | obj_t: %s - bag_t: %s - idx_t: %s", obj_from:name(), bag_from, idx_from, obj_to and obj_to:name(), bag_to, idx_to)
+		
+		-- Scope to Binoc Scope
+		if bag_to == "actor_equ" 
+		and idx_to == 5 
+		and scopes_to_binocs 
+		and scopes_to_binocs[obj_from:section()] 
+		and (not db.actor:item_in_slot(5) or (db.actor:item_in_slot(5) and not IsWeapon(db.actor:item_in_slot(5)))) 
+		then
+			printf("moving %s to binoc slot", obj_from:name())
+			local binoc_scope = scopes_to_binocs[obj_from:section()]
+			alife_release(obj_from)
+			local se_obj = alife_create_item(binoc_scope, db.actor)
+			scopes_as_binocs.enabled = false
+			CreateTimeEvent("scopes_as_binocs", "wait_gobj_and_move_it", 0, function()
+				local obj = level.object_by_id(se_obj.id)
+				if not obj then return end
+
+				db.actor:move_to_slot(obj, idx_to)
+				CreateTimeEvent("scopes_as_binocs", "check_gobj_in_slot", 0, function()
+					local item = db.actor:item_in_slot(5)
+					if item and item:name() == obj:name() then
+						printf("scope %s moved to binoc slot", item:name())
+						scopes_as_binocs.enabled = true 
+						return true
+					end
+				end)
+				return true
+			end)
+		end
+
+		-- Scope to Binoc Scope
+		if bag_to == "actor_equ" 
+		and idx_to == 3 
+		and scopes_to_binocs 
+		and scopes_to_binocs[obj_from:section()] 
+		and (not db.actor:item_in_slot(5) or (db.actor:item_in_slot(5) and not IsWeapon(db.actor:item_in_slot(5)))) 
+		then
+			printf("moving %s to binoc slot", obj_from:name())
+			local binoc_scope = scopes_to_binocs[obj_from:section()]
+			alife_release(obj_from)
+			local se_obj = alife_create_item(binoc_scope, db.actor)
+			scopes_as_binocs.enabled = false
+			CreateTimeEvent("scopes_as_binocs", "wait_gobj_and_move_it", 0, function()
+				local obj = level.object_by_id(se_obj.id)
+				if not obj then return end
+
+				db.actor:move_to_slot(obj, idx_to)
+				CreateTimeEvent("scopes_as_binocs", "check_gobj_in_slot", 0, function()
+					local item = db.actor:item_in_slot(5)
+					if item and item:name() == obj:name() then
+						printf("scope %s moved to binoc slot", item:name())
+						scopes_as_binocs.enabled = true 
+						return true
+					end
+				end)
+				return true
+			end)
+		end
+
+		-- Ruck/Slot to Slot
+		if (bag_to == "actor_equ") and (self:Cond_Equip(obj_from, bag_from) or bag_from == "actor_equ") and (not IsArtefact(obj_from)) then
+			local slot = (SYS_GetParam(2,obj_from:section(),"slot") or -1) + 1
+			local cslots = self.slot_cell[slot] or {}
+			for i=1,#cslots do
+				if (cslots[i] == idx_to) then
+					self:Print(nil, "Callback On_CC_DragDrop | Ruck to Slot | obj_from: %s - obj_to: %s - base slot: %s - new slot: %s", obj_from:name(), obj_to and obj_to:name(), slot, idx_to)
+					if obj_to then
+						db.actor:move_to_ruck(obj_to)
+					end
+
+					db.actor:move_to_slot(obj_from, idx_to)
+					
+					self:PlaySND(snd_item_to_slot)
+					break
+				end
+			end
+		end
+			
+		-- Ruck to Belt
+		if (bag_to == "actor_belt") and self:Cond_Equip(obj_from, bag_from) and IsArtefact(obj_from) then
+			self:Action_Equip(obj_from, bag_from)
+		end
+			
+		-- To Quick access
+		if (bag_to == "actor_quick") and IsItem("consumable",obj_from:section()) then
+			quick_item = exec_console_cmd("slot_" .. (idx_to - 1) .. " " .. obj_from:section())
+			self.update_info = true
+			return
+		end
+			
+		-- Case object to drop on
+		if obj_to then
+		
+			-- Attachment
+			if ((bag_to == "actor_bag") or (bag_to == "actor_equ")) and self:Cond_Attach(obj_from, "actor_bag", nil, nil, obj_to) then
+				self:Action_Attach(obj_from, "actor_bag", nil, nil, obj_to)
+				
+			-- Callback
+			else
+				SendScriptCallback("ActorMenu_on_item_drag_drop", obj_from, obj_to, self.bag_id[bag_from], self.bag_id[bag_to])
+			end
+			
+		-- No object to drop on
+		else
+			if (not bag_to) then
+				for bag,cc in pairs(self.CC) do
+					if (bag ~= "picker") and cc:IsCursorOverWindow() then
+						bag_to = bag
+						break
+					end
+				end
+			end
+			
+			-- Case bag to drop on
+			if bag_to then
+				
+				-- Move to other suitable bag
+				if self:Item_On_Mode("move", bag_from) and self:Cond_Move(obj_from, bag_from, nil, bag_to) then
+					if self.holding_ctrl and self:Cond_Childs(obj_from, bag_from) then
+						self:Action_Move_All(obj_from, bag_from)
+					else
+						self:Action_Move(obj_from, bag_from)
+					end
+					
+				-- Unequip
+				elseif self:Item_On_Mode("to_ruck", bag_from) and (bag_to == "actor_bag" or bag_to == "actor_trade_bag") then
+					self:Action_UnEquip(obj_from, bag_from)
+				end
+			end
+		end
+		
+		self:On_Item_Update()
+	end
+end
