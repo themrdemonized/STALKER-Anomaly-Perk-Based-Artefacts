@@ -948,23 +948,50 @@ artefact_props = { -- Special props of artefacts that are used in processing
 		restore_time = 3.5,
 		active = false,
 		cooldown_time = 30,
-		npc_stun_radius = 5,
+		npc_stun_radius = 4,
 		npc_stun_anims = {
 		    "norm_2_critical_hit_torso_0", -- good
 		    "norm_1_critical_hit_head_0", -- good
 		},
-		npc_stun = function(self, pos)
+
+		-- Saved vars
+		fov = nil,
+		hud_fov = nil,
+		npc_stun = function(self, pos, stun_and_attack)
 			level.iterate_nearest(pos, self.npc_stun_radius, function(npc)
-				if IsStalker(npc) and npc:position():distance_to(pos) < self.npc_stun_radius and xr_combat_ignore.is_enemy(npc, db.actor) then
+				if IsStalker(npc) and npc:position():distance_to(pos) < self.npc_stun_radius and (stun_and_attack or xr_combat_ignore.is_enemy(npc, db.actor)) then
 					if npc:movement_type() == move.walk or npc:movement_type() == move.run then
 				        npc:set_movement_type(move.stand)
 				    end
 				    npc:play_cycle(get_random_array_element(self.npc_stun_anims), true)
 				    state_mgr.set_state(npc, "idle")
+				    if stun_and_attack then
+				    	local s_hit = hit()
+						s_hit.bone = "bip01_spine"
+						s_hit.power = 0.05
+						s_hit.draftsman = db.actor
+						s_hit.type = hit.strike
+						s_hit.direction = VEC_Z
+
+						npc:hit(s_hit)
+						return true
+				    end
 				end
 			end)
 		end,
-		on_death = function(self, actor, artefact_count, artefact_ids, artefact_names, npc, who, last_npc_hit, last_npc_hit_bone_index)
+		actor_net_destroy = function(self)
+			RemoveTimeEvent("af_lighthouse", "af_lighthouse_0")
+			RemoveTimeEvent("af_lighthouse", "af_lighthouse_1")
+			RemoveTimeEvent("af_lighthouse", "af_lighthouse_2")
+			RemoveTimeEvent("af_lighthouse_tp_prehit", 0)
+			RemoveTimeEvent("af_lighthouse_tp", 0)
+			if self.fov and self.hud_fov then
+				exec_console_cmd("fov " .. self.fov)
+				exec_console_cmd("hud_fov " .. self.hud_fov)
+				exec_console_cmd("time_factor 1")
+			end
+		end,
+		on_death = function(self, actor, artefact_count, artefact_ids, artefact_names, npc, who, last_npc_hit, last_npc_hit_bone_index, stun_and_attack)
 			if not check_cooldown("af_lighthouse") then
 				trace("Lighthouse, on cooldown")
 				return
@@ -976,6 +1003,8 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			CreateTimeEvent("af_lighthouse", "af_lighthouse_0", 0, function()
 				local fov = get_console_cmd(2, "fov")
 				local hud_fov = get_console_cmd(2, "hud_fov")
+				self.fov = fov
+				self.hud_fov = hud_fov
 				local mult = self.max_fov / fov
 				local start_tg = time_global()
 				local init_tg = time_global() + self.init_time * 1000
@@ -985,6 +1014,11 @@ artefact_props = { -- Special props of artefacts that are used in processing
 				set_pp_effector_factor(c_id_ppe.black_infinite, 0.005)
 
 				self.active = true
+
+				local function aond()
+					self:actor_net_destroy()
+				end
+				RegisterScriptCallback("actor_on_net_destroy", aond)
 
 				CreateTimeEvent("af_lighthouse", "af_lighthouse_1", 0, function()
 					local tg = time_global()
@@ -1001,7 +1035,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 						add_cooldown(self.cooldown_time, "af_lighthouse")
 						exec_console_cmd("time_factor " .. self.min_tf)
 						play_sound_on_actor(get_random_array_element(self.sounds), 0.7, random_float(0.95, 1.05))
-						self:npc_stun(npc:position())
+						self:npc_stun(npc:position(), stun_and_attack)
 
 						CreateTimeEvent("af_lighthouse", "af_lighthouse_2", 0, function()
 							local tg = time_global()
@@ -1026,6 +1060,9 @@ artefact_props = { -- Special props of artefacts that are used in processing
 								self.active = false
 								remove_pp_effector(c_id_ppe.black_infinite)
 								weapon_modifiers.remove_modifier("af_lighthouse")
+								UnregisterScriptCallback("actor_on_net_destroy", aond)
+								self.fov = nil
+								self.hud_fov = nil
 								return true
 							end
 						end)
@@ -1036,7 +1073,64 @@ artefact_props = { -- Special props of artefacts that are used in processing
 
 				return true
 			end)
-		end
+			return true
+		end,
+		manual_teleport = function(self, position, npc_target)
+			-- Mock object
+			local npc = {
+				position = function(self)
+					return position
+				end
+			}
+			if self:on_death(db.actor, artefact_count, artefact_ids, artefact_names, npc, who, last_npc_hit, last_npc_hit_bone_index, npc_target) then
+
+				-- Telefrag NPC
+				if npc_target then
+					trace("Beacon, telefrag %s", npc_target:name())
+					
+					CreateTimeEvent("af_lighthouse_tp_prehit", 0, self.init_time - 0.05, function()
+						local s_hit = hit()
+						s_hit.bone = "bip01_spine"
+						s_hit.power = 0.01
+						s_hit.draftsman = db.actor
+						s_hit.type = hit.strike
+						s_hit.direction = VEC_Z
+
+						npc_target:hit(s_hit)
+						return true
+					end)
+
+					CreateTimeEvent("af_lighthouse_tp", 0, self.init_time, function()
+						local gibs = particles_object("new_effects\\krovisha_main")
+						if gibs and not gibs:playing() then
+							local p = utils_obj.safe_bone_pos(npc_target, "bip01_spine") or utils_obj.safe_bone_pos(npc_target, "bip01_head") or npc_target:position():add(vector():set(0, 0.2, 0))
+							local dir = device().cam_dir
+							local h = dir:getH()
+							local d = vector():setHP(h, 0)
+							gibs:play_at_pos(p:mad(d, 0.3))
+							local snd = get_safe_sound_object("perk_based_artefacts\\XDEATH" .. random(5))
+							snd:play_at_pos(npc_target, position, 0, sound_object.s3d)
+							snd.frequency = random_float(0.95, 1.05)
+							snd.volume = 0.7
+						else
+							trace("gibs not found")
+						end
+
+						local sim = alife()
+						sim:release(sim:object(npc_target:id()))
+
+						local af_lucifer = artefact_props.af_lucifer
+						if af_lucifer:check_lucifer() then
+							af_lucifer:change_condition(0.06)
+						end
+
+						return true
+					end)					
+				end
+
+				return true
+			end			
+		end,
 	},
 	af_cell = {
 		reduction_coeff = (function() -- LUT with reduction coeffs by artefact count
@@ -3055,7 +3149,7 @@ artefact_on_update_functions = {
 
 		local k = 1 - math.min(1, normalize(actor_health, 0, health_threshold))
 		af_ear.sound.volume = k
-		af_ear.sound.frequency = 1 + 0.4 * k
+		af_ear.sound.frequency = 1 + 0.5 * k
 
 		if actor_health < health_threshold then
 			local health = (health_threshold - actor_health) * 0.0041 * artefact_count * (af_lucifer:check_lucifer() and min(normalize(af_lucifer.condition, -0.4, 0.5), 1) or 1) --66% of reduction at 0 Lucifer condition
@@ -3662,7 +3756,7 @@ artefact_on_before_hit_functions = {
 		local af_ear = artefact_props.af_ear
 		local health_threshold = af_ear.health_threshold[min(5, artefact_count)]
 		local actor_health = round_100(actor.health)
-		local k = min(normalize(actor_health, 0.1, health_threshold), 1)
+		local k = min(normalize(actor_health, 0.15, health_threshold), 1)
 		local new_k = lerp(0.6 - 0.1 * artefact_count, 1, k)
 		trace("af_ear, hit power k %s", new_k)
 		s_hit.power = s_hit.power * new_k
@@ -4502,8 +4596,6 @@ artefact_binder_on_destroy_functions = {
 	end
 }
 
--------------------------------------------------------------------------
--- Special monkey patches for some artefacts to make their effects work
 -- Functors for Bat, Perk: Zone Alchemy
 local add_functor = custom_functor_autoinject.add_functor
 bat_transmutate_func = {
@@ -4525,6 +4617,20 @@ bat_transmutate_func = {
 }
 add_functor("pba_bat", bat_transmutate_func.check_transmutate, bat_transmutate_func.transmutate_string, nil, bat_transmutate_func.transmutate_func, true)
 
+-- Functors for Beacon
+af_lighthouse_user_teleport_func = {
+	check = function(obj, bag, mode)
+		return obj:section() == "af_lighthouse"
+	end,
+	string = function(obj, bag, mode)
+		return "st_pba_teleport"
+	end,
+	action = function(obj, bag, mode)
+		return perk_based_artefacts_af_lighthouse_ui.start(obj)
+	end,
+}
+add_functor("pba_lighthouse", af_lighthouse_user_teleport_func.check, af_lighthouse_user_teleport_func.string, nil, af_lighthouse_user_teleport_func.action)
+
 -- Functors for Lucifer
 lucifer_sacrifice_func = {
 	check_lucifer_condition = function(obj, bag, mode)
@@ -4545,6 +4651,8 @@ lucifer_sacrifice_func = {
 }
 add_functor("pba_lucifer", lucifer_sacrifice_func.check_lucifer_condition, lucifer_sacrifice_func.check_sacrifice, nil, lucifer_sacrifice_func.lucifer_sacrifice, true)
 
+-------------------------------------------------------------------------
+-- Special monkey patches for some artefacts to make their effects work
 -- Patch for Ball for kicking monsters
 local use_kick = bind_monster.generic_object_binder.use_kick
 bind_monster.generic_object_binder.use_kick = function(self, obj, who)
