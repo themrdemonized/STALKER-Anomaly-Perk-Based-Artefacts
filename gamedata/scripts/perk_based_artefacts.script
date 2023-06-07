@@ -326,7 +326,7 @@ local function throttle(func, tg_throttle)
 	end
 end
 
-local function get_time_elapsed()
+function get_time_elapsed()
 	--trace(time_factor)
 	return floor(get_game_time():diffSec(get_start_time()) / time_factor * 10) * 0.1
 end
@@ -1164,6 +1164,8 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			local id = wpn:id()
 			local af_elektron = artefact_props.af_elektron
 			local c_obj = wpn:cast_Weapon()
+
+			if not c_obj then return end
 
 			local last_k = af_elektron.rpm_coeff
 			local weapon_params = weapon_modifiers.get_saved_weapon_params(id)
@@ -4451,6 +4453,11 @@ artefact_bullet_on_impact_functions = {
 artefact_binder_on_update_functions = {
 	-- Medal, Perk: Hacksaw
 	af_medallion = function(binder)
+		if binder.destroyed then
+			if binder.sound_idle then binder.sound_idle:stop() end
+			return
+		end
+
 		local obj = binder.object
 		local id = obj:id()
 		
@@ -4460,21 +4467,31 @@ artefact_binder_on_update_functions = {
 		end
 
 		if obj:parent() then
+			if binder.sound_idle then binder.sound_idle:stop() end
 			return true
 		end
 
 		if not binder.first_update_done then
 			binder.first_update_done = true
+
 			binder.target_current_id = nil
 			binder.target_list = {}
-			binder.target_radius = 25
+			binder.target_radius = 60
 			binder.target_radius_sqr = binder.target_radius ^ 2
-			binder.attack_radius = 0.5
+
+			binder.attack_time = 30
+			binder.attack_radius = 2
 			binder.attack_radius_sqr = binder.attack_radius ^ 2
-			binder.panic_radius = 5
-			binder.panic_radius_sqr = binder.panic_radius ^ 2
+
 			binder.panic_time = 1
-			binder.attack_time = 60
+			binder.panic_radius = 7
+			binder.panic_radius_sqr = binder.panic_radius ^ 2
+			
+			binder.max_distance_from_actor_sqr = 75 ^ 2
+			binder.take_distance_sqr = 1.6 ^ 2
+
+			binder.homing_speed = 1.2
+			binder.speed = 120
 
 			binder.fly_direction = table2vec(props.fly_direction)
 			binder.start_time = props.start_time
@@ -4484,17 +4501,22 @@ artefact_binder_on_update_functions = {
 			binder.sound_idle = get_safe_sound_object("perk_based_artefacts\\FUNGFLY")
 			binder.sound_idle:play_at_pos(obj, obj:position(), 0, sound_object.s3d + sound_object.looped)
 
+			binder.get_target_pos = function(target)
+				local target_pos = utils_obj.safe_bone_pos(target, "bip01_head") or target:position():add(vector():set(0, 0.5, 0))
+				return target_pos
+			end
+
 			local closest_distance = math.huge
 			binder.target_list_func = function(target)
-				if (IsMonster(target) or (
+				if 	target:id() ~= AC_ID 
+				and (IsMonster(target) or (
 						IsStalker(target) 
-						and xr_combat_ignore.is_enemy(target, db.actor)
+						and game_relations.is_factions_enemies(get_actor_true_community(), character_community(target))
 						)
 					)
-				and target:id() ~= AC_ID 
 				and target:alive()
 				then
-					local distance = obj:position():distance_to_sqr(target:position())
+					local distance = obj:position():distance_to_sqr(binder.get_target_pos(target))
 					if distance <= binder.target_radius_sqr and distance < closest_distance then
 						closest_distance = distance
 						binder.target_current_id = target:id()
@@ -4517,7 +4539,7 @@ artefact_binder_on_update_functions = {
 			binder.target_attack_func = throttle(function()
 				if binder.return_home then
 					local distance = obj:position():distance_to_sqr(db.actor:position())
-					if distance < 1 then
+					if distance < binder.take_distance_sqr then
 						db.actor:take_item(obj)
 					end
 					return
@@ -4531,25 +4553,36 @@ artefact_binder_on_update_functions = {
 					return
 				end
 
-				local distance = obj:position():distance_to_sqr(target:position())
-
-				if distance < binder.panic_radius_sqr and IsStalker(target) then
-					demonized_stalker_aoe_panic.npc_add_aoe_panic(target:id(), "af_medallion_panic", binder.panic_time, obj:position(), nil, 1.5)
-				end
+				local distance = obj:position():distance_to_sqr(binder.get_target_pos(target))
 
 				if distance > binder.attack_radius_sqr then
 					return
 				end
 
 				local s_hit = hit()
-				s_hit.power = 0.1
+				s_hit.power = 0.7
 				s_hit.type = hit.wound
 				s_hit.impulse = 1
 				s_hit.direction = _G.VEC_Y
 				s_hit.draftsman = db.actor
 
 				target:hit(s_hit)
-			end, 100)
+			end, 200)
+
+			binder.target_panic_func = throttle(function()
+				if not binder.target_current_id then return end
+
+				local target = get_object_by_id(binder.target_current_id)
+				if not target then
+					return
+				end
+
+				local distance = obj:position():distance_to_sqr(binder.get_target_pos(target))
+
+				if distance < binder.panic_radius_sqr and IsStalker(target) then
+					demonized_stalker_aoe_panic.npc_add_aoe_panic(target:id(), "af_medallion_panic", binder.panic_time, obj:position(), nil, 1.5)
+				end
+			end, binder.panic_time * 1000 - 200)
 
 			binder.target_homing_func = throttle(function()
 				if not binder.target_current_id then return end
@@ -4559,25 +4592,79 @@ artefact_binder_on_update_functions = {
 					return
 				end
 
-				local target_pos = utils_obj.safe_bone_pos(target, "bip01_spine") or utils_obj.safe_bone_pos(target, "bip01_head") or target:position():add(vector():set(0, 0.5, 0))
-				local pos = obj:position()
-				local dir = target_pos:sub(pos):normalize()
-				local delta = device().time_delta
+				-- Homing function
+				local pos = obj:position()				
 
-				binder.fly_direction.x = ema("af_medallion_fly_x", dir.x, binder.fly_direction.x, 15, delta)
-				binder.fly_direction.y = ema("af_medallion_fly_y", dir.y, binder.fly_direction.y, 15, delta)
-				binder.fly_direction.z = ema("af_medallion_fly_z", dir.z, binder.fly_direction.z, 15, delta)
+				-- Get target direction
+				local target_pos = binder.get_target_pos(target)
+				local target_dir = target_pos:sub(pos):normalize()
 
-				obj:set_const_force(vector():set(binder.fly_direction), 50, 500)
+				-- Get angle between target and current directions
+				local angle = yaw_degree3d(binder.fly_direction, target_dir)
+
+				-- Get interpolation based on homing speed
+				local homing_speed = binder.homing_speed * device().time_delta
+				local coeff = math.min(homing_speed / angle, 1)
+
+				-- print_tip("projectile %s%s, homing to obj %s, angle %s, hom speed %s, coeff %s", self.section, self.weapon_id, obj:name(), angle, homing_speed, coeff)
+
+				-- Interpolate between current dir and target dir
+				binder.fly_direction = vector():set(
+					lerp(binder.fly_direction.x, target_dir.x, coeff),
+					lerp(binder.fly_direction.y, target_dir.y, coeff),
+					lerp(binder.fly_direction.z, target_dir.z, coeff)
+				):normalize()
+
+				-- local target_pos = binder.get_target_pos(target)
+				-- local pos = obj:position()
+				-- local dir = target_pos:sub(pos):normalize()
+				-- local delta = device().time_delta
+
+				-- binder.fly_direction.x = ema("af_medallion_fly_x", dir.x, binder.fly_direction.x, 8, delta)
+				-- binder.fly_direction.y = ema("af_medallion_fly_y", dir.y, binder.fly_direction.y, 8, delta)
+				-- binder.fly_direction.z = ema("af_medallion_fly_z", dir.z, binder.fly_direction.z, 8, delta)
 			end)
+
+			binder.fly_func = throttle(function()
+				local ray = demonized_geometry_ray.geometry_ray({
+					ray_range = 50,
+					contact_range = 0.7,
+					ignore_object = obj
+				})
+				local res = ray:get(obj:position(), binder.fly_direction)
+				if res.in_contact then
+					local surface_normal = demonized_geometry_ray.get_surface_normal(obj:position(), binder.fly_direction)
+					if surface_normal then
+						binder.fly_direction:reflect(binder.fly_direction, surface_normal)
+						binder.fly_direction.y = binder.fly_direction.y + 0.5
+
+						-- Possibly play sound
+					end
+				end
+
+				local dir = vector():set(binder.fly_direction):normalize()
+				obj:set_const_force(dir, binder.speed, device().time_delta)
+			end)
+
+			-- Counter gravity force
+			local mass = obj:mass()
+			local dir = vector():set(0, 1, 0)
+			obj:set_const_force(dir, mass * 19.62, 10000000)
 		end
 
 		binder.target_update_func()
 		binder.target_attack_func()
+		binder.target_panic_func()
 		binder.target_homing_func()
+		binder.fly_func()
 		binder.sound_idle:set_position(obj:position())
 
-		if time_elapsed > binder.stop_time then
+		if time_elapsed > binder.stop_time or obj:position():distance_to_sqr(binder.get_target_pos(db.actor)) > binder.max_distance_from_actor_sqr then
+			if obj:condition() <= 0.05 then
+				binder.destroyed = true
+				alife_release_id(id)
+				return
+			end
 			binder.return_home = true
 		end
 

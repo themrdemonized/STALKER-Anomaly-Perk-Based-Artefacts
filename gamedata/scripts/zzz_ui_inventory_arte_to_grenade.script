@@ -89,26 +89,28 @@ function ui_inventory.UIInventory:On_CC_DragDrop(bag_from, idx_from)
 
 		-- Scope to Binoc Scope
 		if bag_to == "actor_equ" 
-		and idx_to == 3 
-		and scopes_to_binocs 
-		and scopes_to_binocs[obj_from:section()] 
-		and (not db.actor:item_in_slot(5) or (db.actor:item_in_slot(5) and not IsWeapon(db.actor:item_in_slot(5)))) 
+		and idx_to == 4 
+		and artefacts_to_grenades 
+		and artefacts_to_grenades[obj_from:section()] 
+		and (not db.actor:item_in_slot(4) or (db.actor:item_in_slot(4) and not IsWeapon(db.actor:item_in_slot(4)))) 
 		then
 			printf("moving %s to binoc slot", obj_from:name())
-			local binoc_scope = scopes_to_binocs[obj_from:section()]
-			alife_release(obj_from)
+			local binoc_scope = artefacts_to_grenades[obj_from:section()]
 			local se_obj = alife_create_item(binoc_scope, db.actor)
-			scopes_as_binocs.enabled = false
-			CreateTimeEvent("scopes_as_binocs", "wait_gobj_and_move_it", 0, function()
+			zz_item_artefact.saveArtefactState(alife_object(obj_from:id()))
+			zz_item_artefact.copyArtefactState(alife_object(obj_from:id()), se_obj)
+			alife_release(obj_from)
+			artefacts_to_grenades.enabled = false
+			CreateTimeEvent("artefacts_to_grenades", "wait_gobj_and_move_it", 0, function()
 				local obj = level.object_by_id(se_obj.id)
 				if not obj then return end
 
 				db.actor:move_to_slot(obj, idx_to)
-				CreateTimeEvent("scopes_as_binocs", "check_gobj_in_slot", 0, function()
-					local item = db.actor:item_in_slot(5)
+				CreateTimeEvent("artefacts_to_grenades", "check_gobj_in_slot", 0, function()
+					local item = db.actor:item_in_slot(4)
 					if item and item:name() == obj:name() then
 						printf("scope %s moved to binoc slot", item:name())
-						scopes_as_binocs.enabled = true 
+						artefacts_to_grenades.enabled = true 
 						return true
 					end
 				end)

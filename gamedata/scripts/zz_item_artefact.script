@@ -1,4 +1,4 @@
-local enable_debug = false
+local enable_debug = true
 local function printf(s, ...)
     if enable_debug then
         _G.printf("Artefact props: " .. s, ...)

@@ -6,16 +6,8 @@ grenades_to_arte_items = {}
 
 enabled = true
 
-function se_clear_vars(id)
-	local m_data = alife_storage_manager.get_state()
-	if m_data.se_object[id] then
-		m_data.se_object[id] = nil
-		-- empty_table(m_data.se_object[id])
-	end
-end
-
 function add_to_grenades_to_arte_items(se_obj)
-	if grenades_to_arte[se_obj:section_name()] then
+	if se_obj and grenades_to_arte[se_obj:section_name()] then
 		printf("adding %s grenade", se_obj:name())
 		grenades_to_arte_items[se_obj:name()] = {
 			section = se_obj:section_name(),
@@ -26,16 +18,22 @@ function add_to_grenades_to_arte_items(se_obj)
 end
 
 function remove_from_grenades_to_arte_items(se_obj)
-	grenades_to_arte_items[se_obj:section_name()] = nil
+	if se_obj then
+		grenades_to_arte_items[se_obj:section_name()] = nil
+	end
 end
 
 function convert(obj, destination)
+	if not obj then return end
+
 	local se_obj = alife_object(obj:id())
+	if not se_obj then return end
+
 	local new_sec = grenades_to_arte[obj:section()]
 	remove_from_grenades_to_arte_items(se_obj)
-	alife_release(se_obj)
 	local new_se_obj = alife_create_item(new_sec, destination)
 	zz_item_artefact.copyArtefactState(se_obj, new_se_obj)
+	alife_release(se_obj)
 end
 
 function convert_grenades_to_arte(obj)
@@ -73,7 +71,7 @@ function check_grenade_to_arte(name, item)
 		return true
 	end
 
-	local item_in_slot = db.actor:item_in_slot(5)
+	local item_in_slot = db.actor:item_in_slot(4)
 	if not item_in_slot then
 		convert_grenades_to_arte(obj)
 		return true
@@ -111,7 +109,6 @@ function actor_on_first_update()
 			add_to_grenades_to_arte_items(se_obj)
 		end
 	end
-	RegisterScriptCallback("actor_on_update", actor_on_update)
 	RegisterScriptCallback("actor_on_update", check_grenades_update)
 	RegisterScriptCallback("server_entity_on_register", server_entity_on_register)
 end

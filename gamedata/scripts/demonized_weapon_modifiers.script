@@ -54,10 +54,12 @@ function save_current_weapon()
 	local wpn = db.actor:active_item()
 	if not wpn then return end
 
+	local c_obj = wpn:cast_Weapon()
+	if not c_obj then return end
+
 	local id = wpn:id()
 	if not saved_weapons[id] then
 		saved_weapons[id] = {}
-		local c_obj = wpn:cast_Weapon()
 		for set, get in pairs(available_modifiers) do
 			saved_weapons[id][set] = c_obj[get](c_obj)
 			saved_weapons[id][get] = saved_weapons[id][set]
@@ -82,6 +84,10 @@ function weapon_callbacks_on_weapon_before_fire(flags)
 
 	local wpn = db.actor:active_item()
 	local id = wpn:id()
+	if not saved_weapons[id] then
+		return
+	end
+	
 	local c_obj = wpn:cast_Weapon()
 	assert(c_obj.RealRPM, "Can't modify weapon stats, Modded Exes requied")
 

@@ -1,0 +1,62 @@
+local thrown_obj_id
+local thrown_obj_state
+
+function bind(obj)
+    obj:bind_object(af_medallion_grenade_binder(obj))
+end
+
+class "af_medallion_grenade_binder" (object_binder)
+
+function af_medallion_grenade_binder:__init(obj) super(obj)
+    self.object:set_fastcall(self.fastcall, self)
+end
+
+function af_medallion_grenade_binder:fastcall()
+    local obj = self.object
+    local id = obj:id()
+
+    -- printf("checking object %s", obj:name())
+
+    if not obj:parent() and thrown_obj_id then
+        printf("af_medallion %s is thrown, transform", obj:name())
+        local se_obj = alife_create("af_medallion", device().cam_pos:mad(device().cam_dir, 0.4), obj:level_vertex_id(), obj:game_vertex_id())
+        local state = zz_item_artefact.readValidMData(se_obj)
+        state.state = thrown_obj_state
+        state.state.condition = math.max((state.state.condition or 1) - 0.5, 0.02)
+        local props = {
+            fly_direction = device().cam_dir,
+            start_time = perk_based_artefacts.get_time_elapsed(),
+            return_home = false,
+        }
+        se_save_var(se_obj.id, nil, "af_medallion", props)
+
+        obj:destroy_object()
+        thrown_obj_id = nil
+        thrown_obj_state = nil
+    end
+end
+
+function actor_on_hud_animation_mark(state, mark)
+    local obj = db.actor:active_item()
+    if obj:section() == "af_medallion_grenade" and state == 7 then
+        thrown_obj_id = obj:id()
+        thrown_obj_state = zz_item_artefact.readValidMData(alife_object(thrown_obj_id)).state
+        print_r(thrown_obj_state)
+        printf("%s, %s", state, mark)
+    end
+end
+
+function actor_on_item_before_pickup(obj, flags)
+    if obj:section() == "af_medallion" then
+        local id = obj:id()
+        local props = se_load_var(id, nil, "af_medallion")
+        if props and not props.return_home then
+            flags.ret_value = false
+        end
+    end
+end
+
+function on_game_start()
+    RegisterScriptCallback("actor_on_item_before_pickup", actor_on_item_before_pickup)
+    RegisterScriptCallback("actor_on_hud_animation_mark", actor_on_hud_animation_mark)
+end
