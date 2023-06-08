@@ -287,6 +287,24 @@ local function lerp(a, b, f)
     end
 end
 
+local function distance_to_xz_sqr(a, b)
+	if a.distance_to_xz_sqr then
+		return a:distance_to_xz_sqr(b)
+	end
+
+	local va = a.x - b.x
+	local vb = a.z - b.z
+	return va * va + vb * vb
+end
+
+-- Check if dir2 is to the left of dir1
+local function angle_left_xz(dir1, dir2)
+	local dir1 = vector():set(dir1.x, 0, dir1.z)
+	local dir2 = vector():set(dir2.x, 0, dir2.z)
+	local dir_res = vector():set(VEC_ZERO):crossproduct(dir1, dir2)
+	return dir_res.y <= 0
+end
+
 -- Wrapper for AddUniqueCall that checks for time_global update before executing function
 local function throttle(func, tg_throttle)
 	local tg = 0
@@ -897,45 +915,45 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			[hit.fire_wound] = true
 		}
 	},
-	af_medallion = {
-		enemy_squad_member_ids = {},
-		on_enemy_eval = function(obj, enemy, flags)  -- Force former companions to become enemies and shoot
-			local _self = artefact_props.af_medallion
-			if _self.enemy_squad_member_ids[obj:id()] and enemy:id() == AC_ID then
-		        flags.override = true
-				flags.result = true
-			end
-		end,
-		npc_on_death_callback = function(npc, who)
-			local _self = artefact_props.af_medallion
-			_self.enemy_squad_member_ids[npc:id()] = nil
-			if is_empty(_self.enemy_squad_member_ids) then
-				trace("Medallion, former companions are dead")
-				UnregisterScriptCallback("on_enemy_eval", _self.on_enemy_eval)
-				UnregisterScriptCallback("npc_on_death_callback", _self.npc_on_death_callback)
-			end
-		end,
-		register = function(self)
-			if is_empty(self.enemy_squad_member_ids) then return end
+	-- af_medallion = {
+	-- 	enemy_squad_member_ids = {},
+	-- 	on_enemy_eval = function(obj, enemy, flags)  -- Force former companions to become enemies and shoot
+	-- 		local _self = artefact_props.af_medallion
+	-- 		if _self.enemy_squad_member_ids[obj:id()] and enemy:id() == AC_ID then
+	-- 	        flags.override = true
+	-- 			flags.result = true
+	-- 		end
+	-- 	end,
+	-- 	npc_on_death_callback = function(npc, who)
+	-- 		local _self = artefact_props.af_medallion
+	-- 		_self.enemy_squad_member_ids[npc:id()] = nil
+	-- 		if is_empty(_self.enemy_squad_member_ids) then
+	-- 			trace("Medallion, former companions are dead")
+	-- 			UnregisterScriptCallback("on_enemy_eval", _self.on_enemy_eval)
+	-- 			UnregisterScriptCallback("npc_on_death_callback", _self.npc_on_death_callback)
+	-- 		end
+	-- 	end,
+	-- 	register = function(self)
+	-- 		if is_empty(self.enemy_squad_member_ids) then return end
 
-			trace("Medallion, Registering former companions callbacks")
-			trace_table(self.enemy_squad_member_ids)
-			RegisterScriptCallback("on_enemy_eval", self.on_enemy_eval)
-			RegisterScriptCallback("npc_on_death_callback", self.npc_on_death_callback)
-		end,
-		reflect_chance = (function() -- LUT with chances to trigger by artefact count
-			local t = {}
-			for artefact_count = 1, 5 do
-				-- Parabolic curve
-				-- Progression is 35 -> 50 -> 62 -> 70 -> 75
-				t[artefact_count] = round((20 - 1.66667 * artefact_count) * artefact_count + 16.6667) + 5
-			end
-			return t
-		end)(),
-		valid_hits = { -- Valid hit types to trigger
-			[hit.fire_wound] = true
-		}
-	},
+	-- 		trace("Medallion, Registering former companions callbacks")
+	-- 		trace_table(self.enemy_squad_member_ids)
+	-- 		RegisterScriptCallback("on_enemy_eval", self.on_enemy_eval)
+	-- 		RegisterScriptCallback("npc_on_death_callback", self.npc_on_death_callback)
+	-- 	end,
+	-- 	reflect_chance = (function() -- LUT with chances to trigger by artefact count
+	-- 		local t = {}
+	-- 		for artefact_count = 1, 5 do
+	-- 			-- Parabolic curve
+	-- 			-- Progression is 35 -> 50 -> 62 -> 70 -> 75
+	-- 			t[artefact_count] = round((20 - 1.66667 * artefact_count) * artefact_count + 16.6667) + 5
+	-- 		end
+	-- 		return t
+	-- 	end)(),
+	-- 	valid_hits = { -- Valid hit types to trigger
+	-- 		[hit.fire_wound] = true
+	-- 	}
+	-- },
 	af_lighthouse = {
 		sounds = {
 			"perk_based_artefacts\\TELEPRT1",
@@ -1491,7 +1509,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			local af_lucifer = artefact_props.af_lucifer
 			local lucifer_bonus = max(1 - normalize(af_lucifer.condition, 0, 0.5), 0)
 
-			s_hit.power = s_hit.power * (1 + artefact_count * 0.5) * (1 + lucifer_bonus)
+			s_hit.power = s_hit.power * (1 + artefact_count * 0.3) * (1 + lucifer_bonus)
 			local health_boost = s_hit.power * self.health_boost_coeff * artefact_count
 
 			add_simple_timed_effect(1, function()
@@ -4476,22 +4494,28 @@ artefact_binder_on_update_functions = {
 
 			binder.target_current_id = nil
 			binder.target_list = {}
-			binder.target_radius = 60
+			binder.target_radius = 50
 			binder.target_radius_sqr = binder.target_radius ^ 2
 
-			binder.attack_time = 30
-			binder.attack_radius = 2
+			binder.attack_time = 35
+			binder.attack_radius = 1.4
 			binder.attack_radius_sqr = binder.attack_radius ^ 2
 
 			binder.panic_time = 1
 			binder.panic_radius = 7
 			binder.panic_radius_sqr = binder.panic_radius ^ 2
+			binder.panic_radius_non_targets = 3
+			binder.panic_radius_non_targets_sqr = binder.panic_radius ^ 2
 			
 			binder.max_distance_from_actor_sqr = 75 ^ 2
 			binder.take_distance_sqr = 1.6 ^ 2
 
-			binder.homing_speed = 1.2
+			binder.homing_speed = 0.5
 			binder.speed = 120
+			binder.damage = 0.55
+
+			binder.invalid_try_max = 25
+			binder.invalid_try_count = 0
 
 			binder.fly_direction = table2vec(props.fly_direction)
 			binder.start_time = props.start_time
@@ -4500,6 +4524,7 @@ artefact_binder_on_update_functions = {
 
 			binder.sound_idle = get_safe_sound_object("perk_based_artefacts\\FUNGFLY")
 			binder.sound_idle:play_at_pos(obj, obj:position(), 0, sound_object.s3d + sound_object.looped)
+			binder.sound_idle.frequency = 1
 
 			binder.get_target_pos = function(target)
 				local target_pos = utils_obj.safe_bone_pos(target, "bip01_head") or target:position():add(vector():set(0, 0.5, 0))
@@ -4511,15 +4536,18 @@ artefact_binder_on_update_functions = {
 				if 	target:id() ~= AC_ID 
 				and (IsMonster(target) or (
 						IsStalker(target) 
-						and game_relations.is_factions_enemies(get_actor_true_community(), character_community(target))
+						and (game_relations.is_factions_enemies(get_actor_true_community(), character_community(target)) or xr_combat_ignore.fighting_with_actor_npcs[target:id()])
 						)
 					)
 				and target:alive()
 				then
-					local distance = obj:position():distance_to_sqr(binder.get_target_pos(target))
-					if distance <= binder.target_radius_sqr and distance < closest_distance then
-						closest_distance = distance
-						binder.target_current_id = target:id()
+					local distance = distance_to_xz_sqr(obj:position(), binder.get_target_pos(target))
+					if distance <= binder.target_radius_sqr then
+						binder.target_list[target:id()] = true
+						if distance < closest_distance then
+							closest_distance = distance
+							binder.target_current_id = target:id()
+						end
 					end
 				end
 			end
@@ -4532,13 +4560,15 @@ artefact_binder_on_update_functions = {
 				if binder.target_current_id then
 					return
 				end
+
 				closest_distance = math.huge
-				level.iterate_nearest(obj:position(), binder.target_radius, binder.target_list_func)
+				empty_table(binder.target_list)
+				level.iterate_nearest(obj:position(), 100, binder.target_list_func)
 			end, 400)
 
 			binder.target_attack_func = throttle(function()
 				if binder.return_home then
-					local distance = obj:position():distance_to_sqr(db.actor:position())
+					local distance = obj:position():distance_to_sqr(binder.get_target_pos(db.actor))
 					if distance < binder.take_distance_sqr then
 						db.actor:take_item(obj)
 					end
@@ -4556,20 +4586,36 @@ artefact_binder_on_update_functions = {
 				local distance = obj:position():distance_to_sqr(binder.get_target_pos(target))
 
 				if distance > binder.attack_radius_sqr then
+					binder.invalid_try_count = binder.invalid_try_count + 1
+					if binder.invalid_try_count > binder.invalid_try_max then
+						binder.invalid_try_count = 0
+						binder.target_current_id = nil
+					end
 					return
 				end
 
 				local s_hit = hit()
-				s_hit.power = 0.7
+				s_hit.power = binder.damage
 				s_hit.type = hit.wound
 				s_hit.impulse = 1
 				s_hit.direction = _G.VEC_Y
 				s_hit.draftsman = db.actor
 
 				target:hit(s_hit)
-			end, 200)
+				binder.invalid_try_count = 0
+			end, 300)
 
 			binder.target_panic_func = throttle(function()
+				for id, _ in pairs(binder.target_list) do
+					local target = get_object_by_id(id)
+					if target and id ~= binder.target_current_id then
+						local distance = obj:position():distance_to_sqr(binder.get_target_pos(target))
+						if distance < binder.panic_radius_non_targets_sqr and IsStalker(target) then
+							demonized_stalker_aoe_panic.npc_add_aoe_panic(target:id(), "af_medallion_panic", binder.panic_time, obj:position(), nil, 1.5)
+						end
+					end
+				end
+
 				if not binder.target_current_id then return end
 
 				local target = get_object_by_id(binder.target_current_id)
@@ -4578,7 +4624,6 @@ artefact_binder_on_update_functions = {
 				end
 
 				local distance = obj:position():distance_to_sqr(binder.get_target_pos(target))
-
 				if distance < binder.panic_radius_sqr and IsStalker(target) then
 					demonized_stalker_aoe_panic.npc_add_aoe_panic(target:id(), "af_medallion_panic", binder.panic_time, obj:position(), nil, 1.5)
 				end
@@ -4615,30 +4660,67 @@ artefact_binder_on_update_functions = {
 					lerp(binder.fly_direction.z, target_dir.z, coeff)
 				):normalize()
 
-				-- local target_pos = binder.get_target_pos(target)
-				-- local pos = obj:position()
-				-- local dir = target_pos:sub(pos):normalize()
-				-- local delta = device().time_delta
-
-				-- binder.fly_direction.x = ema("af_medallion_fly_x", dir.x, binder.fly_direction.x, 8, delta)
-				-- binder.fly_direction.y = ema("af_medallion_fly_y", dir.y, binder.fly_direction.y, 8, delta)
-				-- binder.fly_direction.z = ema("af_medallion_fly_z", dir.z, binder.fly_direction.z, 8, delta)
+				if settings.debug_mode then
+					demonized_geometry_ray.VisualizeRay(obj:position(), obj:position():mad(binder.fly_direction, binder.get_target_pos(target):sub(obj:position()):magnitude()), nil, device().time_delta)
+					demonized_geometry_ray.VisualizeRay(obj:position(), binder.get_target_pos(target), nil, device().time_delta)
+				end
 			end)
 
 			binder.fly_func = throttle(function()
+
+				-- Procedure to possibly unstuck Medallion from closed rooms
+				local temp = vector():set(binder.fly_direction)
 				local ray = demonized_geometry_ray.geometry_ray({
-					ray_range = 50,
-					contact_range = 0.7,
-					ignore_object = obj
+					ray_range = 200,
+					ignore_object = obj,
+					flags = 3,
 				})
 				local res = ray:get(obj:position(), binder.fly_direction)
-				if res.in_contact then
-					local surface_normal = demonized_geometry_ray.get_surface_normal(obj:position(), binder.fly_direction)
-					if surface_normal then
-						binder.fly_direction:reflect(binder.fly_direction, surface_normal)
-						binder.fly_direction.y = binder.fly_direction.y + 0.5
+				if res.result and res.result.object and res.result.object:id() == binder.target_current_id then
+					RemoveTimeEvent("af_medallion_temp_lower_speed", obj:id())
+					binder.homing_speed = binder.temp_homing_speed or binder.homing_speed
+					binder.temp_homing_speed = nil
+				else
+					local ray = demonized_geometry_ray.geometry_ray({
+						ray_range = 50,
+						contact_range = 0.7,
+						ignore_object = obj,
+						flags = 2,
+					})
+					local res = ray:get(obj:position(), binder.fly_direction)
+					if res.in_contact then
+						local surface_normal = demonized_geometry_ray.get_surface_normal(obj:position():mad(binder.fly_direction, 0.1), binder.fly_direction)
+						if surface_normal then
+							binder.fly_direction:reflect(binder.fly_direction, surface_normal)
+							binder.fly_direction.y = binder.fly_direction.y + 0.5
 
-						-- Possibly play sound
+							-- If stuck in corner - reflect Y and turn 60 degrees away from target
+							local ray = demonized_geometry_ray.geometry_ray({
+								ray_range = 50,
+								contact_range = 0.7,
+								ignore_object = obj,
+								flags = 2,
+							})
+							local res = ray:get(obj:position(), binder.fly_direction)
+							if res.in_contact then
+								binder.fly_direction.y = -binder.fly_direction.y
+
+								if angle_left_xz(binder.fly_direction, temp) then
+									temp = vector_rotate_y(temp, -60)
+								else
+									temp = vector_rotate_y(temp, 60)
+								end
+
+								binder.fly_direction:setHP(temp:getH(), binder.fly_direction:getP()):normalize()
+								binder.temp_homing_speed = binder.temp_homing_speed or binder.homing_speed
+								binder.homing_speed = 0.01
+								CreateTimeEvent("af_medallion_temp_lower_speed", obj:id(), 1.5, function(homing_speed)
+									binder.homing_speed = homing_speed
+								end, binder.temp_homing_speed)
+							end
+
+							-- Possibly play sound
+						end
 					end
 				end
 
@@ -4685,6 +4767,7 @@ artefact_binder_on_destroy_functions = {
 
 -- Functors for Bat, Perk: Zone Alchemy
 local add_functor = custom_functor_autoinject.add_functor
+local override_functor = custom_functor_autoinject.override_functor
 bat_transmutate_func = {
 	check_transmutate = function(obj, bag, mode)
 		local modes = {
@@ -4717,6 +4800,20 @@ af_lighthouse_user_teleport_func = {
 	end,
 }
 add_functor("pba_lighthouse", af_lighthouse_user_teleport_func.check, af_lighthouse_user_teleport_func.string, nil, af_lighthouse_user_teleport_func.action)
+
+-- Functors for Medallion
+af_medallion_engage_func = {
+	check = function(obj, bag, mode)
+		return obj:section() == "af_medallion"
+	end,
+	string = function(obj, bag, mode)
+		return "st_pba_medallion_engage"
+	end,
+	action = function(obj, bag, mode)
+		zzz_ui_inventory_arte_to_grenade.move_arte_to_grenade(obj)
+	end,
+}
+override_functor(1, af_medallion_engage_func.check, af_medallion_engage_func.string, nil, af_medallion_engage_func.action)
 
 -- Functors for Lucifer
 lucifer_sacrifice_func = {

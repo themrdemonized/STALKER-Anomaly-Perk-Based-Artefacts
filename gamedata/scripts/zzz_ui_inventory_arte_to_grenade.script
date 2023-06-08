@@ -19,6 +19,37 @@ local snd_item_use     = sound_object([[interface\inv_none]])
 scopes_to_binocs = scopes_as_binocs and scopes_as_binocs.scopes_to_binocs
 artefacts_to_grenades = arte_to_grenades and arte_to_grenades.arte_to_grenades
 
+function move_arte_to_grenade(obj_from)
+	-- Scope to Binoc Scope
+	if artefacts_to_grenades 
+	and artefacts_to_grenades[obj_from:section()] 
+	and (not db.actor:item_in_slot(4) or (db.actor:item_in_slot(4) and not IsWeapon(db.actor:item_in_slot(4)))) 
+	then
+		printf("moving %s to binoc slot", obj_from:name())
+		local binoc_scope = artefacts_to_grenades[obj_from:section()]
+		local se_obj = alife_create_item(binoc_scope, db.actor)
+		zz_item_artefact.saveArtefactState(alife_object(obj_from:id()))
+		zz_item_artefact.copyArtefactState(alife_object(obj_from:id()), se_obj)
+		alife_release(obj_from)
+		artefacts_to_grenades.enabled = false
+		CreateTimeEvent("artefacts_to_grenades", "wait_gobj_and_move_it", 0, function()
+			local obj = level.object_by_id(se_obj.id)
+			if not obj then return end
+
+			db.actor:move_to_slot(obj, idx_to)
+			CreateTimeEvent("artefacts_to_grenades", "check_gobj_in_slot", 0, function()
+				local item = db.actor:item_in_slot(4)
+				if item and item:name() == obj:name() then
+					printf("scope %s moved to binoc slot", item:name())
+					artefacts_to_grenades.enabled = true 
+					return true
+				end
+			end)
+			return true
+		end)
+	end
+end
+
 -- Callbacks - UI
 On_CC_DragDrop = ui_inventory.UIInventory.On_CC_DragDrop
 function ui_inventory.UIInventory:On_CC_DragDrop(bag_from, idx_from)
@@ -94,28 +125,7 @@ function ui_inventory.UIInventory:On_CC_DragDrop(bag_from, idx_from)
 		and artefacts_to_grenades[obj_from:section()] 
 		and (not db.actor:item_in_slot(4) or (db.actor:item_in_slot(4) and not IsWeapon(db.actor:item_in_slot(4)))) 
 		then
-			printf("moving %s to binoc slot", obj_from:name())
-			local binoc_scope = artefacts_to_grenades[obj_from:section()]
-			local se_obj = alife_create_item(binoc_scope, db.actor)
-			zz_item_artefact.saveArtefactState(alife_object(obj_from:id()))
-			zz_item_artefact.copyArtefactState(alife_object(obj_from:id()), se_obj)
-			alife_release(obj_from)
-			artefacts_to_grenades.enabled = false
-			CreateTimeEvent("artefacts_to_grenades", "wait_gobj_and_move_it", 0, function()
-				local obj = level.object_by_id(se_obj.id)
-				if not obj then return end
-
-				db.actor:move_to_slot(obj, idx_to)
-				CreateTimeEvent("artefacts_to_grenades", "check_gobj_in_slot", 0, function()
-					local item = db.actor:item_in_slot(4)
-					if item and item:name() == obj:name() then
-						printf("scope %s moved to binoc slot", item:name())
-						artefacts_to_grenades.enabled = true 
-						return true
-					end
-				end)
-				return true
-			end)
+			move_arte_to_grenade(obj_from)
 		end
 
 		-- Ruck/Slot to Slot
