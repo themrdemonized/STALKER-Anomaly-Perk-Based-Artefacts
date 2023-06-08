@@ -2613,15 +2613,17 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			function(self, actor)
 				self:hurt_psy(actor, 0.7, {1, 2, 3, 4}, 3, 15, 0.009)
 
-				CreateTimeEvent("af_zhelch_fatality", "af_zhelch_fatality", 16, function()
-					play_sound_on_actor("perk_based_artefacts\\psy_1", 0.8)
-					play_sound_on_actor("perk_based_artefacts\\psya_fatality")
-					CreateTimeEvent("af_zhelch_suicide", "af_zhelch_suicide", 5, function()
-						set_psy_health(-1)
+				if get_psy_health() < 0.3 then
+					CreateTimeEvent("af_zhelch_fatality", "af_zhelch_fatality", 16, function()
+						play_sound_on_actor("perk_based_artefacts\\psy_1", 0.8)
+						play_sound_on_actor("perk_based_artefacts\\psya_fatality")
+						CreateTimeEvent("af_zhelch_suicide", "af_zhelch_suicide", 5, function()
+							set_psy_health(-1)
+							return true
+						end)
 						return true
 					end)
-					return true
-				end)
+				end
 			end,
 			function(self, actor)
 				self:hide_all_ui(actor)
@@ -4472,6 +4474,10 @@ artefact_binder_on_update_functions = {
 	-- Medal, Perk: Hacksaw
 	af_medallion = function(binder)
 		if binder.destroyed then
+			if settings.debug_mode then
+				-- level.remove_cam_custom_position_direction()
+			end
+			
 			if binder.sound_idle then binder.sound_idle:stop() end
 			return
 		end
@@ -4485,6 +4491,10 @@ artefact_binder_on_update_functions = {
 		end
 
 		if obj:parent() then
+			if settings.debug_mode then
+				-- level.remove_cam_custom_position_direction()
+			end
+			
 			if binder.sound_idle then binder.sound_idle:stop() end
 			return true
 		end
@@ -4497,21 +4507,21 @@ artefact_binder_on_update_functions = {
 			binder.target_radius = 50
 			binder.target_radius_sqr = binder.target_radius ^ 2
 
-			binder.attack_time = 35
-			binder.attack_radius = 1.4
+			binder.attack_time = 40
+			binder.attack_radius = 1.55
 			binder.attack_radius_sqr = binder.attack_radius ^ 2
 
-			binder.panic_time = 1
+			binder.panic_time = 1.2
 			binder.panic_radius = 7
 			binder.panic_radius_sqr = binder.panic_radius ^ 2
-			binder.panic_radius_non_targets = 3
+			binder.panic_radius_non_targets = 2.5
 			binder.panic_radius_non_targets_sqr = binder.panic_radius ^ 2
 			
 			binder.max_distance_from_actor_sqr = 75 ^ 2
 			binder.take_distance_sqr = 1.6 ^ 2
 
 			binder.homing_speed = 0.5
-			binder.speed = 120
+			binder.speed = 130
 			binder.damage = 0.55
 
 			binder.invalid_try_max = 25
@@ -4522,7 +4532,7 @@ artefact_binder_on_update_functions = {
 			binder.stop_time = props.start_time + binder.attack_time
 			binder.return_home = props.return_home
 
-			binder.sound_idle = get_safe_sound_object("perk_based_artefacts\\FUNGFLY")
+			binder.sound_idle = sound_object("perk_based_artefacts\\FUNGFLY")
 			binder.sound_idle:play_at_pos(obj, obj:position(), 0, sound_object.s3d + sound_object.looped)
 			binder.sound_idle.frequency = 1
 
@@ -4563,7 +4573,7 @@ artefact_binder_on_update_functions = {
 
 				closest_distance = math.huge
 				empty_table(binder.target_list)
-				level.iterate_nearest(obj:position(), 100, binder.target_list_func)
+				level.iterate_nearest(obj:position(), 150, binder.target_list_func)
 			end, 400)
 
 			binder.target_attack_func = throttle(function()
@@ -4602,8 +4612,22 @@ artefact_binder_on_update_functions = {
 				s_hit.draftsman = db.actor
 
 				target:hit(s_hit)
+
+				-- Play hit sound
+				local snd = sound_object("perk_based_artefacts\\hit_0" .. random(0, 9))
+				snd:play_at_pos(obj, obj:position(), 0, sound_object.s3d)
+				snd.frequency = random_float(0.9, 1.1)
+
+				-- Play particles
+				local particle = particles_object(get_random_array_element({
+					"hit_fx\\hit_flesh_01",
+					"hit_fx\\hit_flesh_02",
+					"hit_fx\\hit_flesh_02a",
+				}))
+				particle:play_at_pos(obj:position())
+
 				binder.invalid_try_count = 0
-			end, 300)
+			end, 250)
 
 			binder.target_panic_func = throttle(function()
 				for id, _ in pairs(binder.target_list) do
@@ -4661,8 +4685,8 @@ artefact_binder_on_update_functions = {
 				):normalize()
 
 				if settings.debug_mode then
-					demonized_geometry_ray.VisualizeRay(obj:position(), obj:position():mad(binder.fly_direction, binder.get_target_pos(target):sub(obj:position()):magnitude()), nil, device().time_delta)
-					demonized_geometry_ray.VisualizeRay(obj:position(), binder.get_target_pos(target), nil, device().time_delta)
+					-- demonized_geometry_ray.VisualizeRay(obj:position(), obj:position():mad(binder.fly_direction, binder.get_target_pos(target):sub(obj:position()):magnitude()), nil, device().time_delta)
+					-- demonized_geometry_ray.VisualizeRay(obj:position(), binder.get_target_pos(target), nil, device().time_delta)
 				end
 			end)
 
@@ -4685,10 +4709,10 @@ artefact_binder_on_update_functions = {
 						ray_range = 50,
 						contact_range = 0.7,
 						ignore_object = obj,
-						flags = 2,
+						flags = 3,
 					})
 					local res = ray:get(obj:position(), binder.fly_direction)
-					if res.in_contact then
+					if res.in_contact and (not res.result.object or (res.result.object and res.result.object:id() ~= binder.target_current_id)) then
 						local surface_normal = demonized_geometry_ray.get_surface_normal(obj:position():mad(binder.fly_direction, 0.1), binder.fly_direction)
 						if surface_normal then
 							binder.fly_direction:reflect(binder.fly_direction, surface_normal)
@@ -4699,10 +4723,10 @@ artefact_binder_on_update_functions = {
 								ray_range = 50,
 								contact_range = 0.7,
 								ignore_object = obj,
-								flags = 2,
+								flags = 3,
 							})
 							local res = ray:get(obj:position(), binder.fly_direction)
-							if res.in_contact then
+							if res.in_contact and (not res.result.object or (res.result.object and res.result.object:id() ~= binder.target_current_id)) then
 								binder.fly_direction.y = -binder.fly_direction.y
 
 								if angle_left_xz(binder.fly_direction, temp) then
@@ -4713,9 +4737,10 @@ artefact_binder_on_update_functions = {
 
 								binder.fly_direction:setHP(temp:getH(), binder.fly_direction:getP()):normalize()
 								binder.temp_homing_speed = binder.temp_homing_speed or binder.homing_speed
-								binder.homing_speed = 0.01
-								CreateTimeEvent("af_medallion_temp_lower_speed", obj:id(), 1.5, function(homing_speed)
+								binder.homing_speed = 0.02
+								CreateTimeEvent("af_medallion_temp_lower_speed", obj:id(), 1.2, function(homing_speed)
 									binder.homing_speed = homing_speed
+									return true
 								end, binder.temp_homing_speed)
 							end
 
@@ -4726,6 +4751,10 @@ artefact_binder_on_update_functions = {
 
 				local dir = vector():set(binder.fly_direction):normalize()
 				obj:set_const_force(dir, binder.speed, device().time_delta)
+
+				if settings.debug_mode then
+					-- level.set_cam_custom_position_direction(obj:position():mad(binder.fly_direction, -0.2), vector():set(binder.fly_direction:getH(), binder.fly_direction:getP(), 0))
+				end
 			end)
 
 			-- Counter gravity force
@@ -4743,6 +4772,11 @@ artefact_binder_on_update_functions = {
 
 		if time_elapsed > binder.stop_time or obj:position():distance_to_sqr(binder.get_target_pos(db.actor)) > binder.max_distance_from_actor_sqr then
 			if obj:condition() <= 0.05 then
+
+				if settings.debug_mode then
+					-- level.remove_cam_custom_position_direction()
+				end
+
 				binder.destroyed = true
 				alife_release_id(id)
 				return
@@ -4813,7 +4847,7 @@ af_medallion_engage_func = {
 		zzz_ui_inventory_arte_to_grenade.move_arte_to_grenade(obj)
 	end,
 }
-override_functor(1, af_medallion_engage_func.check, af_medallion_engage_func.string, nil, af_medallion_engage_func.action)
+add_functor("pba_medallion", af_medallion_engage_func.check, af_medallion_engage_func.string, nil, af_medallion_engage_func.action)
 
 -- Functors for Lucifer
 lucifer_sacrifice_func = {

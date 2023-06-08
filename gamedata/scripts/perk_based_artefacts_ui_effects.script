@@ -1,0 +1,133 @@
+class "UIIndicators" (CUIScriptWnd)
+
+function UIIndicators:__init() super()
+	
+	self.mirrored = false
+	self.slot = {}
+	self.clr_list = {
+		[0] = GetARGB(255,255,255,255), -- white
+		[1] = GetARGB(255,200,200,200), -- grey
+		[2] = GetARGB(255,255,255,50), -- yellow
+		[3] = GetARGB(255,255,125,50), -- orange
+		[4] = GetARGB(255,255,50,50), -- red
+	}
+	
+	self.ratio  = utils_xml.screen_ratio()
+	self._tmr   = time_global()
+	self.index  = 0
+	self.W      = 40
+	self.offset = 10
+	
+	prepare_indictors_list()
+	
+	self:InitControls()
+end
+
+function UIIndicators:__finalize()
+end
+
+function UIIndicators:InitControls()
+	local xml = utils_xml.get_hud_xml()
+	
+	self.dialog = xml:InitStatic("indicators", self)
+	--utils_xml.correct_ratio(self.dialog)
+	self.dialog:Show(false)
+	
+	local t_size = size_table(indicators)
+	for i=1,t_size do
+		local x = (i-1)*(self.W + self.offset)
+		if self.mirrored then
+			x = (1-i)*(self.W + self.offset)
+		end
+		
+		self.slot[i] = {}
+		self.slot[i].back_s = xml:InitStatic("indicators:static", self.dialog)
+		self.slot[i].back_f = xml:InitStatic("indicators:flashing", self.dialog)
+		self.slot[i].icon_s = xml:InitStatic("indicators:static", self.dialog)
+		self.slot[i].icon_f = xml:InitStatic("indicators:flashing", self.dialog)
+		for k, ele in pairs(self.slot[i]) do
+			ele:SetWndPos( vector2():set( x , 0 ) )
+			utils_xml.correct_ratio(ele)
+		end
+	end
+end
+
+function UIIndicators:Clear()
+	for i=1,size_table(indicators) do
+		if self.slot[i] then
+			for k, ele in pairs(self.slot[i]) do
+				ele:Show(false)
+			end
+		end
+	end
+	self.index = 0
+end
+
+function UIIndicators:Update(force)
+	CUIScriptWnd.Update(self)
+	
+	local tg = time_global()
+	if force then
+		self._tmr = tg - 1
+	end
+	if self._tmr >= tg then
+		return
+	else
+		self._tmr = tg + 1000
+	end
+	
+	-- Clear all
+	self:Clear()
+	
+	-- Hide HUD when it's occupied by a GUI class
+	if not main_hud_shown() then
+		return
+	end
+	
+	-- Gather info
+	for name,t in spairs(indicators, func_index) do
+		local value = t.functor and execute_func(unpack(t.functor))
+		
+		-- Determine if we should show the indicator on HUD according to type and value
+		local pass = false
+		if t.typ == "state" then
+			pass = value and value <= 4 and value >= 1
+		elseif t.typ == "booster" then
+			pass = value and true or false
+		end
+		
+		if pass then
+			local i = self.index + 1
+			
+			if t.icon then
+				local ico
+				if t.anim_period and (t.typ == "booster") and (value < t.anim_period) then
+					ico = self.slot[i].icon_f
+				else
+					ico = t.anim_icon and self.slot[i].icon_f or self.slot[i].icon_s
+				end
+				
+				ico:InitTexture( t.icon )
+				ico:Show(true)
+			end
+			
+			if t.background then
+				local bk
+				if t.anim_period and (t.typ == "booster") and (value < t.anim_period) then
+					bk = self.slot[i].back_f
+				else
+					bk = t.anim_bk and self.slot[i].back_f or self.slot[i].back_s
+				end
+				
+				bk:InitTexture( t.background )
+				bk:SetTextureColor( t.typ == "state" and self.clr_list[value] or self.clr_list[0] )
+				bk:Show(true)
+			end
+			
+			self.index = i
+		end
+	end
+	
+	self.dialog:Show(self.index > 0)
+end
+
