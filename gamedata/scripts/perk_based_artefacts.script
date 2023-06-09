@@ -2613,17 +2613,17 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			function(self, actor)
 				self:hurt_psy(actor, 0.7, {1, 2, 3, 4}, 3, 15, 0.009)
 
-				if get_psy_health() < 0.3 then
-					CreateTimeEvent("af_zhelch_fatality", "af_zhelch_fatality", 16, function()
+				CreateTimeEvent("af_zhelch_fatality", "af_zhelch_fatality", 16, function()
+					if get_psy_health() < 0.3 then
 						play_sound_on_actor("perk_based_artefacts\\psy_1", 0.8)
 						play_sound_on_actor("perk_based_artefacts\\psya_fatality")
 						CreateTimeEvent("af_zhelch_suicide", "af_zhelch_suicide", 5, function()
 							set_psy_health(-1)
 							return true
 						end)
-						return true
-					end)
-				end
+					end
+					return true
+				end)
 			end,
 			function(self, actor)
 				self:hide_all_ui(actor)
