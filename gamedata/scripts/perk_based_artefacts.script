@@ -842,7 +842,7 @@ speed_boosts = { -- Table of speed boosts for different artefacts
 	},
 	af_generator = {
 		name = "af_generator_boost",
-		boost = 0.095
+		boost = 0.05
 	},
 	af_kogot = {
 		name = "af_kogot_boost",
@@ -3231,7 +3231,7 @@ artefact_on_update_functions = {
 
 	-- Generator, Perk: Godzilla is Approaching
 	af_generator = function(actor, artefact_count, artefact_ids, artefact_names)
-		local charge_boost = 0.00003
+		local charge_boost = 0.000015
 		local charge_threshold = 0.05 -- Below this charge the item has no battery
 
 		--Pda, Detector and NVG slots

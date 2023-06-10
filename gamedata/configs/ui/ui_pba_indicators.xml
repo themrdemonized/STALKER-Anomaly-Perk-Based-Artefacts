@@ -1,0 +1,9 @@
+<w>
+	<indicators x="160" y="726" width="480" height="40" stretch="1"> 
+		<static x="0" y="0" width="40" height="40" stretch="1"/>
+	</indicators>
+	
+	<indicators_text x="0" y="4" width="146" height="20" stretch="1" complex_mode="1">
+		<text r="255" g="255" b="255" align="l" vert_align="c" font="letterica16"/>
+	</indicators_text>
+</w>

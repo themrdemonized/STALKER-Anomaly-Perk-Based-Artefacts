@@ -1,13 +1,268 @@
-op = {
-	id = "perk_based_artefacts", sh = true, gr = {
-    	{id = "banner", type = "slide", text = "ui_mcm_perk_based_artefacts_title", size = {512, 50}, spacing = 20},
-        {id = "debug_mode", type = "check", val = 1, def = false},
-        {id = "allow_arty_containers", type = "check", val = 1, def = false},
-        {id = "treasure_chance", type = "track", val = 2, min = 0, max = 100, step = 10, def = 30},
-    	{id = "timed_degradation", type = "track", val = 2, min = 0, max = 5, step = 0.2, def = 0},
-    }
-}
-
 function on_mcm_load()
+    op = {
+        id = "perk_based_artefacts", sh = true, gr = {
+            {id = "banner", type = "slide", text = "ui_mcm_perk_based_artefacts_title", size = {512, 50}, spacing = 20},
+            {id = "debug_mode", type = "check", val = 1, def = false},
+            {id = "allow_arty_containers", type = "check", val = 1, def = false},
+            {id = "treasure_chance", type = "track", val = 2, min = 0, max = 100, step = 10, def = 30},
+            {id = "timed_degradation", type = "track", val = 2, min = 0, max = 5, step = 0.2, def = 0},
+
+            {id = "divider", type = "line"},
+
+            {id = "ui_enabled", type = "check", val = 1, def = true},
+            {id = "pos_x", type = "track", val = 2, min = 0, max = 1020, step = 10, def = 500},
+            {id = "pos_y", type = "track", val = 2, min = 0, max = 760, step = 10, def = 670},
+            {id = "scaling", type = "track", val = 2, min = 0.3, max = 2, step = 0.1, def = 0.7},
+            {id = "indicator_margin", type = "track", val = 2, min = 0, max = 40, step = 1, def = 15},
+            {id = "text_margin", type = "track", val = 2, min = 0, max = 40, step = 1, def = 25},
+            {id = "alignment", type = "track", val = 2, min = 0, max = 2, step = 1, def = 1},
+            {id = "text_alignment", type = "track", val = 2, min = 0, max = 2, step = 1, def = 0},
+
+            {id = "divider", type = "line", precondition = {level_present}},
+            {id = "position", type = "button", functor_ui = {start_ui}, precondition = {level_present}},
+            {id = "divider", type = "line", precondition = {level_present}}
+        }
+    }
+
+    -- Special
+    function start_ui(self)
+        self:On_Cancel()
+        start()
+    end
+
+    -- Preconditions
+    function level_present()
+        return level.present()
+    end
+
+    function get_mcm_params(key)
+        for _, v in ipairs(op.gr) do
+            if v.id == key then
+                return v
+            end
+        end
+    end
+
+    function update_option(k, val)
+        local g = perk_based_artefacts_ui_effects.GUI
+        g:SetParam(k, val or ui_mcm.get("perk_based_artefacts/" .. k))
+        g:PopulateTestIndicators()
+        g:UpdateLayout()
+    end
+
+    local commands = {
+        { 
+            name = "ui_mcm_perk_based_artefacts_test_elements",
+            get = function() return 5 end,
+            set = function(val) update_option("test_elements", val) end,
+            def = 5,
+            min = 1,
+            max = 10,
+            step = 1
+        },
+        { 
+            name = "ui_mcm_perk_based_artefacts_scaling",
+            get = function() return ui_mcm.get("perk_based_artefacts/scaling") * 10 end,
+            set = function(val) ui_mcm.set("perk_based_artefacts/scaling", val / 10); update_option("scaling", val / 10) end,
+            def = get_mcm_params("scaling").def * 10,
+            min = get_mcm_params("scaling").min * 10,
+            max = get_mcm_params("scaling").max * 10,
+            step = get_mcm_params("scaling").step * 10
+        },
+        {   
+            name = "ui_mcm_perk_based_artefacts_pos_x",
+            get = function() return ui_mcm.get("perk_based_artefacts/pos_x") end,
+            set = function(val) ui_mcm.set("perk_based_artefacts/pos_x", val); update_option("pos_x", val) end,
+            def = get_mcm_params("pos_x").def,
+            min = get_mcm_params("pos_x").min,
+            max = get_mcm_params("pos_x").max,
+            step = get_mcm_params("pos_x").step
+        },
+        { 
+            name = "ui_mcm_perk_based_artefacts_pos_y",
+            get = function() return ui_mcm.get("perk_based_artefacts/pos_y") end,
+            set = function(val) ui_mcm.set("perk_based_artefacts/pos_y", val); update_option("pos_y", val) end,
+            def = get_mcm_params("pos_y").def,
+            min = get_mcm_params("pos_y").min,
+            max = get_mcm_params("pos_y").max,
+            step = get_mcm_params("pos_y").step
+        },
+        { 
+            name = "ui_mcm_perk_based_artefacts_indicator_margin",
+            get = function() return ui_mcm.get("perk_based_artefacts/indicator_margin") end,
+            set = function(val) ui_mcm.set("perk_based_artefacts/indicator_margin", val); update_option("indicator_margin", val) end,
+            def = get_mcm_params("indicator_margin").def,
+            min = get_mcm_params("indicator_margin").min,
+            max = get_mcm_params("indicator_margin").max,
+            step = get_mcm_params("indicator_margin").step
+        },
+        { 
+            name = "ui_mcm_perk_based_artefacts_text_margin",
+            get = function() return ui_mcm.get("perk_based_artefacts/text_margin") end,
+            set = function(val) ui_mcm.set("perk_based_artefacts/text_margin", val); update_option("text_margin", val) end,
+            def = get_mcm_params("text_margin").def,
+            min = get_mcm_params("text_margin").min,
+            max = get_mcm_params("text_margin").max,
+            step = get_mcm_params("text_margin").step
+        },
+        { 
+            name = "ui_mcm_perk_based_artefacts_alignment",
+            get = function() return ui_mcm.get("perk_based_artefacts/alignment") end,
+            set = function(val) ui_mcm.set("perk_based_artefacts/alignment", val); update_option("alignment", val) end,
+            def = get_mcm_params("alignment").def,
+            min = get_mcm_params("alignment").min,
+            max = get_mcm_params("alignment").max,
+            step = get_mcm_params("alignment").step
+        },
+        { 
+            name = "ui_mcm_perk_based_artefacts_text_alignment",
+            get = function() return ui_mcm.get("perk_based_artefacts/text_alignment") end,
+            set = function(val) ui_mcm.set("perk_based_artefacts/text_alignment", val); update_option("text_alignment", val) end,
+            def = get_mcm_params("text_alignment").def,
+            min = get_mcm_params("text_alignment").min,
+            max = get_mcm_params("text_alignment").max,
+            step = get_mcm_params("text_alignment").step
+        },
+    }
+
+    -------------------------------------------------------------------
+    GUI = nil -- instance, don't touch
+    function start()
+        exec_console_cmd("main_menu off")
+            
+        if not GUI then
+            GUI = UIPBAPopupControl()
+        end
+
+        if GUI and not GUI:IsShown() then
+            GUI:ShowDialog(true)
+            Register_UI("UIPBAPopupControl","perk_based_artefacts_mcm")
+            local g = perk_based_artefacts_ui_effects.GUI
+            g:SwitchTestMode(true)
+            RemoveDelayDisableTestMode()
+        end
+    end
+
+    function DelayDisableTestMode()
+        CreateTimeEvent("perk_based_artefacts_mcm", "DelayDisableTestMode", 2, function()
+            local g = perk_based_artefacts_ui_effects.GUI
+            g:SwitchTestMode(false)
+            return true
+        end) 
+    end
+
+    function RemoveDelayDisableTestMode()
+        RemoveTimeEvent("perk_based_artefacts_mcm", "DelayDisableTestMode")
+    end
+
+    -------------------------------------------------------------------
+    class "UIPBAPopupControl" (CUIScriptWnd)
+
+    function UIPBAPopupControl:__init() super()
+        self:InitControls()
+        RegisterScriptCallback("actor_on_net_destroy", self)
+    end
+
+    function UIPBAPopupControl:__finalize()
+        DelayDisableTestMode()
+    end
+
+    function UIPBAPopupControl:actor_on_net_destroy()
+        self:Close()
+        DelayDisableTestMode()
+        GUI = nil
+    end
+
+    function UIPBAPopupControl:InitControls()
+        self:SetWndRect         (Frect():set(0,0,1024,768))
+        self:SetAutoDelete(true)
+        
+        self.xml = CScriptXmlInit()
+        
+        local xml = self.xml
+        xml:ParseFile           ("ui_options.xml")
+        
+        self.dialog = xml:InitStatic("ctrl_lighting", self)
+        
+        xml:InitFrame("ctrl_lighting:frame", self.dialog)
+        local cap = xml:InitStatic("ctrl_lighting:cap_main",self.dialog)
+        cap:TextControl():SetText("Offsets")
+        self.scroll = xml:InitScrollView("ctrl_lighting:scroll", self.dialog)
+        self.scroll:Clear()
+        
+        self.Track = {}
+        self.Value = {}
+        self.Num = {}
+        for i=1,#commands do
+            local _st = xml:InitStatic("ctrl_lighting:st", nil)
+            
+            local tbl = commands[i]
+            local name = tbl.name
+            local val = tbl.get()
+            local cap = xml:InitStatic("ctrl_lighting:cap", _st)
+            cap:TextControl():SetText( game.translate_string(name) )
+            
+            self.Track[i] = xml:InitTrackBar("ctrl_lighting:track", _st)
+            self.Track[i]:SetStep(tbl.step)
+            self.Track[i]:SetOptFBounds(tbl.min, tbl.max)
+            self.Track[i]:SetFValue(val)
+            self.Value[i] = val
+            self.Num[i] = xml:InitTextWnd("ctrl_lighting:num", _st)
+            self.Num[i]:SetText(val)
+            
+            self.scroll:AddWindow(_st, true)
+            _st:SetAutoDelete(true)
+        end
+    end
+
+    function UIPBAPopupControl:Callback_Track(i, val)
+        local cmd = commands[i].set
+        if cmd and val then
+            cmd(val)
+            self.Num[i]:SetText(val)
+        end
+    end
+
+    function UIPBAPopupControl:Update()
+        CUIScriptWnd.Update(self)
+        
+        -- Hack to simulate tracing method for TrackBar value changes. TODO: add callback support for CUITrackBar in engine, this is just silly
+        for i,ctrl in pairs(self.Track) do
+            if ctrl:IsCursorOverWindow() then
+                local val = round_idp(ctrl:GetFValue(), precision)
+                if (val ~= self.Value[i]) then
+                    self.Value[i] = val
+                    self:Callback_Track(i, val)
+                    return
+                end
+            end
+        end
+    end
+
+    function UIPBAPopupControl:OnKeyboard(dik, keyboard_action)
+        local res = CUIScriptWnd.OnKeyboard(self,dik,keyboard_action)
+        if (res == false) then
+            local bind = dik_to_bind(dik)
+            if keyboard_action == ui_events.WINDOW_KEY_PRESSED then
+            
+                if dik == DIK_keys.DIK_ESCAPE then
+                    self:Close()
+                end
+
+            end
+        end
+
+        return res
+    end
+
+    function UIPBAPopupControl:Close()
+        self:HideDialog()
+        self:Show(false)
+
+        Unregister_UI("UIPBAPopupControl")
+        DelayDisableTestMode()
+        GUI = nil
+    end
+
     return op
 end
