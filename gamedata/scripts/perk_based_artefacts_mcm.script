@@ -10,13 +10,15 @@ function on_mcm_load()
             {id = "divider", type = "line"},
 
             {id = "ui_enabled", type = "check", val = 1, def = true},
-            {id = "pos_x", type = "track", val = 2, min = 0, max = 1020, step = 10, def = 500},
-            {id = "pos_y", type = "track", val = 2, min = 0, max = 760, step = 10, def = 670},
-            {id = "scaling", type = "track", val = 2, min = 0.3, max = 2, step = 0.1, def = 0.7},
-            {id = "indicator_margin", type = "track", val = 2, min = 0, max = 40, step = 1, def = 15},
-            {id = "text_margin", type = "track", val = 2, min = 0, max = 40, step = 1, def = 25},
-            {id = "alignment", type = "track", val = 2, min = 0, max = 2, step = 1, def = 1},
-            {id = "text_alignment", type = "track", val = 2, min = 0, max = 2, step = 1, def = 0},
+            {id = "pos_x", type = "track", val = 2, min = 0, max = 1020, step = 10, def = 500, precondition = {function() return false end}},
+            {id = "pos_y", type = "track", val = 2, min = 0, max = 760, step = 10, def = 670, precondition = {function() return false end}},
+            {id = "scaling", type = "track", val = 2, min = 0.3, max = 2, step = 0.1, def = 0.7, precondition = {function() return false end}},
+            {id = "indicator_margin", type = "track", val = 2, min = 0, max = 40, step = 1, def = 15, precondition = {function() return false end}},
+            {id = "text_margin", type = "track", val = 2, min = 0, max = 100, step = 2, def = 24, precondition = {function() return false end}},
+            {id = "alignment", type = "track", val = 2, min = 0, max = 2, step = 1, def = 1, precondition = {function() return false end}},
+            {id = "display_text", type = "track", val = 2, min = 0, max = 1, step = 1, def = 1, precondition = {function() return false end}},
+            {id = "text_alignment", type = "track", val = 2, min = 0, max = 2, step = 1, def = 0, precondition = {function() return false end}},
+            {id = "text_font", type = "track", val = 2, min = 1, max = 10, step = 1, def = 3, precondition = {function() return false end}},
 
             {id = "divider", type = "line", precondition = {level_present}},
             {id = "position", type = "button", functor_ui = {start_ui}, precondition = {level_present}},
@@ -46,6 +48,13 @@ function on_mcm_load()
     function update_option(k, val)
         local g = perk_based_artefacts_ui_effects.GUI
         g:SetParam(k, val or ui_mcm.get("perk_based_artefacts/" .. k))
+        g:PopulateTestIndicators()
+        g:UpdateLayout()
+    end
+
+    function update_font(k, val)
+        local g = perk_based_artefacts_ui_effects.GUI
+        g:SetFont(k, val or ui_mcm.get("perk_based_artefacts/text_font"))
         g:PopulateTestIndicators()
         g:UpdateLayout()
     end
@@ -97,15 +106,6 @@ function on_mcm_load()
             step = get_mcm_params("indicator_margin").step
         },
         { 
-            name = "ui_mcm_perk_based_artefacts_text_margin",
-            get = function() return ui_mcm.get("perk_based_artefacts/text_margin") end,
-            set = function(val) ui_mcm.set("perk_based_artefacts/text_margin", val); update_option("text_margin", val) end,
-            def = get_mcm_params("text_margin").def,
-            min = get_mcm_params("text_margin").min,
-            max = get_mcm_params("text_margin").max,
-            step = get_mcm_params("text_margin").step
-        },
-        { 
             name = "ui_mcm_perk_based_artefacts_alignment",
             get = function() return ui_mcm.get("perk_based_artefacts/alignment") end,
             set = function(val) ui_mcm.set("perk_based_artefacts/alignment", val); update_option("alignment", val) end,
@@ -115,6 +115,24 @@ function on_mcm_load()
             step = get_mcm_params("alignment").step
         },
         { 
+            name = "ui_mcm_perk_based_artefacts_display_text",
+            get = function() return ui_mcm.get("perk_based_artefacts/display_text") end,
+            set = function(val) ui_mcm.set("perk_based_artefacts/display_text", val); update_option("display_text", val) end,
+            def = get_mcm_params("display_text").def,
+            min = get_mcm_params("display_text").min,
+            max = get_mcm_params("display_text").max,
+            step = get_mcm_params("display_text").step
+        },
+        { 
+            name = "ui_mcm_perk_based_artefacts_text_margin",
+            get = function() return ui_mcm.get("perk_based_artefacts/text_margin") end,
+            set = function(val) ui_mcm.set("perk_based_artefacts/text_margin", val); update_option("text_margin", val) end,
+            def = get_mcm_params("text_margin").def,
+            min = get_mcm_params("text_margin").min,
+            max = get_mcm_params("text_margin").max,
+            step = get_mcm_params("text_margin").step
+        },
+        { 
             name = "ui_mcm_perk_based_artefacts_text_alignment",
             get = function() return ui_mcm.get("perk_based_artefacts/text_alignment") end,
             set = function(val) ui_mcm.set("perk_based_artefacts/text_alignment", val); update_option("text_alignment", val) end,
@@ -122,6 +140,15 @@ function on_mcm_load()
             min = get_mcm_params("text_alignment").min,
             max = get_mcm_params("text_alignment").max,
             step = get_mcm_params("text_alignment").step
+        },
+        { 
+            name = "ui_mcm_perk_based_artefacts_text_font",
+            get = function() return ui_mcm.get("perk_based_artefacts/text_font") end,
+            set = function(val) ui_mcm.set("perk_based_artefacts/text_font", val); update_font("font_num", val) end,
+            def = get_mcm_params("text_font").def,
+            min = get_mcm_params("text_font").min,
+            max = get_mcm_params("text_font").max,
+            step = get_mcm_params("text_font").step
         },
     }
 

@@ -11,11 +11,25 @@ function PBAUI:__init() super()
 	self.indicator_width = 50
 	self.indicator_height = 100
 	self.indicator_margin = ui_mcm.get("perk_based_artefacts/indicator_margin")
+	self.display_text = ui_mcm.get("perk_based_artefacts/display_text")
 	self.text_margin = ui_mcm.get("perk_based_artefacts/text_margin")
 	self.scaling = ui_mcm.get("perk_based_artefacts/scaling")
 	self.alignment = ui_mcm.get("perk_based_artefacts/alignment")
 	self.text_alignment = ui_mcm.get("perk_based_artefacts/text_alignment")
-	self.font = GetFontDI()
+	self.font_list = {
+		GetFontSmall(),
+		GetFontMedium(),
+		GetFontDI(),
+		GetFontLetterica16Russian(),
+		GetFontLetterica18Russian(),
+		GetFontLetterica25(),
+		GetFontGraffiti19Russian(),
+		GetFontGraffiti22Russian(),
+		GetFontGraffiti32Russian(),
+		GetFontGraffiti50Russian(),
+	}
+	self.font_num = ui_mcm.get("perk_based_artefacts/text_font")
+	self.font = self.font_list[self.font_num]
 
 	self.indicators = {}
 	self.test_indicators = {}
@@ -34,6 +48,12 @@ function PBAUI:__init() super()
 	self:PopulateTestIndicators()
 
 	RegisterScriptCallback("actor_on_net_destroy", self)
+end
+
+function PBAUI:SetFont(param, val)
+	self.font_num = val
+	self.font = self.font_list[self.font_num]
+	self:UpdateLayout()
 end
 
 function PBAUI:SetParam(param, val)
@@ -107,9 +127,6 @@ function PBAUI:UpdateLayout()
         wnd_icon:SetWndPos(vector2():set(icon_pos_x, icon_pos_y))
 		wnd_icon:SetWndSize(vector2():set(icon_width, icon_height))
 
-		-- utils_xml.correct_ratio(wnd_icon_shadow)
-		-- utils_xml.correct_ratio(wnd_icon)
-
 		local text_width = self:GetUIParam("indicator_width")
 		local text_height = self:GetUIParam("indicator_height") / 2 - self.text_margin
 		local text_pos_x = 0
@@ -130,6 +147,11 @@ function PBAUI:UpdateLayout()
 		wnd_text:SetText(v.text_func())
 		wnd_text:SetFont(self.font)
 		wnd_text:SetTextAlignment(self.text_alignment)
+
+		if self.display_text == 0 then
+			wnd_text_shadow:Show(false)
+			wnd_text:Show(false)
+		end
 
 		width = width + self:GetUIParam("indicator_width") + self:GetUIParam("indicator_margin")
 
@@ -159,8 +181,9 @@ end
 -- Section - section for artefact
 -- text_func - Function for displaying text
 -- validate_func - Function for checking, should the indicator display or not. Return false will remove the indicator 
-function PBAUI:AddIndicator(key, section, text_func, validate_func)
+function PBAUI:AddIndicator(key, override, section, text_func, validate_func)
 	if self.indicators[key] then
+		if not override then return end
 		self:SafeDetach(self.indicators[key])
 	end
 
@@ -279,8 +302,10 @@ function PBAUI:Update(force)
 			self:SafeDetach(v)
 			indicators[k] = nil
 		else
-			v.wnd.text:SetText(v.text_func())
-			v.wnd.text_shadow:SetText(v.text_func())
+			if self.display_text == 1 then
+				v.wnd.text:SetText(v.text_func())
+				v.wnd.text_shadow:SetText(v.text_func())
+			end
 		end
 	end
 
@@ -292,6 +317,7 @@ function PBAUI:Update(force)
 end
 
 function on_option_change()
+	GUI:UpdateLayout()
 	if ui_mcm.get("perk_based_artefacts/ui_enabled") then
 		GUI:Show()
 	else
@@ -307,4 +333,54 @@ end
 
 function on_game_start()
 	RegisterScriptCallback("actor_on_first_update", start)
+end
+
+-- Debug
+function addRandomIndicator()
+	local artes = {
+		"af_dragon_eye",
+		"af_fire_loop",
+		"af_ball",
+		"af_fonar",
+		"af_tapeworm",
+		"af_moh",
+		"af_serofim",
+		"af_elektron",
+		"af_kogot",
+		"af_generator",
+		"af_black_angel",
+		"af_grapes",
+		"af_skull_miser",
+		"af_star_phantom",
+		"af_medallion",
+		"af_peas",
+		"af_kislushka",
+		"af_zhelch",
+		"af_sandstone",
+		"af_fountain",
+		"af_spaika",
+		"af_signet",
+		"af_repei",
+		"af_bat",
+		"af_sun",
+		"af_ear",
+		"af_chelust",
+		"af_atom",
+		"af_lighthouse",
+		"af_cell",
+		"af_cocoon",
+	}
+	local texts = {
+		("C:%s \\n"):format(math.random(100)),
+		("E:%s \\nC:%s"):format(math.random(100), math.random(100)),
+		("S:%s \\nE:%s \\nC:%s"):format(math.random(10), math.random(100), math.random(100))
+	}
+	local display_time = math.random(5, 15)
+	local a = artes[math.random(#artes)]
+	local t = texts[math.random(#texts)]
+	local tg = time_global()
+	GUI:AddIndicator(a, false, a,
+		function() return round_idp(display_time - (time_global() - tg) * 0.001, 2) end,
+		function() return time_global() - tg < display_time * 1000 end
+	)
 end
