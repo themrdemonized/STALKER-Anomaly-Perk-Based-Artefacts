@@ -16,6 +16,7 @@ function PBAUI:__init() super()
 	self.scaling = ui_mcm.get("perk_based_artefacts/scaling")
 	self.alignment = ui_mcm.get("perk_based_artefacts/alignment")
 	self.text_alignment = ui_mcm.get("perk_based_artefacts/text_alignment")
+	self.icon_size = ui_mcm.get("perk_based_artefacts/icon_size")
 	self.font_list = {
 		GetFontSmall(),
 		GetFontMedium(),
@@ -107,10 +108,10 @@ function PBAUI:UpdateLayout()
 		wnd_container:SetWndPos(vector2():set(width, 0))
 		wnd_container:SetWndSize(vector2():set(self:GetUIParam("indicator_width"), self:GetUIParam("indicator_height")))
 
-		local icon_width = self:GetUIParam("indicator_width")
-		local icon_height = self:GetUIParam("indicator_height") / 2 * (4/3)
-		local icon_pos_x = 0
-		local icon_pos_y = 0
+		local icon_width = self:GetUIParam("indicator_width") * self.icon_size
+		local icon_height = self:GetUIParam("indicator_height") / 2 * (4/3) * self.icon_size
+		local icon_pos_x = (self:GetUIParam("indicator_width") - icon_width) / 2
+		local icon_pos_y =  (self:GetUIParam("indicator_height") / 2 * (4/3) - icon_height)
 
 		local wnd_icon_shadow = xml:InitStatic("indicators:static", wnd_container)
 		wnd_icon_shadow:InitTexture(utils_xml.get_icons_texture(v.section))
@@ -177,6 +178,10 @@ function PBAUI:UpdateLayout()
 	self.dialog:SetWndSize(vector2():set(width, self:GetUIParam("indicator_height")))
 end
 
+AddScriptCallback("pbaui_on_indicator_add")
+AddScriptCallback("pbaui_on_indicator_remove")
+AddScriptCallback("pbaui_on_indicator_ui_init")
+
 -- Key - unique key for indicator
 -- Section - section for artefact
 -- text_func - Function for displaying text
@@ -194,6 +199,9 @@ function PBAUI:AddIndicator(key, override, section, text_func, validate_func)
 		wnd = {}
 	}
 
+	if not self.test_mode then
+		SendScriptCallback("pbaui_on_indicator_add", key, self.indicators[key])
+	end
 	self:UpdateLayout()
 end
 
@@ -252,6 +260,9 @@ function PBAUI:RemoveIndicator(key)
 	if self.indicators[key] then
 		self:SafeDetach(self.indicators[key])
 		self.indicators[key] = nil
+		if not self.test_mode then
+			SendScriptCallback("pbaui_on_indicator_remove", key)
+		end
 		self:UpdateLayout()
 	end
 end
@@ -301,6 +312,9 @@ function PBAUI:Update(force)
 			update_pending = true
 			self:SafeDetach(v)
 			indicators[k] = nil
+			if not self.test_mode then
+				SendScriptCallback("pbaui_on_indicator_remove", k)
+			end
 		else
 			if self.display_text == 1 then
 				v.wnd.text:SetText(v.text_func())
@@ -328,6 +342,7 @@ end
 function start()
 	GUI = PBAUI()
 	on_option_change()
+	SendScriptCallback("pbaui_on_indicator_ui_init", GUI)
 	RegisterScriptCallback("on_option_change", on_option_change)
 end
 

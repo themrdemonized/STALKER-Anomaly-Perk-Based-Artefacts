@@ -1,3 +1,7 @@
+function false_func()
+    return false
+end
+
 function on_mcm_load()
     op = {
         id = "perk_based_artefacts", sh = true, gr = {
@@ -10,15 +14,16 @@ function on_mcm_load()
             {id = "divider", type = "line"},
 
             {id = "ui_enabled", type = "check", val = 1, def = true},
-            {id = "pos_x", type = "track", val = 2, min = 0, max = 1020, step = 10, def = 500, precondition = {function() return false end}},
-            {id = "pos_y", type = "track", val = 2, min = 0, max = 760, step = 10, def = 670, precondition = {function() return false end}},
-            {id = "scaling", type = "track", val = 2, min = 0.3, max = 2, step = 0.1, def = 0.7, precondition = {function() return false end}},
-            {id = "indicator_margin", type = "track", val = 2, min = 0, max = 40, step = 1, def = 15, precondition = {function() return false end}},
-            {id = "text_margin", type = "track", val = 2, min = 0, max = 100, step = 2, def = 24, precondition = {function() return false end}},
-            {id = "alignment", type = "track", val = 2, min = 0, max = 2, step = 1, def = 1, precondition = {function() return false end}},
-            {id = "display_text", type = "track", val = 2, min = 0, max = 1, step = 1, def = 1, precondition = {function() return false end}},
-            {id = "text_alignment", type = "track", val = 2, min = 0, max = 2, step = 1, def = 0, precondition = {function() return false end}},
-            {id = "text_font", type = "track", val = 2, min = 1, max = 10, step = 1, def = 3, precondition = {function() return false end}},
+            {id = "pos_x", type = "track", val = 2, min = 0, max = 1020, step = 5, def = 500, precondition = {false_func}},
+            {id = "pos_y", type = "track", val = 2, min = 0, max = 760, step = 5, def = 680, precondition = {false_func}},
+            {id = "scaling", type = "track", val = 2, min = 0.3, max = 1.5, step = 0.05, def = 0.7, precondition = {false_func}},
+            {id = "indicator_margin", type = "track", val = 2, min = 0, max = 40, step = 1, def = 15, precondition = {false_func}},
+            {id = "icon_size", type = "track", val = 2, min = 0.3, max = 1, step = 0.05, def = 0.8, precondition = {false_func}},
+            {id = "text_margin", type = "track", val = 2, min = 0, max = 100, step = 2, def = 24, precondition = {false_func}},
+            {id = "alignment", type = "track", val = 2, min = 0, max = 2, step = 1, def = 1, precondition = {false_func}},
+            {id = "display_text", type = "track", val = 2, min = 0, max = 1, step = 1, def = 1, precondition = {false_func}},
+            {id = "text_alignment", type = "track", val = 2, min = 0, max = 2, step = 1, def = 0, precondition = {false_func}},
+            {id = "text_font", type = "track", val = 2, min = 1, max = 10, step = 1, def = 3, precondition = {false_func}},
 
             {id = "divider", type = "line", precondition = {level_present}},
             {id = "position", type = "button", functor_ui = {start_ui}, precondition = {level_present}},
@@ -71,12 +76,12 @@ function on_mcm_load()
         },
         { 
             name = "ui_mcm_perk_based_artefacts_scaling",
-            get = function() return ui_mcm.get("perk_based_artefacts/scaling") * 10 end,
-            set = function(val) ui_mcm.set("perk_based_artefacts/scaling", val / 10); update_option("scaling", val / 10) end,
-            def = get_mcm_params("scaling").def * 10,
-            min = get_mcm_params("scaling").min * 10,
-            max = get_mcm_params("scaling").max * 10,
-            step = get_mcm_params("scaling").step * 10
+            get = function() return ui_mcm.get("perk_based_artefacts/scaling") * 100 end,
+            set = function(val) ui_mcm.set("perk_based_artefacts/scaling", val / 100); update_option("scaling", val / 100) end,
+            def = get_mcm_params("scaling").def * 100,
+            min = get_mcm_params("scaling").min * 100,
+            max = get_mcm_params("scaling").max * 100,
+            step = get_mcm_params("scaling").step * 100
         },
         {   
             name = "ui_mcm_perk_based_artefacts_pos_x",
@@ -113,6 +118,15 @@ function on_mcm_load()
             min = get_mcm_params("alignment").min,
             max = get_mcm_params("alignment").max,
             step = get_mcm_params("alignment").step
+        },
+        { 
+            name = "ui_mcm_perk_based_artefacts_icon_size",
+            get = function() return ui_mcm.get("perk_based_artefacts/icon_size") * 100 end,
+            set = function(val) ui_mcm.set("perk_based_artefacts/icon_size", val / 100); update_option("icon_size", val / 100) end,
+            def = get_mcm_params("icon_size").def * 100,
+            min = get_mcm_params("icon_size").min * 100,
+            max = get_mcm_params("icon_size").max * 100,
+            step = get_mcm_params("icon_size").step * 100
         },
         { 
             name = "ui_mcm_perk_based_artefacts_display_text",

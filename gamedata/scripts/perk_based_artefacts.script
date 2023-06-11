@@ -835,6 +835,33 @@ local function process_timed_effects()
 	end
 end
 
+-- Stored UI functions
+ui_funcs = {}
+function add_ui_func(key, override, section, text_func, validate_func)
+	if ui_funcs[key] and not override then return end
+	local ui = perk_based_artefacts_ui_effects.GUI
+	ui:AddIndicator(key, override, section, text_func, validate_func)
+	ui_funcs[key] = {
+		key = key,
+		override = override,
+		section = section,
+		text_func = text_func,
+		validate_func = validate_func
+	}
+end
+
+function remove_ui_func(key)
+	if ui_funcs[key] then
+		local ui = perk_based_artefacts_ui_effects.GUI
+		ui:RemoveIndicator(key)
+		ui_funcs[key] = nil
+	end
+end
+
+function pbaui_on_indicator_remove(key)
+	ui_funcs[key] = nil
+end
+
 speed_boosts = { -- Table of speed boosts for different artefacts
 	af_peas = {
 		name = "af_peas_boost",
@@ -966,12 +993,18 @@ artefact_props = { -- Special props of artefacts that are used in processing
 		restore_time = 3.5,
 		active = false,
 		cooldown_time = 30,
+		cooldown_name = "af_lighthouse",
 		npc_stun_radius = 4,
 		npc_stun_anims = {
 		    "norm_2_critical_hit_torso_0", -- good
 		    "norm_1_critical_hit_head_0", -- good
 		},
-
+		ui_text_func = function(self)
+			return ("C:%s"):format(ceil(cooldowns[self.cooldown_name] - time_elapsed))
+		end,
+		ui_validate_func = function(self)
+			return not check_cooldown(self.cooldown_name)
+		end,
 		-- Saved vars
 		fov = nil,
 		hud_fov = nil,
@@ -1010,7 +1043,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			end
 		end,
 		on_death = function(self, actor, artefact_count, artefact_ids, artefact_names, npc, who, last_npc_hit, last_npc_hit_bone_index, stun_and_attack)
-			if not check_cooldown("af_lighthouse") then
+			if not check_cooldown(self.cooldown_name) then
 				trace("Lighthouse, on cooldown")
 				return
 			end
@@ -1050,7 +1083,16 @@ artefact_props = { -- Special props of artefacts that are used in processing
 
 					if k == 1 then
 						actor:set_actor_position(npc:position())
-						add_cooldown(self.cooldown_time, "af_lighthouse")
+
+						add_cooldown(self.cooldown_time, self.cooldown_name)
+						add_ui_func(
+							self.cooldown_name,
+							false,
+							"af_lighthouse",
+							function() return perk_based_artefacts.artefact_props.af_lighthouse:ui_text_func() end,
+							function() return perk_based_artefacts.artefact_props.af_lighthouse:ui_validate_func() end
+						)
+
 						exec_console_cmd("time_factor " .. self.min_tf)
 						play_sound_on_actor(get_random_array_element(self.sounds), 0.7, random_float(0.95, 1.05))
 						self:npc_stun(npc:position(), stun_and_attack)
@@ -1156,7 +1198,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			for artefact_count = 1, 5 do
 				-- Parabolic curve
 				-- Progression is 15 -> 29 -> 42 -> 54 -> 65
-				t[artefact_count] = round(-0.5 * artefact_count ^ 2 + 15.5 * artefact_count) * 0.01
+				t[artefact_count] = round(-0.5 * artefact_count ^ 2 + 15.5 * artefact_count + 2.5) * 0.01
 			end
 			return t
 		end)(),
@@ -1176,40 +1218,31 @@ artefact_props = { -- Special props of artefacts that are used in processing
 		buff_time = 600,
 		buff_time_rare = 1200,
 		callbacks_registered = false,
-		weapon_fired = false,
-		on_weapon_before_fire = function(flags)
-			local wpn = db.actor:active_item()
+		ui_text_func = function(self)
+			return ("E:%s\\nT:%s"):format(
+				round(normalize_100(self.rpm_coeff, self.min_rpm_coeff, self.max_rpm_coeff)),
+				ceil(get_status_effect_remaining_time("af_elektron"))
+			)
+		end,
+		ui_validate_func = function(self)
+			return check_status_effect("af_elektron")
+		end,
+		on_weapon_fired = function(obj, wpn, ammo_elapsed, grenade_elapsed, ammo_type, grenade_type)
 			local id = wpn:id()
 			local af_elektron = artefact_props.af_elektron
 			local c_obj = wpn:cast_Weapon()
 
 			if not c_obj then return end
 
-			local last_k = af_elektron.rpm_coeff
 			local weapon_params = weapon_modifiers.get_saved_weapon_params(id)
-			local steps = max(1, (weapon_params.RealRPM / 10) ^ 1.5)
-			af_elektron.rpm_coeff = ema("af_elektron_rpm_coeff", af_elektron.max_rpm_coeff, nil, steps)
+			local steps = max(1, (weapon_params.RealRPM / 17) ^ 1.6)
+			af_elektron.rpm_coeff = ema("af_elektron_rpm_coeff", af_elektron.max_rpm_coeff, af_elektron.rpm_coeff, steps)
 
 			weapon_modifiers.add_modifier("af_elektron", {
 				SetRealRPM = af_elektron.rpm_coeff,
 				SetModeRealRPM = af_elektron.rpm_coeff,
 				anm_speed = af_elektron.rpm_coeff
 			})
-
-			local should_fire = c_obj:GetAmmoElapsed() > 0
-			
-			CreateTimeEvent("af_elektron_next_tick_reset", 0, 0, function()
-				if not (should_fire and flags.ret_value) then
-					trace("Electron, restore coeff, should_fire %s, flags.ret_value %s, weapon_fired %s", should_fire, flags.ret_value, af_elektron.weapon_fired)
-					af_elektron.rpm_coeff = ema("af_elektron_rpm_coeff", last_k, nil, 1)
-				end
-				af_elektron.weapon_fired = false
-				return true
-			end)
-		end,
-		on_weapon_fired = function(obj, wpn, ammo_elapsed, grenade_elapsed, ammo_type, grenade_type)
-			local af_elektron = artefact_props.af_elektron
-			af_elektron.weapon_fired = true
 		end,
 		buff_func = function(self)
 			db.actor:change_power(1)
@@ -1218,14 +1251,19 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			add_speed("af_elektron_rpm_coeff", speed_k, true, true)
 
 			-- Electron, reduce powerup
-			self.rpm_coeff = ema("af_elektron_rpm_coeff", self.min_rpm_coeff, self.rpm_coeff, 120)
+			self.rpm_coeff = ema("af_elektron_rpm_coeff", self.min_rpm_coeff, self.rpm_coeff, 100)
 			trace("Electron, new coeff %s", self.rpm_coeff)
+
+			weapon_modifiers.add_modifier("af_elektron", {
+				SetRealRPM = self.rpm_coeff,
+				SetModeRealRPM = self.rpm_coeff,
+				anm_speed = self.rpm_coeff
+			})
 
 			if not self.callbacks_registered then
 				self.callbacks_registered = true
 				trace("Electron, registering callbacks")
 
-				RegisterScriptCallback("actor_on_weapon_before_fire", self.on_weapon_before_fire)
 				RegisterScriptCallback("actor_on_weapon_fired", self.on_weapon_fired)
 
 				RemoveTimeEvent("af_elektron_sound_stop", 0)
@@ -1234,7 +1272,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 				self.sound_idle:play(db.actor, 0, sound_object.s2d + sound_object.looped)
 			end
 
-			self.sound_idle.volume = lerp(0.25, 0.5, normalize(self.rpm_coeff, self.min_rpm_coeff, self.max_rpm_coeff))
+			self.sound_idle.volume = lerp(0.2, 0.5, normalize(self.rpm_coeff, self.min_rpm_coeff, self.max_rpm_coeff))
 			self.sound_idle.frequency = lerp(0.5, 1.5, normalize(self.rpm_coeff, self.min_rpm_coeff, self.max_rpm_coeff))
 		end,
 		buff_func_reset = function(self)
@@ -1242,7 +1280,6 @@ artefact_props = { -- Special props of artefacts that are used in processing
 
 			self.callbacks_registered = false
 			UnregisterScriptCallback("actor_on_weapon_fired", self.on_weapon_fired)
-			UnregisterScriptCallback("actor_on_weapon_before_fire", self.on_weapon_before_fire)
 			weapon_modifiers.remove_modifier("af_elektron")
 			remove_speed("af_elektron_rpm_coeff")			
 
@@ -1326,7 +1363,14 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			-- 	131, -- Bibliotekar
 			-- }
 		},
-		iterate_func_radius = 2,
+		cooldown_name = "af_tapeworm",
+		ui_text_func = function(self)
+			return ("C:%s"):format(ceil(cooldowns[self.cooldown_name] - time_elapsed))
+		end,
+		ui_validate_func = function(self)
+			return not check_cooldown(self.cooldown_name)
+		end,
+		iterate_func_radius = 3,
 		iterate_func = function(self, actor, artefact_count, artefact_ids, artefact_names, obj) -- Function to find nearest monster to trigger
 			if IsMonster(obj) and obj.alive and obj:alive() and obj:position():distance_to_sqr(actor:position()) <= self.iterate_func_radius * self.iterate_func_radius then
 				trace("Monster %s near Tapeworm, stun", obj:name())
@@ -1420,7 +1464,14 @@ artefact_props = { -- Special props of artefacts that are used in processing
 				return true
 			end)
 
-			add_cooldown(6, "af_tapeworm")
+			add_cooldown(6, self.cooldown_name)
+			add_ui_func(
+				self.cooldown_name,
+				false,
+				"af_tapeworm",
+				function() return perk_based_artefacts.artefact_props.af_tapeworm:ui_text_func() end,
+				function() return perk_based_artefacts.artefact_props.af_tapeworm:ui_validate_func() end
+			)
 		end,
 	},
 	af_sun = {
@@ -1442,6 +1493,23 @@ artefact_props = { -- Special props of artefacts that are used in processing
 		power_clear_boost = 0.002,
 		power_partly_boost = 0.001,
 		power_not_clear_penalty = -0.001,
+		eff = 0,
+		ui_text_func = function(self)
+			return self.eff
+		end,
+		ui_validate_func = function(self)
+			return artefacts.af_sun
+		end,
+		ui_func = function(self, eff)
+			add_ui_func(
+				"af_sun",
+				eff ~= self.eff,
+				"af_sun",
+				function() return perk_based_artefacts.artefact_props.af_sun:ui_text_func() end,
+				function() return perk_based_artefacts.artefact_props.af_sun:ui_validate_func() end
+			)
+			self.eff = eff or 0
+		end
 	},
 	af_peas = {
 		moon_sleep_decrease = { -- Mock item to send to actor_status_sleep to decrease sleep
@@ -1462,6 +1530,23 @@ artefact_props = { -- Special props of artefacts that are used in processing
 				change_sleep(change)
 				add_cooldown(10, "af_peas_moon_sleep")
 			end
+		end,
+		eff = 0,
+		ui_text_func = function(self)
+			return self.eff
+		end,
+		ui_validate_func = function(self)
+			return artefacts.af_peas
+		end,
+		ui_func = function(self, eff)
+			add_ui_func(
+				"af_peas",
+				eff ~= self.eff,
+				"af_peas",
+				function() return perk_based_artefacts.artefact_props.af_peas:ui_text_func() end,
+				function() return perk_based_artefacts.artefact_props.af_peas:ui_validate_func() end
+			)
+			self.eff = eff or 0
 		end
 	},
 	af_kogot = {
@@ -3125,6 +3210,7 @@ artefact_on_update_functions = {
 		if hours >= 21 or hours <= 5 or indoor_levels[actor_level] then
 			actor:change_power(power_not_clear_penalty * artefact_count)
 			trace("Dark time penalty, time %s, level %s, health %s, power %s", hours, actor_level, actor.health, actor.power)
+			af_sun:ui_func("--")
 		else
 			local current_weather = get_current_weather()
 			if not current_weather then
@@ -3136,12 +3222,15 @@ artefact_on_update_functions = {
 				actor:change_health(health_boost * artefact_count)
 				actor:change_power(power_clear_boost * artefact_count)
 				trace("Clear boost, time %s, current_weather %s, health %s, power %s", hours, current_weather, actor.health, actor.power)
+				af_sun:ui_func("++")
 			elseif current_weather == "partly" then
 				actor:change_power(power_partly_boost * artefact_count)
 				trace("Partly boost, time %s, current_weather %s, health %s, power %s", hours, current_weather, actor.health, actor.power)
+				af_sun:ui_func("+")
 			else
 				actor:change_power(power_not_clear_penalty * artefact_count)
 				trace("Not clear penalty, time %s, current_weather %s, health %s, power %s", hours, current_weather, actor.health, actor.power)
+				af_sun:ui_func("-")
 			end
 
 		end
@@ -3193,12 +3282,14 @@ artefact_on_update_functions = {
 			for i = 1, artefact_count do
 				af_peas:change_sleep(false)
 			end
+			af_peas:ui_func("++")
 		else
 			remove_speed(speed_boosts.af_peas.name)
 			remove_jump(jump_boosts.af_peas.name)
 			for i = 1, artefact_count do
 				af_peas:change_sleep(true)
 			end
+			af_peas:ui_func("--")
 		end
 	end,
 
@@ -3923,11 +4014,18 @@ artefact_on_before_hit_functions = {
 		end
 		local key = "af_elektron"
 
+		add_status_effect(time, nil, "af_elektron", 1)
+
 		if not (timed_effects[key] and timed_effects[key].timer > (time_elapsed + time)) then
 			add_timed_effect(time, af_elektron.buff_func_time_effect, nil, af_elektron.buff_func_time_effect_reset, nil, "af_elektron")
+			add_ui_func(
+				key,
+				true,
+				key,
+				function() return perk_based_artefacts.artefact_props.af_elektron:ui_text_func() end,
+				function() return perk_based_artefacts.artefact_props.af_elektron:ui_validate_func() end
+			)
 		end
-
-		add_status_effect(time, nil, "af_elektron", 1)
 	end,
 
 	-- Cell, Perk: Disintegrator
@@ -4508,7 +4606,7 @@ artefact_binder_on_update_functions = {
 			binder.target_radius_sqr = binder.target_radius ^ 2
 
 			binder.attack_time = 40
-			binder.attack_radius = 1.55
+			binder.attack_radius = 1.5
 			binder.attack_radius_sqr = binder.attack_radius ^ 2
 
 			binder.panic_time = 1.2
@@ -4914,30 +5012,24 @@ bind_monster.generic_object_binder.use_kick = function(self, obj, who)
 			local position = monster:position()
 			position.y = position.y + 1
 
-			if artefact_count <= 2 then
+			if artefact_count < 2 then
 				play_sound_on_actor("perk_based_artefacts\\BONSNAP" .. random(8), 0.1 + 0.2 * (artefact_count - 1), random_float(0.9, 1.0))
 				local gibs = particles_object("artefact\\effects\\af_idle_dist")
 				if gibs and not gibs:playing() then
 					gibs:play_at_pos(position)
 				end
+			elseif artefact_count < 4 then
+				play_sound_on_actor("perk_based_artefacts\\BONSNAP" .. random(8), 0.7, random_float(0.9, 1.0))
+				local gibs = particles_object("artefact\\artefact_mincer")
+				if gibs and not gibs:playing() then
+					gibs:play_at_pos(position)
+				end
 			else
-
-				if artefact_count > 2 then
-					play_sound_on_actor("perk_based_artefacts\\BONSNAP" .. random(8), 0.7, random_float(0.9, 1.0))
-					local gibs = particles_object("artefact\\artefact_mincer")
-					if gibs and not gibs:playing() then
-						gibs:play_at_pos(position)
-					end
+				play_sound_on_actor("perk_based_artefacts\\GNTEAR0" .. random(2), 0.75, random_float(0.9, 1.0))
+				local gibs = particles_object("artefact\\artefact_gravi")
+				if gibs and not gibs:playing() then
+					gibs:play_at_pos(position)
 				end
-
-				if artefact_count > 4 then
-					play_sound_on_actor("perk_based_artefacts\\GNTEAR0" .. random(2), 0.75, random_float(0.9, 1.0))
-					local gibs = particles_object("artefact\\artefact_gravi")
-					if gibs and not gibs:playing() then
-						gibs:play_at_pos(position)
-					end
-				end
-
 			end
 
 			return true
@@ -5545,6 +5637,7 @@ function save_state(m_data)
 	m_data.perk_based_artefacts_status_effects = status_effects
 	m_data.perk_based_artefacts_lucifer_condition = artefact_props.af_lucifer.condition
 	m_data.perk_based_artefacts_virtual_artefacts = virtual_artefacts
+	m_data.perk_based_artefacts_ui_funcs = ui_funcs
 	-- m_data.perk_based_artefacts_last_time = time_elapsed
 end
 
@@ -5569,7 +5662,15 @@ function load_state(m_data)
 	status_effects = m_data.perk_based_artefacts_status_effects or {}
 	artefact_props.af_lucifer.condition = m_data.perk_based_artefacts_lucifer_condition or 1
 	virtual_artefacts = m_data.perk_based_artefacts_virtual_artefacts or {}
+	ui_funcs = m_data.perk_based_artefacts_ui_funcs or {}
 	-- saved_time_elapsed = m_data.perk_based_artefacts_last_time or 0
+end
+
+function pbaui_on_indicator_ui_init(ui)
+	RegisterScriptCallback("pbaui_on_indicator_remove", pbaui_on_indicator_remove)
+	for key, t in pairs(ui_funcs) do
+		ui:AddIndicator(key, t.override, t.section, t.text_func, t.validate_func)
+	end
 end
 
 function on_option_change()
@@ -5592,6 +5693,7 @@ function on_game_start()
 	RegisterScriptCallback("ActorMenu_on_trade_started", ActorMenu_on_trade_started)
 	RegisterScriptCallback("ActorMenu_on_trade_closed", ActorMenu_on_trade_closed)
 	RegisterScriptCallback("on_option_change", on_option_change)
+	RegisterScriptCallback("pbaui_on_indicator_ui_init", pbaui_on_indicator_ui_init)
 end
 
 --Debug
