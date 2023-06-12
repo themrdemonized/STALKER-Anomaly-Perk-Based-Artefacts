@@ -1575,7 +1575,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			[hit.wound] = true
 		},
 		dice_roll = 0,
-		health_boost_coeff = 0.003,
+		health_boost_coeff = 0.004,
 		anims_to_accelerate = {
 			anm_attack       = true,
 			anm_attack2      = true,
@@ -1585,6 +1585,13 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			anm_show         = true,
 			anm_show_empty   = true,
 		},
+		effect_time_trigger = 0,
+		ui_text_func = function(self)
+			return ("T:%s"):format(ceil(self.effect_time_trigger - time_elapsed))
+		end,
+		ui_validate_func = function(self)
+			return time_elapsed < self.effect_time_trigger
+		end,
 		on_before_hit = function(self, actor, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
 			if not self.valid_hits[s_hit.type] then
 				trace("Claw, not a valid hit type %s", s_hit.type)
@@ -1608,6 +1615,14 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			add_simple_timed_effect(4 + 1 * artefact_count, nil, function()
 				remove_speed(speed_boosts.af_kogot.name)
 			end, "af_kogot_boost")
+			self.effect_time_trigger = time_elapsed + 4 + 1 * artefact_count
+			add_ui_func(
+				"af_kogot_boost",
+				true,
+				"af_kogot",
+				function() return perk_based_artefacts.artefact_props.af_kogot:ui_text_func() end,
+				function() return perk_based_artefacts.artefact_props.af_kogot:ui_validate_func() end
+			)
 
 			self.dice_roll = random()
 			if af_lucifer:check_lucifer() and self.dice_roll < (lucifer_bonus * lucifer_bonus) then -- Squared chance to have less proc on better condition
@@ -1777,7 +1792,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 	af_skull_miser = {
 		money_items = (function() -- Money items to choose and spawn
 			local t = {}
-			insert_n_times(t, "roubles", 100)
+			insert_n_times(t, "roubles", 90)
 			insert_n_times(t, "money_10_50", 12)
 			insert_n_times(t, "money_50_100", 8)
 			insert_n_times(t, "money_100_200", 6)
@@ -1882,39 +1897,36 @@ artefact_props = { -- Special props of artefacts that are used in processing
 	},
 	af_dragon_eye = {
 		trigger = false,
+		cooldown_name = "af_dragon_eye",
+		ui_text_func = function(self)
+			return ("C:%s"):format(ceil(cooldowns[self.cooldown_name] - time_elapsed))
+		end,
+		ui_validate_func = function(self)
+			return not check_cooldown(self.cooldown_name)
+		end,
 		on_before_hit = function(self, actor, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
-			if not check_cooldown("af_dragon_eye") then
+			if not check_cooldown(self.cooldown_name) then
 				trace("Dragon's Eye, on the cooldown")
 				return
 			end
 
 			local current_weapon = actor:active_item()
-			if not current_weapon then
+			if not (current_weapon and not IsMelee(current_weapon)) then
 				trace("Dragon's Eye, no current_weapon")
 				return
-			end
-
-			local casted_weapon = current_weapon:cast_Weapon()
-			if not casted_weapon then
-				trace("Dragon's Eye, no casted weapon")
-				return
-			end
-
-			local ammo_type = casted_weapon:GetAmmoType() + 1
-			trace("ammo type %s", ammo_type)
-			local ammo_types = str_explode(SYS_GetParam(0, current_weapon:section(), "ammo_class", ""), ",")
-
-			if not ammo_types[ammo_type] then
-				trace("Dragon's Eye, no valid ammo type")
-				return
-			end
-
-			local pellet_count = max(SYS_GetParam(2, ammo_types[ammo_type], "buck_shot", 1), 1)
+			end			
 
 			s_hit.power = 1000
 
 			local next_time = (60 * 2) / (3 ^ (artefact_count - 1))
-			add_cooldown(next_time, "af_dragon_eye")
+			add_cooldown(next_time, self.cooldown_name)
+			add_ui_func(
+				self.cooldown_name,
+				false,
+				"af_dragon_eye",
+				function() return perk_based_artefacts.artefact_props.af_dragon_eye:ui_text_func() end,
+				function() return perk_based_artefacts.artefact_props.af_dragon_eye:ui_validate_func() end
+			)
 			self.trigger = true
 		end,
 		on_death = function(self, actor, artefact_count, artefact_ids, artefact_names, npc, who, last_npc_hit, last_npc_hit_bone_index)
@@ -1924,14 +1936,114 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			end
 			self.trigger = false
 
+			
 			local npc_id = npc:id()
 			trace("Victim's id: %s", npc_id)
 			if npc_id == AC_ID then return end
 
-			local npc_position = npc:position()
-			local npc_level_vertex_id = npc:level_vertex_id()
-			local npc_game_vertex_id = npc:game_vertex_id()
+			-- Slight delay for sound sync
+			play_sound_on_actor("perk_based_artefacts\\SPHNEXP")
+			CreateTimeEvent("af_dragon_eye_delay_explode", 0, 0.25, function()
+				local npc_position = npc:position()
+				local npc_level_vertex_id = npc:level_vertex_id()
+				local npc_game_vertex_id = npc:game_vertex_id()
 
+				local function explode(explode_id)
+					local explode_obj = get_object_by_id(explode_id)
+					if explode_obj then
+						trace("explode_obj spawned")
+						local sim = alife()
+						sim:release(sim:object(npc_id))
+						explode_obj:explode(0)
+						trace("explode obj exploded")
+						local gibs = particles_object("new_effects\\krovisha_main")
+						if gibs and not gibs:playing() then
+							gibs:play_at_pos(npc_position)
+							local snd = get_safe_sound_object("perk_based_artefacts\\XDEATH" .. random(5))
+							snd:play_at_pos(npc, npc_position, 0, sound_object.s3d)
+							snd.frequency = random_float(0.95, 1.05)
+						else
+							trace("gibs not found")
+						end
+						return true
+					end
+					trace("explode_obj not spawned yet")
+					return false
+				end
+
+				local explode_obj = alife_create_item("ied_new_blow", {npc_position, npc_level_vertex_id, npc_game_vertex_id, nil})
+				CreateTimeEvent(explode_obj.id, explode_obj.id, 0, explode, explode_obj.id)
+
+				artefact_props.af_lucifer:change_condition(0.01)
+				return true
+			end)
+		end,
+
+		-- Special heli case
+		on_heli_hit = function(self, actor, artefact_count, artefact_ids, artefact_names, npc, who)
+			if not check_cooldown(self.cooldown_name) then
+				trace("Dragon's Eye, on the cooldown")
+				return
+			end
+
+			if random() > 0.05 then
+				trace("Dragon's Eye, heli not triggered")
+				return
+			end
+			
+			local npc_id = npc:id()
+			trace("Victim's id: %s", npc_id)
+			if npc_id == AC_ID then return end
+
+			self.trigger = false
+
+			-- Slight delay for sound sync
+			play_sound_on_actor("perk_based_artefacts\\SPHNEXP")
+			CreateTimeEvent("af_dragon_eye_delay_explode", 0, 0.25, function()
+				local npc_position = npc:position()
+				local npc_level_vertex_id = npc:level_vertex_id()
+				local npc_game_vertex_id = npc:game_vertex_id()
+
+				local function explode(explode_id)
+					local explode_obj = get_object_by_id(explode_id)
+					if explode_obj then
+						trace("explode_obj spawned")
+						explode_obj:explode(0)
+						trace("explode obj exploded")
+
+						-- Apply hit
+						local s_hit = hit()
+						s_hit.power = 1000
+						s_hit.draftsman = db.actor
+						s_hit.type = hit.strike
+						s_hit.direction = VEC_Z
+						npc:hit(s_hit)
+
+						return true
+					end
+					trace("explode_obj not spawned yet")
+					return false
+				end
+
+				local explode_obj = alife_create_item("ied_new_blow", {npc_position, npc_level_vertex_id, npc_game_vertex_id, nil})
+				CreateTimeEvent(explode_obj.id, explode_obj.id, 0, explode, explode_obj.id)
+
+				artefact_props.af_lucifer:change_condition(0.05)
+				return true
+			end)
+
+			local next_time = (60 * 2) / (3 ^ (artefact_count - 1))
+			add_cooldown(next_time, self.cooldown_name)
+			add_ui_func(
+				self.cooldown_name,
+				false,
+				"af_dragon_eye",
+				function() return perk_based_artefacts.artefact_props.af_dragon_eye:ui_text_func() end,
+				function() return perk_based_artefacts.artefact_props.af_dragon_eye:ui_validate_func() end
+			)
+		end,
+
+		manual_explode = function(self, obj)
 			local function explode(explode_id)
 				local explode_obj = get_object_by_id(explode_id)
 				if explode_obj then
@@ -1957,9 +2069,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 
 			local explode_obj = alife_create_item("ied_new_blow", {npc_position, npc_level_vertex_id, npc_game_vertex_id, nil})
 			CreateTimeEvent(explode_obj.id, explode_obj.id, 0, explode, explode_obj.id)
-
-			artefact_props.af_lucifer:change_condition(0.01)
-		end
+		end,
 	},
 	af_fountain = {
 		cashback_triggered = false, -- Trigger flag to reset time event
@@ -4551,6 +4661,14 @@ artefact_on_equip_functions = {
 
 }
 
+-- Functions for artefacts which provide perk bonuses for helicopter hits specifically
+artefact_on_heli_hit_functions = {
+	-- Dragon's Eye
+	af_dragon_eye = function(actor, artefact_count, artefact_ids, artefact_names, heli, amount, who)
+		artefact_props.af_dragon_eye:on_heli_hit(actor, artefact_count, artefact_ids, artefact_names, heli, who)
+	end
+}
+
 -- Functions for artefacts which provide perk bonuses for animations
 artefact_on_hud_animation_play_functions = {
 
@@ -5478,6 +5596,20 @@ function monster_on_death_callback(monster, who)
 	process_artefacts(artefact_on_monster_death_functions, monster, who, last_monster_hit, last_monster_hit_bone_index)
 end
 
+function heli_on_hit_callback(heli, amount, unused, who, unused2)
+	if not (who and who.id) then
+		trace("on_hit_callback not triggered, who not defined")
+		return
+	end
+
+	if who:id() ~= AC_ID then
+		-- trace("monster_on_hit_callback not triggered %s, %s, %s", monster:section(), amount, who:section())
+		return
+	end
+
+	process_artefacts(artefact_on_heli_hit_functions, heli, amount, who)
+end
+
 function on_item_drag_dropped(obj_1, obj_2, slot_from, slot_to)
 	if not (obj_1 and obj_2) then 
 		trace("No obj_1 or obj_2 found, o1 %s, o2 %s", obj_1 and obj_1:section(), obj_2 and obj_2:section())
@@ -5583,6 +5715,8 @@ function actor_on_first_update()
 	RegisterScriptCallback("monster_on_hit_callback", monster_on_hit_callback)
 	RegisterScriptCallback("monster_on_death_callback", monster_on_death_callback)
 	RegisterScriptCallback("on_before_level_changing", on_before_level_changing)
+	RegisterScriptCallback("heli_on_hit_callback", heli_on_hit_callback)
+
 
 	-- 1.5.2
 	if _G.CHudItem__PlayHUDMotion then
