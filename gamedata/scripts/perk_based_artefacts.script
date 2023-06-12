@@ -1944,7 +1944,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			-- Slight delay for sound sync
 			play_sound_on_actor("perk_based_artefacts\\SPHNEXP")
 			CreateTimeEvent("af_dragon_eye_delay_explode", 0, 0.25, function()
-				local npc_position = npc:position()
+				local npc_position = npc:position():add(vector():set(0, 1, 0))
 				local npc_level_vertex_id = npc:level_vertex_id()
 				local npc_game_vertex_id = npc:game_vertex_id()
 
@@ -2042,7 +2042,6 @@ artefact_props = { -- Special props of artefacts that are used in processing
 				function() return perk_based_artefacts.artefact_props.af_dragon_eye:ui_validate_func() end
 			)
 		end,
-
 		manual_explode = function(self, obj)
 			local function explode(explode_id)
 				local explode_obj = get_object_by_id(explode_id)
@@ -5046,10 +5045,25 @@ af_lighthouse_user_teleport_func = {
 		return "st_pba_teleport"
 	end,
 	action = function(obj, bag, mode)
-		return perk_based_artefacts_af_lighthouse_ui.start(obj)
+		return perk_based_artefacts_af_choose_ui.start(obj, "st_pba_teleport_choose")
 	end,
 }
 add_functor("pba_lighthouse", af_lighthouse_user_teleport_func.check, af_lighthouse_user_teleport_func.string, nil, af_lighthouse_user_teleport_func.action)
+
+-- Functors for Dragon Eye
+af_dragon_eye_engage_func = {
+	check = function(obj, bag, mode)
+		return obj:section() == "af_dragon_eye"
+	end,
+	string = function(obj, bag, mode)
+		return "st_pba_engage"
+	end,
+	action = function(obj, bag, mode)
+		db.actor:drop_item(obj)
+		return perk_based_artefacts_af_choose_ui.start(obj, "st_pba_dragon_eye_engage")
+	end,
+}
+add_functor("pba_dragon_eye", af_dragon_eye_user_teleport_func.check, af_dragon_eye_user_teleport_func.string, nil, af_dragon_eye_user_teleport_func.action)
 
 -- Functors for Medallion
 af_medallion_engage_func = {
@@ -5057,7 +5071,7 @@ af_medallion_engage_func = {
 		return obj:section() == "af_medallion"
 	end,
 	string = function(obj, bag, mode)
-		return "st_pba_medallion_engage"
+		return "st_pba_engage"
 	end,
 	action = function(obj, bag, mode)
 		zzz_ui_inventory_arte_to_grenade.move_arte_to_grenade(obj)
