@@ -22,7 +22,7 @@ function on_mcm_load()
             {id = "text_margin", type = "track", val = 2, min = 0, max = 100, step = 2, def = 24, precondition = {false_func}},
             {id = "alignment", type = "track", val = 2, min = 0, max = 2, step = 1, def = 1, precondition = {false_func}},
             {id = "display_text", type = "track", val = 2, min = 0, max = 1, step = 1, def = 1, precondition = {false_func}},
-            {id = "text_alignment", type = "track", val = 2, min = 0, max = 2, step = 1, def = 0, precondition = {false_func}},
+            {id = "text_alignment", type = "track", val = 2, min = 0, max = 2, step = 1, def = 2, precondition = {false_func}},
             {id = "text_font", type = "track", val = 2, min = 1, max = 10, step = 1, def = 3, precondition = {false_func}},
 
             {id = "divider", type = "line", precondition = {level_present}},

@@ -30,6 +30,19 @@ function af_medallion_grenade_binder:fastcall()
         }
         se_save_var(se_obj.id, nil, "af_medallion", props)
 
+        -- Make initial push up
+        CreateTimeEvent("af_medallion_push", se_obj.id, 0, function()
+            local o = level.object_by_id(se_obj.id)
+            if o and o:get_physics_shell() then
+                local mass = o:mass()
+                o:get_physics_shell():apply_force(
+                    device().cam_dir.x * mass * 100,
+                    mass * 19.62 * 15,
+                    device().cam_dir.z * mass * 100)
+                return true
+            end
+        end)
+
         obj:destroy_object()
         thrown_obj_id = nil
         thrown_obj_state = nil

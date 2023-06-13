@@ -249,7 +249,7 @@ function PBAUI:PopulateTestIndicators()
 		end
 		self.test_indicators[key] = {
 			section = artes[math.random(#artes)],
-			text_func = function() return "C:1200 \\nE:100" end,
+			text_func = function() return "C:1200\\nE:100" end,
 			validate_func = function() return true end,
 			wnd = {}
 		}

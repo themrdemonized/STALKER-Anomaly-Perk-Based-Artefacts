@@ -57,7 +57,39 @@ class "AfChooseUI" (CUIScriptWnd)
 function AfChooseUI:__init(af_obj, msg) super()
 	self.af_update_funcs = {
 		af_dragon_eye = throttle(function(self)
+			if not self.af_dragon_eye_props then
+				self.af_dragon_eye_props = {
+					position = self.af_obj:position(),
+					velocity = vector():set(0, 0, 0)
+				}
+				return
+			end
 
+			if not self.worldPos then return end
+
+			local pos = self.af_dragon_eye_props.position
+			local new_pos = self.af_obj:position()
+			local velocity = vector():set(new_pos):sub(pos)
+
+			self.af_dragon_eye_props.position = new_pos
+			self.af_dragon_eye_props.velocity = velocity
+
+			local mass = self.af_obj:mass()
+			local result_dir = vector():set(self.worldPos):sub(new_pos):normalize()
+			local force_vec = vector():set(
+				result_dir.x * mass * 250,
+				math.max(mass * velocity.y * 19.62 * 10, 0),
+				result_dir.z * mass * 250
+			)
+
+			-- demonized_geometry_ray.VisualizeRay(
+			-- 	self.af_obj:position(),
+			-- 	self.af_obj:position():mad(vector():set(force_vec):normalize(), 5),
+			-- 	nil,
+			-- 	100
+			-- )
+
+			self.af_obj:get_physics_shell():apply_force(force_vec.x, force_vec.y, force_vec.z)
 		end, 100)
 	}
 
@@ -71,8 +103,22 @@ function AfChooseUI:__init(af_obj, msg) super()
 			end
 		end,
 		af_dragon_eye = function(self)
-
+			perk_based_artefacts.artefact_props.af_dragon_eye:manual_explode(self.af_obj)
+			self.af_dragon_eye_props = nil
+			self:Close()
 		end,
+	}
+
+	self.af_sub_action_funcs = {
+		af_dragon_eye = throttle(function(self)
+			local mass = self.af_obj:mass()
+			local force_vec = vector():set(
+				0,
+				mass * 19.62 * 20,
+				0
+			)
+			self.af_obj:get_physics_shell():apply_force(force_vec.x, force_vec.y, force_vec.z)
+		end, 500),
 	}
 
 	self:Reset(af_obj, msg)
@@ -110,6 +156,14 @@ function AfChooseUI:TryAction()
 	end
 end
 
+function AfChooseUI:TrySubAction()
+	if not self.worldPos then return end
+
+	if self.af_sub_action_funcs[self.af_obj:section()] then
+		self.af_sub_action_funcs[self.af_obj:section()](self)
+	end
+end
+
 function AfChooseUI:OnKeyboard(dik, keyboard_action)
 	local res = CUIScriptWnd.OnKeyboard(self,dik,keyboard_action)
 	if (res == false) then
@@ -117,6 +171,8 @@ function AfChooseUI:OnKeyboard(dik, keyboard_action)
 		if keyboard_action == ui_events.WINDOW_KEY_PRESSED then
 			if dik == DIK_keys.MOUSE_1 then
 				self:TryAction()
+			elseif dik == DIK_keys.MOUSE_2 then
+				self:TrySubAction()
 			elseif dik == DIK_keys.DIK_ESCAPE then
 				self:Close()
 			end
