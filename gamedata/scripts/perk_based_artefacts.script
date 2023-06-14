@@ -863,6 +863,17 @@ function pbaui_on_indicator_remove(key)
 	ui_funcs[key] = nil
 end
 
+-- Save var to mdata
+function mdata_save(key, val)
+	key = "pba_vars_" .. key
+	alife_storage_manager.get_state()[key] = val
+end
+
+function mdata_load(key)
+	key = "pba_vars_" .. key
+	return alife_storage_manager.get_state()[key]
+end
+
 speed_boosts = { -- Table of speed boosts for different artefacts
 	af_peas = {
 		name = "af_peas_boost",
@@ -2195,27 +2206,30 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			[hit.shock] = true,
 			[hit.chemical_burn] = true
 		},
-		valid_hits_table = {}, -- Table of valid hits to choose from, updates each hour
-		valid_hits_table_pointer = 1, -- Current valid hit
-		valid_hits_table_update_time = 0, -- Update time of valid_hits_table
-		update_valid_hits_table = function(self)
-			-- Set randomseed to current game hour and reset back later
-			local seed = ceil(time_elapsed * time_factor / 60 / 60)
-			if seed ~= self.valid_hits_table_update_time or is_empty(self.valid_hits_table) then
-				empty_table(self.valid_hits_table)
-				math.randomseed(seed)
-				for i = 1, 100 do
-					self.valid_hits_table[i] = get_random_key(self.valid_hits)
-				end
-				self.valid_hits_table_pointer = 1
-				self.valid_hits_table_update_time = seed
-				math.randomseed(os.time())
+		valid_hits_table = nil, -- Table of valid hits to choose from, updates each hour
+		get_seed = function(self)
+			return ceil(time_elapsed * time_factor / 60 / 60)
+		end,
+		new_fixed_random_table = function(self)
+			local a = {}
+			for k, v in pairs(self.valid_hits) do
+				a[#a+1] = k
 			end
+			return demonized_fixed_random_table.FixedRandomTable(a, self:get_seed(), 100)
+		end,
+		update_valid_hits_table = function(self)
+			self.valid_hits_table = self.valid_hits_table or mdata_load("af_sandstone_valid_hits") or self:new_fixed_random_table()
+
+			-- Set randomseed to current game hour and reset back later
+			if self:get_seed() ~= self.valid_hits_table.seed then
+				self.valid_hits_table = self:new_fixed_random_table()
+			end
+			mdata_save("af_sandstone_valid_hits", self.valid_hits_table)
 		end,
 		get_valid_hit_type = function(self)
 			self:update_valid_hits_table()
-			local res = self.valid_hits_table[self.valid_hits_table_pointer]
-			self.valid_hits_table_pointer = (self.valid_hits_table_pointer % #self.valid_hits_table) + 1
+			local res = self.valid_hits_table:next()
+			mdata_save("af_sandstone_valid_hits", self.valid_hits_table)
 			return res
 		end,
 		hit_types_sounds = { -- Hit type to sounds associations
@@ -2248,8 +2262,26 @@ artefact_props = { -- Special props of artefacts that are used in processing
 				"artefact\\artefact_ameba"
 			}
 		},
+		hit_types_icons = { -- Hit type to icons
+			[hit.light_burn] = "ui_am_prop_thermo",
+			[hit.burn] = "ui_am_prop_burn_immunity",
+			[hit.shock] = "ui_am_prop_electro",
+			[hit.chemical_burn] = "ui_am_prop_chem"
+		},
 		hit_power_coeff = 0.7,
 		elemental_power_coeff = 0.7,
+		ui_text_func = function(self)
+			local actor_weapon = db.actor:active_item()
+			if actor_weapon then
+				return ("T:%s"):format(ceil(get_status_effect_remaining_time("af_sandstone" .. actor_weapon:name())))
+			end
+		end,
+		ui_validate_func = function(self)
+			local actor_weapon = db.actor:active_item()
+			if actor_weapon then
+				return check_status_effect("af_sandstone" .. actor_weapon:name())
+			end
+		end,
 		play_particles = function(self, effect, position)
 			local gibs = particles_object(get_random_array_element(self.hit_types_particles[effect.hit_type]))
 
@@ -3128,19 +3160,26 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			alife_create_item(new_artefact, actor)
 			CreateTimeEvent("refresh_artefacts", "refresh_artefacts", 0.15, refresh_artefacts_time_event_func, true)
 		end,
-		randomseed = 0,
-		randomseed_update_time = 0,
+		randomseed = nil,
+		randomseed_update_time = nil,
 		transmutate_artefact = function(self, obj)
 			-- Set randomseed to current game hour and reset back
+			self.randomseed = self.randomseed or mdata_load("af_bat_randomseed")
+			self.randomseed_update_time = self.randomseed_update_time or mdata_load("af_bat_randomseed_update_time")
+
 			local seed = ceil(time_elapsed * time_factor / 60 / 60)
 			if self.randomseed_update_time ~= seed then
 				self.randomseed = seed
 				self.randomseed_update_time = seed
 			else
 				math.randomseed(self.randomseed)
-				self.randomseed = self.randomseed + math.random(100, 200)
+				self.randomseed = self.randomseed + math.random(100,200) + math.random()
 			end
 			math.randomseed(self.randomseed)
+
+			mdata_save("af_bat_randomseed", self.randomseed)
+			mdata_save("af_bat_randomseed_update_time", self.randomseed_update_time)
+
 			local sec = obj:section()
 			local new_sec
 			if self.perk_artefacts[sec] then
@@ -3625,6 +3664,26 @@ artefact_on_update_functions = {
 					CreateTimeEvent("refresh_artefacts", "refresh_artefacts", 0.15, refresh_artefacts_time_event_func, true)
 				end
 			end
+		end
+	end,
+
+	-- Sandstone
+	af_sandstone = function(actor, artefact_count, artefact_ids, artefact_names)
+		local af_sandstone = artefact_props.af_sandstone
+		local wpn = actor:active_item()
+		if wpn and check_status_effect("af_sandstone" .. wpn:name()) then
+			add_ui_func(
+				"af_sandstone",
+				true,
+				"af_sandstone",
+				function() return perk_based_artefacts.artefact_props.af_sandstone:ui_text_func() end,
+				function() return perk_based_artefacts.artefact_props.af_sandstone:ui_validate_func() end
+				,{
+					{
+						icon = status_effects["af_sandstone" .. wpn:name()].effect.hit_type_icon
+					}
+				}
+			)
 		end
 	end,
 
@@ -4360,7 +4419,8 @@ artefact_on_hit_functions = {
 
 		add_status_effect(180, {
 			weapon_name = actor_weapon:name(),
-			hit_type = last_hit.type
+			hit_type = last_hit.type,
+			hit_type_icon = af_sandstone.hit_types_icons[last_hit.type],
 		}, "af_sandstone" .. actor_weapon:name(), true)
 	end,
 
@@ -4607,7 +4667,8 @@ artefact_on_item_drag_dropped_functions = {
 
 		add_status_effect(600, {
 			weapon_name = obj_2:name(),
-			hit_type = hit_type
+			hit_type = hit_type,
+			hit_type_icon = af_sandstone.hit_types_icons[hit_type],
 		}, "af_sandstone" .. obj_2:name())
 		
 		add_virtual_artefact("af_sandstone")

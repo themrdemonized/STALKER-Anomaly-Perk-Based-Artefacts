@@ -131,42 +131,50 @@ function PBAUI:UpdateLayout()
 		wnd_icon:SetWndSize(vector2():set(icon_width, icon_height))
 
 		-- Icon layers have right bottom alignment
-		local icon_layer_hor = 1
-		local icon_layer_vert = 1
-		local icon_layer_hor_max = math.ceil(self.indicator_width / (self.icon_layer_margin + self.icon_layer_size))
-		local icon_layers = {}
-		for i, v1 in ipairs(v.icon_layers) do
-			local icon_layer_size = self:GetUIParam("icon_layer_size") * self.icon_size
-			local icon_layer_margin = self:GetUIParam("icon_layer_margin") * self.icon_size
-			local icon_layer_width = icon_layer_size
-			local icon_layer_height = icon_layer_size * (4/3)
-			local icon_layer_pos_x = icon_pos_x + icon_width - (icon_layer_hor * (icon_layer_margin + icon_layer_width)) 
-			local icon_layer_pos_y = icon_pos_y + icon_height - (icon_layer_vert * (icon_layer_margin + icon_layer_height))
+		if is_not_empty(v.icon_layers) then
+			local icon_layer_hor = 1
+			local icon_layer_vert = 1
+			local icon_layer_hor_max = math.ceil(self.indicator_width / (self.icon_layer_margin + self.icon_layer_size))
+			local icon_layers = {}
+			for i, v1 in ipairs(v.icon_layers) do
+				if is_not_empty(v1) then
+					local icon_layer_size = self:GetUIParam("icon_layer_size") * self.icon_size
+					local icon_layer_margin = self:GetUIParam("icon_layer_margin") * self.icon_size
+					local icon_layer_width = icon_layer_size
+					local icon_layer_height = icon_layer_size * (4/3)
+					local icon_layer_pos_x = icon_pos_x + icon_width - (icon_layer_hor * (icon_layer_margin + icon_layer_width)) 
+					local icon_layer_pos_y = icon_pos_y + icon_height - (icon_layer_vert * (icon_layer_margin + icon_layer_height))
 
-			icon_layer_hor = icon_layer_hor + 1
-			if icon_layer_hor >= icon_layer_hor_max then
-				icon_layer_vert = icon_layer_vert + 1
-				icon_layer_hor = 1
+					icon_layer_hor = icon_layer_hor + 1
+					if icon_layer_hor >= icon_layer_hor_max then
+						icon_layer_vert = icon_layer_vert + 1
+						icon_layer_hor = 1
+					end
+
+					local wnd_icon_shadow = xml:InitStatic("indicators:static", wnd_container)
+					wnd_icon_shadow:InitTexture(v1.section and utils_xml.get_icons_texture(v1.section) or v1.icon)
+					if v1.section then
+			        	wnd_icon_shadow:SetTextureRect(Frect():set(utils_xml.get_item_axis(v1.section, nil, true)))
+			        end
+			        wnd_icon_shadow:SetStretchTexture(true)
+			        wnd_icon_shadow:SetTextureColor(GetARGB(255, 20, 20, 20))
+			        wnd_icon_shadow:SetWndPos(vector2():set(icon_layer_pos_x + 1, icon_layer_pos_y + 1))
+					wnd_icon_shadow:SetWndSize(vector2():set(icon_layer_width, icon_layer_height))
+
+					local wnd_icon = xml:InitStatic("indicators:static", wnd_container)
+					wnd_icon:InitTexture(v1.section and utils_xml.get_icons_texture(v1.section) or v1.icon)
+					if v1.section then
+			        	wnd_icon:SetTextureRect(Frect():set(utils_xml.get_item_axis(v1.section, nil, true)))
+			        end
+			        wnd_icon:SetStretchTexture(true)
+			        wnd_icon:SetWndPos(vector2():set(icon_layer_pos_x, icon_layer_pos_y))
+					wnd_icon:SetWndSize(vector2():set(icon_layer_width, icon_layer_height))
+					icon_layers[#icon_layers + 1] = {
+						wnd_icon = wnd_icon,
+						wnd_icon_shadow = wnd_icon_shadow,
+					}
+				end
 			end
-
-			local wnd_icon_shadow = xml:InitStatic("indicators:static", wnd_container)
-			wnd_icon_shadow:InitTexture(utils_xml.get_icons_texture(v1.section))
-	        wnd_icon_shadow:SetTextureRect(Frect():set(utils_xml.get_item_axis(v1.section, nil, true)))
-	        wnd_icon_shadow:SetStretchTexture(true)
-	        wnd_icon_shadow:SetTextureColor(GetARGB(255, 20, 20, 20))
-	        wnd_icon_shadow:SetWndPos(vector2():set(icon_layer_pos_x + 1, icon_layer_pos_y + 1))
-			wnd_icon_shadow:SetWndSize(vector2():set(icon_layer_width, icon_layer_height))
-
-			local wnd_icon = xml:InitStatic("indicators:static", wnd_container)
-			wnd_icon:InitTexture(utils_xml.get_icons_texture(v1.section))
-	        wnd_icon:SetTextureRect(Frect():set(utils_xml.get_item_axis(v1.section, nil, true)))
-	        wnd_icon:SetStretchTexture(true)
-	        wnd_icon:SetWndPos(vector2():set(icon_layer_pos_x, icon_layer_pos_y))
-			wnd_icon:SetWndSize(vector2():set(icon_layer_width, icon_layer_height))
-			icon_layers[#icon_layers + 1] = {
-				wnd_icon = wnd_icon,
-				wnd_icon_shadow = wnd_icon_shadow,
-			}
 		end
 
 		local text_width = self:GetUIParam("indicator_width")
@@ -177,7 +185,7 @@ function PBAUI:UpdateLayout()
 		local wnd_text_shadow = xml:InitTextWnd("indicators_text", wnd_container)
 		wnd_text_shadow:SetWndPos(vector2():set(text_pos_x, text_pos_y))
 		wnd_text_shadow:SetWndSize(vector2():set(text_width, text_height))
-		wnd_text_shadow:SetText(v.text_func())
+		wnd_text_shadow:SetText(v.text_func() or "")
 		wnd_text_shadow:SetWndPos(vector2():set(wnd_text_shadow:GetWndPos().x + 1, wnd_text_shadow:GetWndPos().y + 1))
 		wnd_text_shadow:SetTextColor(GetARGB(255, 20, 20, 20))
 		wnd_text_shadow:SetFont(self.font)
@@ -186,7 +194,7 @@ function PBAUI:UpdateLayout()
 		local wnd_text = xml:InitTextWnd("indicators_text", wnd_container)
 		wnd_text:SetWndPos(vector2():set(text_pos_x, text_pos_y))
 		wnd_text:SetWndSize(vector2():set(text_width, text_height))
-		wnd_text:SetText(v.text_func())
+		wnd_text:SetText(v.text_func() or "")
 		wnd_text:SetFont(self.font)
 		wnd_text:SetTextAlignment(self.text_alignment)
 
@@ -227,7 +235,9 @@ AddScriptCallback("pbaui_on_indicator_ui_init")
 -- Key - unique key for indicator
 -- Section - section for artefact
 -- text_func - Function for displaying text
--- validate_func - Function for checking, should the indicator display or not. Return false will remove the indicator 
+-- validate_func - Function for checking, should the indicator display or not.
+-- icon_layers - table of icons that will be layered on top of section, each table entry is a table that can contain either section or icon field
+-- Return false will remove the indicator 
 function PBAUI:AddIndicator(key, override, section, text_func, validate_func, icon_layers)
 	if self.indicators[key] then
 		if not override then return end
@@ -370,8 +380,8 @@ function PBAUI:Update(force)
 			end
 		else
 			if self.display_text == 1 then
-				v.wnd.text:SetText(v.text_func())
-				v.wnd.text_shadow:SetText(v.text_func())
+				v.wnd.text:SetText(v.text_func() or "")
+				v.wnd.text_shadow:SetText(v.text_func() or "")
 			end
 		end
 	end

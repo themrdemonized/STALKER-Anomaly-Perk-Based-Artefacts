@@ -1,0 +1,39 @@
+-- Generate a random table from another table with custom seed and next/prev functions
+-- Input table must be an array 
+function FixedRandomTable(values, seed, amount)
+	local _self = {}
+	_self.pointer = 0
+	_self.seed = seed or os.time()
+	amount = amount or #values
+
+	_self.t = {}
+	math.randomseed(seed)
+	for i = 1, amount do
+		_self.t[i] = values[math.random(#values)]
+	end
+	math.randomseed(os.time())
+
+	_self.next = function(self)
+		print_r(self.t)
+		-- Init first value
+		if self.pointer == 0 then
+			self.pointer = 1
+			return self.t[1]
+		end
+		self.pointer = self.pointer == #self.t and 1 or (self.pointer + 1)
+		return self.t[self.pointer]
+	end
+
+	_self.prev = function(self)
+		-- Init first value
+		if self.pointer == 0 then
+			self.pointer = 1
+			return self.t[1]
+		end
+		self.pointer = self.pointer == 1 and #self.t or (self.pointer - 1)
+		return self.t[self.pointer]
+	end
+
+	return _self
+end
+
