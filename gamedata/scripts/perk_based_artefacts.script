@@ -837,16 +837,17 @@ end
 
 -- Stored UI functions
 ui_funcs = {}
-function add_ui_func(key, override, section, text_func, validate_func)
+function add_ui_func(key, override, section, text_func, validate_func, icon_layers)
 	if ui_funcs[key] and not override then return end
 	local ui = perk_based_artefacts_ui_effects.GUI
-	ui:AddIndicator(key, override, section, text_func, validate_func)
+	ui:AddIndicator(key, override, section, text_func, validate_func, icon_layers)
 	ui_funcs[key] = {
 		key = key,
 		override = override,
 		section = section,
 		text_func = text_func,
-		validate_func = validate_func
+		validate_func = validate_func,
+		icon_layers = icon_layers,
 	}
 end
 
@@ -2135,9 +2136,8 @@ artefact_props = { -- Special props of artefacts that are used in processing
 		end,
 		psy_health_penalty_coeff = 0.15,
 		psy_health_restore_coeff = 0.07,
-		hit_buff_coeff = 0.025,
-		critical_hit_buff_coeff = 0.075,
-		artefact_count_coeff = 0.025,
+		hit_buff_coeff = 0.05,
+		critical_hit_buff_coeff = 0.15,
 		stacks = 0,
 		ui_text_func = function(self)
 			return ("E:%s"):format(self.stacks)
@@ -2164,8 +2164,17 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			trace("Spike, Final Damage %s, bonus %s", s_hit.power, self.damage_multiplier)
 			play_sound_on_actor("perk_based_artefacts\\quake3_hitsound", 0.75, 1 + (self.damage_multiplier - 1) * 0.5)
 			
-			self.stacks = self.stacks + (is_critical_bone(npc:clsid(), bone_id) and 2 or 1) * artefact_count
-			self.damage_multiplier = self.damage_multiplier + (is_critical_bone(npc:clsid(), bone_id) and self.critical_hit_buff_coeff + self.artefact_count_coeff * artefact_count or self.hit_buff_coeff + self.artefact_count_coeff * artefact_count)
+			self.stacks = self.stacks + (
+				is_critical_bone(npc:clsid(), bone_id)
+				and 3 * artefact_count
+				or 1 * artefact_count
+			)
+			self.damage_multiplier = self.damage_multiplier + (
+				is_critical_bone(npc:clsid(), bone_id)
+				and self.critical_hit_buff_coeff * artefact_count
+				or self.hit_buff_coeff * artefact_count
+			)
+
 			change_psy_health((self.damage_multiplier - 1) * self.psy_health_restore_coeff)
 
 			add_ui_func(
@@ -2572,6 +2581,13 @@ artefact_props = { -- Special props of artefacts that are used in processing
 				end
 			end)
 		end,
+		effect_time_trigger = 0,
+		ui_text_func = function(self)
+			return ("T:%s"):format(ceil(self.effect_time_trigger - time_elapsed))
+		end,
+		ui_validate_func = function(self)
+			return time_elapsed < self.effect_time_trigger
+		end,
 		activate_effect = function(self, actor, food_section)
 			if self[food_section] then
 				trace("Moss, Eating food %s", food_section)
@@ -2588,6 +2604,20 @@ artefact_props = { -- Special props of artefacts that are used in processing
 				add_simple_timed_effect(60, nil, function()
 					self:reset()
 				end, "af_moh")
+
+				self.effect_time_trigger = time_elapsed + 60
+				add_ui_func(
+					"af_moh",
+					true,
+					"af_moh",
+					function() return perk_based_artefacts.artefact_props.af_moh:ui_text_func() end,
+					function() return perk_based_artefacts.artefact_props.af_moh:ui_validate_func() end,
+					{
+						{
+							section = food_section,
+						}
+					}
+				)
 			end
 		end
 	},
@@ -3131,6 +3161,15 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			math.randomseed(os.time())
 		end
 	},
+	af_grapes = {
+		status_effect_key = "af_grapes_effect",
+		ui_text_func = function(self)
+			return ("T:%s"):format(ceil(get_status_effect_remaining_time(self.status_effect_key)))
+		end,
+		ui_validate_func = function(self)
+			return check_status_effect(self.status_effect_key)
+		end,
+	},
 	af_lucifer = {
 		allow_artefacts = (function()
 			local t = {}
@@ -3617,7 +3656,7 @@ artefact_on_update_functions = {
 		else
 			local normal_condition = normalize(condition, 0, 0.5) - 1
 			actor:change_power(power_boost * normal_condition * 0.5)
-			if condition < 0.4 then
+			if condition < 0.35 then
 				actor:change_health(health_boost * normal_condition * 0.27)
 			end
 			if condition < 0.0001 then
@@ -3864,6 +3903,16 @@ artefact_on_item_use_functions = {
 				db.actor:change_health(satiety_increase)
 				_G.printf("health increased by %s", satiety_increase)
 			end, {satiety_increase})
+
+			local af_grapes = artefact_props.af_grapes
+			add_status_effect(5 * artefact_count, nil, af_grapes.status_effect_key)
+			add_ui_func(
+				af_grapes.status_effect_key,
+				true,
+				"af_grapes",
+				function() return perk_based_artefacts.artefact_props.af_grapes:ui_text_func() end,
+				function() return perk_based_artefacts.artefact_props.af_grapes:ui_validate_func() end
+			)
 		end
 	end,
 

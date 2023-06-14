@@ -17,6 +17,8 @@ function PBAUI:__init() super()
 	self.alignment = ui_mcm.get("perk_based_artefacts/alignment")
 	self.text_alignment = ui_mcm.get("perk_based_artefacts/text_alignment")
 	self.icon_size = ui_mcm.get("perk_based_artefacts/icon_size")
+	self.icon_layer_size = 18
+	self.icon_layer_margin = 1
 	self.font_list = {
 		GetFontSmall(),
 		GetFontMedium(),
@@ -128,6 +130,45 @@ function PBAUI:UpdateLayout()
         wnd_icon:SetWndPos(vector2():set(icon_pos_x, icon_pos_y))
 		wnd_icon:SetWndSize(vector2():set(icon_width, icon_height))
 
+		-- Icon layers have right bottom alignment
+		local icon_layer_hor = 1
+		local icon_layer_vert = 1
+		local icon_layer_hor_max = math.ceil(self.indicator_width / (self.icon_layer_margin + self.icon_layer_size))
+		local icon_layers = {}
+		for i, v1 in ipairs(v.icon_layers) do
+			local icon_layer_size = self:GetUIParam("icon_layer_size") * self.icon_size
+			local icon_layer_margin = self:GetUIParam("icon_layer_margin") * self.icon_size
+			local icon_layer_width = icon_layer_size
+			local icon_layer_height = icon_layer_size * (4/3)
+			local icon_layer_pos_x = icon_pos_x + icon_width - (icon_layer_hor * (icon_layer_margin + icon_layer_width)) 
+			local icon_layer_pos_y = icon_pos_y + icon_height - (icon_layer_vert * (icon_layer_margin + icon_layer_height))
+
+			icon_layer_hor = icon_layer_hor + 1
+			if icon_layer_hor >= icon_layer_hor_max then
+				icon_layer_vert = icon_layer_vert + 1
+				icon_layer_hor = 1
+			end
+
+			local wnd_icon_shadow = xml:InitStatic("indicators:static", wnd_container)
+			wnd_icon_shadow:InitTexture(utils_xml.get_icons_texture(v1.section))
+	        wnd_icon_shadow:SetTextureRect(Frect():set(utils_xml.get_item_axis(v1.section, nil, true)))
+	        wnd_icon_shadow:SetStretchTexture(true)
+	        wnd_icon_shadow:SetTextureColor(GetARGB(255, 20, 20, 20))
+	        wnd_icon_shadow:SetWndPos(vector2():set(icon_layer_pos_x + 1, icon_layer_pos_y + 1))
+			wnd_icon_shadow:SetWndSize(vector2():set(icon_layer_width, icon_layer_height))
+
+			local wnd_icon = xml:InitStatic("indicators:static", wnd_container)
+			wnd_icon:InitTexture(utils_xml.get_icons_texture(v1.section))
+	        wnd_icon:SetTextureRect(Frect():set(utils_xml.get_item_axis(v1.section, nil, true)))
+	        wnd_icon:SetStretchTexture(true)
+	        wnd_icon:SetWndPos(vector2():set(icon_layer_pos_x, icon_layer_pos_y))
+			wnd_icon:SetWndSize(vector2():set(icon_layer_width, icon_layer_height))
+			icon_layers[#icon_layers + 1] = {
+				wnd_icon = wnd_icon,
+				wnd_icon_shadow = wnd_icon_shadow,
+			}
+		end
+
 		local text_width = self:GetUIParam("indicator_width")
 		local text_height = self:GetUIParam("indicator_height") / 2 - self.text_margin
 		local text_pos_x = 0
@@ -161,6 +202,7 @@ function PBAUI:UpdateLayout()
 		indicators[k].wnd.icon_shadow = wnd_icon_shadow
 		indicators[k].wnd.text = wnd_text
 		indicators[k].wnd.text_shadow = wnd_text_shadow
+		indicators[k].wnd.icon_layers = icon_layers
 		indicators[k].wnd.container_attached = true
 	end
 
@@ -186,7 +228,7 @@ AddScriptCallback("pbaui_on_indicator_ui_init")
 -- Section - section for artefact
 -- text_func - Function for displaying text
 -- validate_func - Function for checking, should the indicator display or not. Return false will remove the indicator 
-function PBAUI:AddIndicator(key, override, section, text_func, validate_func)
+function PBAUI:AddIndicator(key, override, section, text_func, validate_func, icon_layers)
 	if self.indicators[key] then
 		if not override then return end
 		self:SafeDetach(self.indicators[key])
@@ -196,6 +238,7 @@ function PBAUI:AddIndicator(key, override, section, text_func, validate_func)
 		section = section,
 		text_func = text_func,
 		validate_func = validate_func,
+		icon_layers = icon_layers or {},
 		wnd = {}
 	}
 
@@ -251,6 +294,16 @@ function PBAUI:PopulateTestIndicators()
 			section = artes[math.random(#artes)],
 			text_func = function() return "C:1200\\nE:100" end,
 			validate_func = function() return true end,
+			icon_layers = (function()
+				local t = {}
+				for i = 1, math.random(4) do
+					t[#t + 1] = {
+						section = artes[math.random(#artes)]
+					}
+				end
+				return t
+			end)()
+			,
 			wnd = {}
 		}
 	end
