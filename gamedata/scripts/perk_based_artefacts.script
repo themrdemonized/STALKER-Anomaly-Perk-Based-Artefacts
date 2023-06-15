@@ -4866,8 +4866,8 @@ artefact_binder_on_update_functions = {
 			binder.max_distance_from_actor_sqr = 80 ^ 2
 			binder.take_distance_sqr = 1.6 ^ 2
 
-			binder.homing_speed = 0.5
-			binder.speed = 130
+			binder.homing_speed = 0.7
+			binder.speed = 120
 			binder.damage = 0.55
 
 			binder.invalid_try_max = 25
@@ -4926,6 +4926,10 @@ artefact_binder_on_update_functions = {
 				if binder.return_home then
 					local distance = obj:position():distance_to_sqr(binder.get_target_pos(db.actor))
 					if distance < binder.take_distance_sqr then
+						-- game.play_hud_motion(1, "af_medallion_grenade_hud", "anm_catch", true, 1)
+						game.play_hud_motion(1, "af_medallion_grenade_hud", "anm_hands_catch", true, 1)
+						-- game.play_hud_anm("camera_effects\\weapon\\barry_af_medallion_hands_catch.anm", 0, 1, 1, false)
+						level.add_cam_effector("camera_effects\\weapon\\barry_af_medallion_hands_catch.anm", 8539, false, "", 0, false)
 						db.actor:take_item(obj)
 					end
 					return

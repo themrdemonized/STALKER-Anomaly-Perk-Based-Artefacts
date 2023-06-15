@@ -18,7 +18,12 @@ local function load_defaults()
 	end
 	return t
 end
-local settings = load_defaults()
+
+local settings
+function load_settings()
+	settings = load_defaults()
+	return settings
+end
 
 local function get_artefact_from_container(sec)
 	local sec = sec
@@ -104,6 +109,7 @@ end
 -- register callbacks for saving/loading
 function on_game_start()
     RegisterScriptCallback("save_state", save_state)
+    RegisterScriptCallback("load_state", load_settings)
     RegisterScriptCallback("load_state", load_state)
     RegisterScriptCallback("actor_on_first_update", actor_on_first_update)
 end
