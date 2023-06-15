@@ -108,16 +108,16 @@ eat_sleepiness = 0.035
         script_binding              = perk_based_artefacts_af_medallion_binder.bind
 
 [af_medallion_grenade_hud]:hud_base
-        item_visual                 = anomaly_weapons\wpn_grenades\wpn_rgd5_hud.ogf
+        item_visual                 = anomaly_weapons\af_medallion\af_medallion_hud.ogf
         attach_place_idx            = 0
         
-        item_position               = -0.001, 0.004, 0
-        item_orientation            = 18.5, 1.5, 0
+        item_position               = 0, 0, 0
+        item_orientation            = 0, 0, 0
         
-        hands_position              = -0.061, -0.16, 0.1
-        hands_position_16x9         = -0.061, -0.16, 0.1
-        hands_orientation           = -0.5, 1.0, -2.0
-        hands_orientation_16x9      = -0.5, 1.0, -2.0
+        hands_orientation                = -0.5, 1, -2
+        hands_orientation_16x9           = -0.5, 1, -2
+        hands_position                   = -0.00595, -0.022415, -0.052184
+        hands_position_16x9              = -0.00595, -0.022415, -0.052184
         
         aim_hud_offset_pos          = 0, 0, 0
         aim_hud_offset_rot          = 0, 0, 0
@@ -128,20 +128,21 @@ eat_sleepiness = 0.035
         lean_hud_offset_pos         = 0, 0, 0
         lean_hud_offset_rot         = 0, 0, 0
         
-        anm_hide                    = lancew_rgd5_holster
-        anm_idle                    = lancew_rgd5_idle
-        anm_idle_moving             = lancew_rgd5_moving, moving
-        anm_idle_sprint             = lancew_rgd5_sprint, sprint
-        anm_show                    = lancew_rgd5_draw
-        anm_throw                   = lancew_f1_throw
-        anm_throw_begin             = lancew_rgd5_throw_begin, begin
-        anm_throw_idle              = lancew_rgd5_throw_idle, throw_idle
+        anm_hide                    = barry_af_holster_hands, af_holster
+        anm_idle                    = barry_af_idle_hands, af_idle
+        anm_idle_moving             = barry_af_walk_hands, af_walk
+        anm_idle_sprint             = barry_af_sprint_hands, af_sprint
+        anm_show                    = barry_af_draw_hands_alt, af_draw_alt
+        anm_throw                   = barry_af_medallion_throw_hands_1, af_end_throw
+        anm_throw_begin             = barry_af_throw_start_hands, af_throw_start
+        anm_throw_idle              = barry_af_throw_idle_hands, throw_idle, af_throw_idle
+        anm_bore                    = barry_af_inspect_hands, af_inspect
         
-        fire_bone                   = wpn_body
+        fire_bone                   = link
         fire_point                  = 0, 0, 0
         
         third_person_throw_point_offset = -0.05, 0.848, 0.706
         throw_dir                   = 0, 0, 1
         throw_point                 = 0, 0.4, 0.3
  
-		freelook_z_offset_mul		= 0.15
+	freelook_z_offset_mul		= 0.15
