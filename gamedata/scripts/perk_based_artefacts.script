@@ -1859,7 +1859,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 		sound_stop = get_safe_sound_object("perk_based_artefacts\\CTIMSTOP"),
 		saved_volume_snd = 1,
 		saved_volume_music = 1,
-		degradation_rate = 0.00045,
+		degradation_rate = 0.00036,
 		add_pp_effector = function(self)
 			add_pp_effector_const_smooth("phantom_star.ppe", c_id_ppe.phantom_star, true, 0.7)
 			self.sound_stop:stop()
@@ -2420,9 +2420,26 @@ artefact_props = { -- Special props of artefacts that are used in processing
 
 			add_speed(self.speed_penalty_name, self.speed_penalty[self.protection_stacks], false, true)
 			add_speed(self.speed_penalty_name, self.speed_penalty[self.protection_stacks], true, true)
+
+			add_ui_func(
+				"af_cocoon",
+				false,
+				"af_cocoon",
+				function() return perk_based_artefacts.artefact_props.af_cocoon:ui_text_func() end,
+				function() return perk_based_artefacts.artefact_props.af_cocoon:ui_validate_func() end
+			)
+
+			self.effect_time_trigger = time_elapsed + 10
 			add_simple_timed_effect(10, nil, function()
 				self:stack_reset()
 			end, "af_cocoon_speed_penalty")
+		end,
+		effect_time_trigger = 0,
+		ui_text_func = function(self)
+			return ("E:%s\\nT:%s"):format(self.protection_stacks, ceil(self.effect_time_trigger - time_elapsed))
+		end,
+		ui_validate_func = function(self)
+			return self.protection_stacks > 0
 		end
 	},
 	-- Moss, Perk: Culinary Hyperversity

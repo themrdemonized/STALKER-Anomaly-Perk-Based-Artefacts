@@ -1,0 +1,83 @@
+-- Misc sounds for PBA
+anims_to_snd = {
+	anm_throw_idle = {
+		snd = "snd_throw_idle",
+		loop = true,
+		force_stop = true,
+		fade_out_time = 0.8,
+		volume = 1,
+	},
+}
+
+valid_sec = {
+	af_medallion_grenade = true,
+}
+
+local current_sound = {}
+
+function play_current_sound(anim_name, item)
+	if not anims_to_snd[anim_name] then return end
+
+	local snd_table = anims_to_snd[anim_name]
+	local snd = SYS_GetParam(0, item:section(), snd_table.snd)
+	if not snd then return end
+
+	local snd_obj = xr_sound.get_safe_sound_object(snd)
+	if not snd_obj then return end
+
+	current_sound.type = anims_to_snd[anim_name]
+	current_sound.type.anim_name = anim_name
+	current_sound.sounds = {}
+	table.insert(current_sound.sounds, snd_obj)
+
+	for i, v in ipairs(current_sound.sounds) do
+		v:play(db.actor, 0, snd_table.loop and sound_object.looped + sound_object.s2d or sound_object.s2d)
+		v.volume = snd_table.volume or 1
+		v.frequency = snd_table.frequency or 1
+	end
+end
+
+function stop_current_sound()
+	if is_not_empty(current_sound) then
+		if current_sound.type.loop or current_sound.type.force_stop then
+			for i, v in ipairs(current_sound.sounds) do
+				if not current_sound.type.fade_out_time or current_sound.type.fade_out_time == 0 then
+					v:stop()
+				else
+					local time_start = time_global()
+					local time_end = time_global() + current_sound.type.fade_out_time * 1000
+					local volume_start = v.volume
+					AddUniqueCall(function()
+						local progress = 1 - math.min(1, normalize(time_global(), time_start, time_end))
+						v.volume = volume_start * progress
+						if progress <= 0 then
+							v:stop()
+							return true
+						end
+					end)
+				end
+			end
+		end
+	end
+	empty_table(current_sound)
+end
+
+function actor_on_hud_animation_play(anm_table, item)
+	--local item = db.actor:active_item()
+	if not (item and valid_sec[item:section()]) then
+		stop_current_sound()
+		return
+	end
+	
+	stop_current_sound()
+
+	local anim_name = anm_table.anm_name
+	play_current_sound(anim_name, item)
+end
+
+function on_game_start()
+	RegisterScriptCallback("actor_on_item_drop", stop_current_sound)
+	RegisterScriptCallback("actor_on_before_death", stop_current_sound)
+	RegisterScriptCallback("actor_on_net_destroy", stop_current_sound)
+	RegisterScriptCallback("actor_on_hud_animation_play", actor_on_hud_animation_play)
+end 

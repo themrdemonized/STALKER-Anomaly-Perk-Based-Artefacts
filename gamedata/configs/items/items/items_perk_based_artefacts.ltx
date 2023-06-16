@@ -23,8 +23,12 @@ eat_sleepiness = -0.02
 [moon_sleep_increase]
 eat_sleepiness = 0.035
 
+[af_medallion_grenade_sounds]
+snd_checkout                            = perk_based_artefacts\FUNGSTART
+snd_throw_idle                          = perk_based_artefacts\FUNGFLY
+
 ; Medallion grenade item
-[af_medallion_grenade]:identity_immunities,weapon_probability,default_weapon_params,af_medallion
+[af_medallion_grenade]:identity_immunities,weapon_probability,default_weapon_params,af_medallion,af_medallion_grenade_sounds
         GroupControlSection         = spawn_group
         discovery_dependency        =
         $prefetch                   = 128
