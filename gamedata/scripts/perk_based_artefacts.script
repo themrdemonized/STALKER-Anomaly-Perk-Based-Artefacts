@@ -839,8 +839,6 @@ end
 ui_funcs = {}
 function add_ui_func(key, override, section, text_func, validate_func, icon_layers)
 	if ui_funcs[key] and not override then return end
-	local ui = perk_based_artefacts_ui_effects.GUI
-	ui:AddIndicator(key, override, section, text_func, validate_func, icon_layers)
 	ui_funcs[key] = {
 		key = key,
 		override = override,
@@ -849,6 +847,11 @@ function add_ui_func(key, override, section, text_func, validate_func, icon_laye
 		validate_func = validate_func,
 		icon_layers = icon_layers,
 	}
+
+	local ui = perk_based_artefacts_ui_effects.GUI
+	if not ui then return end
+	
+	ui:AddIndicator(key, override, section, text_func, validate_func, icon_layers)
 end
 
 function remove_ui_func(key)
@@ -1839,7 +1842,14 @@ artefact_props = { -- Special props of artefacts that are used in processing
 				flags.result = false
 				return
 			end
-		end
+		end,
+		effect_time_trigger = 0,
+		ui_text_func = function(self)
+			return ("T:%s"):format(ceil(self.effect_time_trigger - time_elapsed))
+		end,
+		ui_validate_func = function(self)
+			return time_elapsed < self.effect_time_trigger
+		end,
 	},
 	af_star_phantom = {
 		weapon_hidden = false, -- Check for weapon is hidden
@@ -1849,6 +1859,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 		sound_stop = get_safe_sound_object("perk_based_artefacts\\CTIMSTOP"),
 		saved_volume_snd = 1,
 		saved_volume_music = 1,
+		degradation_rate = 0.00045,
 		add_pp_effector = function(self)
 			add_pp_effector_const_smooth("phantom_star.ppe", c_id_ppe.phantom_star, true, 0.7)
 			self.sound_stop:stop()
@@ -1905,7 +1916,25 @@ artefact_props = { -- Special props of artefacts that are used in processing
 				flags.result = false
 				return
 			end
-		end
+		end,
+		used_artys = nil,
+		ui_text_func = function(self)
+			if is_empty(self.used_artys) then return end
+
+			local combined_condition = 0
+			for _, id in ipairs(self.used_artys) do
+				local obj = get_object_by_id(id)
+				if obj then
+					combined_condition = combined_condition + obj:condition() - 0.01
+				end
+			end
+
+			local time = ceil(combined_condition / (self.degradation_rate * 10))
+			return ("T:%s"):format(time)
+		end,
+		ui_validate_func = function(self)
+			return is_not_empty(self.used_artys)
+		end,
 	},
 	af_dragon_eye = {
 		trigger = false,
@@ -3658,7 +3687,7 @@ artefact_on_update_functions = {
 		for k, v in pairs(artefact_ids) do
 			local obj = get_object_by_id(v)
 			if obj then
-				obj:set_condition(obj:condition() - 0.00037 / artefact_count)
+				obj:set_condition(obj:condition() - af_star_phantom.degradation_rate / artefact_count)
 				if obj:condition() < 0.01 then
 					alife_release(obj)
 					CreateTimeEvent("refresh_artefacts", "refresh_artefacts", 0.15, refresh_artefacts_time_event_func, true)
@@ -4080,6 +4109,7 @@ artefact_on_before_death_functions = {
 			trace("unregistering callback")
 			UnregisterScriptCallback("on_enemy_eval", af_serofim.ignore_enemy_on_down_function)	
 			ironman_patch()
+
 			add_simple_timed_effect(5, revive, function()
 				remove_pp_effector(c_id_ppe.blur)
 				remove_pp_effector(c_id_ppe.snd_shock)
@@ -4089,6 +4119,16 @@ artefact_on_before_death_functions = {
 				ironman_patch()
 				actor_is_dying = false
 			end)
+
+			af_serofim.effect_time_trigger = time_elapsed + 5
+			add_ui_func(
+				"af_serofim",
+				false,
+				"af_serofim",
+				function() return perk_based_artefacts.artefact_props.af_serofim:ui_text_func() end,
+				function() return perk_based_artefacts.artefact_props.af_serofim:ui_validate_func() end
+			)
+
 			return true
 		end)
 		if artefact_ids[1] then
@@ -4707,13 +4747,24 @@ artefact_on_equip_functions = {
 		end
 		af_star_phantom:add_pp_effector()
 
+		af_star_phantom.used_artys = artefact_ids
+		add_ui_func(
+			"af_star_phantom",
+			true,
+			"af_star_phantom",
+			function() return perk_based_artefacts.artefact_props.af_star_phantom:ui_text_func() end,
+			function() return perk_based_artefacts.artefact_props.af_star_phantom:ui_validate_func() end
+		)
+
 		RemoveTimeEvent("af_star_phantom_on_enemy_eval_unreg", 0)
 		register_callback("on_enemy_eval", af_star_phantom.ignore_enemy_function, nil, "af_star_phantom")
 		register_on_equip_callback("actor_on_first_update", nil, function()
 			af_star_phantom:restore_weapon()
 			af_star_phantom:remove_pp_effector()
+			remove_ui_func("af_star_phantom")
 			CreateTimeEvent("af_star_phantom_on_enemy_eval_unreg", 0, 1.5, function()
 				unregister_callback("af_star_phantom")
+				return true
 			end)
 		end, "af_star_phantom")
 	end,
@@ -4926,10 +4977,11 @@ artefact_binder_on_update_functions = {
 				if binder.return_home then
 					local distance = obj:position():distance_to_sqr(binder.get_target_pos(db.actor))
 					if distance < binder.take_distance_sqr then
-						-- game.play_hud_motion(1, "af_medallion_grenade_hud", "anm_catch", true, 1)
-						game.play_hud_motion(1, "af_medallion_grenade_hud", "anm_hands_catch", true, 1)
-						-- game.play_hud_anm("camera_effects\\weapon\\barry_af_medallion_hands_catch.anm", 0, 1, 1, false)
-						level.add_cam_effector("camera_effects\\weapon\\barry_af_medallion_hands_catch.anm", 8539, false, "", 0, false)
+
+						-- Play animation
+						-- game.play_hud_motion(1, "af_medallion_grenade_hud", "anm_hands_catch", true, 1)
+						-- level.add_cam_effector("camera_effects\\weapon\\barry_af_medallion_hands_catch.anm", 8539, false, "", 0, false)
+
 						db.actor:take_item(obj)
 					end
 					return
