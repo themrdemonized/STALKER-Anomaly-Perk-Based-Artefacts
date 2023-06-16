@@ -2157,7 +2157,15 @@ artefact_props = { -- Special props of artefacts that are used in processing
 				
 			}
 		},
-		monsters = {} -- Generated table to check if current monster is allowed to be kick
+		monsters = {}, -- Generated table to check if current monster is allowed to be kick
+		cooldown_name = "af_ball",
+		scan_radius = 2.7,
+		ui_text_func = function(self)
+			return ("C:%s"):format(ceil(cooldowns[self.cooldown_name] - time_elapsed))
+		end,
+		ui_validate_func = function(self)
+			return not check_cooldown(self.cooldown_name)
+		end,	
 	},
 	af_spaika = {
 		weapon_shot = false,
@@ -4345,7 +4353,7 @@ artefact_on_before_hit_functions = {
 			return true
 		end
 
-		for i = 1, artefact_count do
+		for i = 1, min(5, artefact_count) do
 			CreateTimeEvent("af_cell" .. i, "af_cell" .. i, random_float(0.15, 0.3) * i, rad_sound)
 		end
 	end,
@@ -4795,7 +4803,7 @@ artefact_on_equip_functions = {
 	af_ball = function(actor, artefact_count, artefact_ids, artefact_names)
 		local af_ball = artefact_props.af_ball
 		empty_table(af_ball.monsters)
-		for i = 1, artefact_count do
+		for i = 1, min(5, artefact_count) do
 			for j, monster in ipairs(af_ball.monster_tiers[i]) do
 				af_ball.monsters[monster] = true
 			end
@@ -4882,6 +4890,138 @@ artefact_on_hud_animation_play_functions = {
 -- Functions for artefacts which provide perk bonuses for bullet impacts
 artefact_bullet_on_impact_functions = {
 
+}
+
+-- Functions for artefacts on key press
+artefact_on_key_press_functions = {
+	-- Ball
+	af_ball = function(actor, artefact_count, artefact_ids, artefact_names, key)
+		local af_ball = artefact_props.af_ball
+		if not check_cooldown(af_ball.cooldown_name) then return end
+
+		local bind = dik_to_bind(key)
+		if (bind == key_bindings.kUSE) then
+			local distance = math.huge
+			local target
+			level.iterate_nearest(actor:position(), af_ball.scan_radius, function(obj)
+				if not 
+				(
+					(
+						IsMonster(obj) and 
+						(
+							af_ball.monsters[obj:clsid()] or af_ball.monsters[SYS_GetParam(2, obj:section(), "kind", "definitely_not_found_kind")]
+						)
+						or IsStalker(obj) and xr_combat_ignore.fighting_with_actor_npcs[obj:id()]
+					)
+					and obj:alive() and obj:position():distance_to(actor:position()) <= af_ball.scan_radius
+				) then return end
+
+				local pos = obj:position()
+
+				-- Visibility check, position or obj bones
+				local visibility_checks = {
+					function()
+						local see = game.world2ui(obj:position())
+						return (see.x > 0 and see.x < 1024 and see.y > 0 and see.y < 1024)
+					end,
+					function()
+						local see = game.world2ui(utils_obj.safe_bone_pos(obj, "bip01_spine"))
+						return (see.x > 0 and see.x < 1024 and see.y > 0 and see.y < 1024)
+					end,
+					function()
+						local see = game.world2ui(utils_obj.safe_bone_pos(obj, "bip01_head"))
+						return (see.x > 0 and see.x < 1024 and see.y > 0 and see.y < 1024)
+					end,
+				}
+				local see = false
+				for i, v in ipairs(visibility_checks) do
+					if v() then
+						see = true
+						break
+					end
+				end
+				if not see then return end
+
+				-- Obstacle check
+				local ray = demonized_geometry_ray.geometry_ray({
+					ray_range = 200,
+					ignore_object = obj,
+					flags = 3,
+				})
+				local res = ray:get(pos, utils_obj.safe_bone_pos(actor, "bip01_spine"):sub(pos):normalize())
+				if not (res.result and res.result.object and res.result.object:id() == AC_ID) then return end
+
+				local dist = pos:distance_to_sqr(actor:position())
+				if dist < distance then
+					distance = dist
+					target = obj
+				end
+			end)
+			if not target then return end
+
+			local pos = actor:position()
+			local h = hit()
+			local direction = device().cam_dir
+			local magnitude = artefact_count * 60
+			direction.x = direction.x * 1000 * magnitude
+			direction.y = random_float(0.1, 0.2) * 5000 * magnitude
+			direction.z = direction.z * 1000 * magnitude
+			h.power = 10000
+			h.direction = direction
+			h.bone = "bip01_spine"
+			h.draftsman = actor
+			h.impulse = 10000	--6000
+			h.type = hit.wound
+			target:hit(h)
+
+			local obj_id = target:id()
+
+			local function fly(obj_id)
+				local monster = get_object_by_id(obj_id)
+				if monster and not monster:alive() and monster:get_physics_shell() then
+					trace("monster dead, physics shell works")
+					monster:get_physics_shell():apply_force(direction.x, direction.y, direction.z)
+					play_sound_on_actor("perk_based_artefacts\\BIGGIB0" .. random(6), 1, random_float(0.9, 1.0))
+					local position = monster:position()
+					position.y = position.y + 1
+
+					if artefact_count < 2 then
+						play_sound_on_actor("perk_based_artefacts\\BONSNAP" .. random(8), 0.1 + 0.2 * (artefact_count - 1), random_float(0.9, 1.0))
+						local gibs = particles_object("artefact\\effects\\af_idle_dist")
+						if gibs and not gibs:playing() then
+							gibs:play_at_pos(position)
+						end
+					elseif artefact_count < 4 then
+						play_sound_on_actor("perk_based_artefacts\\BONSNAP" .. random(8), 0.7, random_float(0.9, 1.0))
+						local gibs = particles_object("artefact\\artefact_mincer")
+						if gibs and not gibs:playing() then
+							gibs:play_at_pos(position)
+						end
+					else
+						play_sound_on_actor("perk_based_artefacts\\GNTEAR0" .. random(2), 0.75, random_float(0.9, 1.0))
+						local gibs = particles_object("artefact\\artefact_gravi")
+						if gibs and not gibs:playing() then
+							gibs:play_at_pos(position)
+						end
+					end
+
+					return true
+				end
+				trace("monster not dead yet")
+				return false
+			end
+			CreateTimeEvent("af_bat_fly" .. obj_id, obj_id, 0, fly, obj_id)
+
+			add_cooldown(IsStalker(target) and 5 or (1 + 1 * artefact_count), af_ball.cooldown_name)
+			add_ui_func(
+				"af_ball",
+				false,
+				"af_ball",
+				function() return perk_based_artefacts.artefact_props.af_ball:ui_text_func() end,
+				function() return perk_based_artefacts.artefact_props.af_ball:ui_validate_func() end
+			)
+		end
+	end,
 }
 
 artefact_binder_on_update_functions = {
@@ -5308,93 +5448,6 @@ add_functor("pba_lucifer", lucifer_sacrifice_func.check_lucifer_condition, lucif
 
 -------------------------------------------------------------------------
 -- Special monkey patches for some artefacts to make their effects work
--- Patch for Ball for kicking monsters
-local use_kick = bind_monster.generic_object_binder.use_kick
-bind_monster.generic_object_binder.use_kick = function(self, obj, who)
-	if who:id() ~= AC_ID then
-		use_kick(self, obj, who)
-		return
-	end
-
-	if not artefacts.af_ball then
-		use_kick(self, obj, who)
-		return
-	end
-
-	if not (obj:alive() and check_cooldown("af_ball")) then return end
-
-	local actor = db.actor
-	local pos = actor:position()
-	local h = hit()
-	local direction = device().cam_dir
-	local artefact_count = artefacts.af_ball.count
-	local magnitude = artefact_count * 50
-	direction.x = direction.x * 1000 * magnitude
-	direction.y = random_float(0.1, 0.2) * 5000 * magnitude
-	direction.z = direction.z * 1000 * magnitude
-	h.power = 10000
-	h.direction = direction
-	h.bone = "bip01_spine"
-	h.draftsman = obj
-	h.impulse = 10000	--6000
-	h.type = hit.wound
-	obj:hit(h)
-
-	local obj_id = obj:id()
-
-	local function fly(obj_id)
-		local monster = get_object_by_id(obj_id)
-		if monster and not monster:alive() and monster:get_physics_shell() then
-			trace("monster dead, physics shell works")
-			monster:get_physics_shell():apply_force(direction.x, direction.y, direction.z)
-			play_sound_on_actor("perk_based_artefacts\\BIGGIB0" .. random(6), 1, random_float(0.9, 1.0))
-			local position = monster:position()
-			position.y = position.y + 1
-
-			if artefact_count < 2 then
-				play_sound_on_actor("perk_based_artefacts\\BONSNAP" .. random(8), 0.1 + 0.2 * (artefact_count - 1), random_float(0.9, 1.0))
-				local gibs = particles_object("artefact\\effects\\af_idle_dist")
-				if gibs and not gibs:playing() then
-					gibs:play_at_pos(position)
-				end
-			elseif artefact_count < 4 then
-				play_sound_on_actor("perk_based_artefacts\\BONSNAP" .. random(8), 0.7, random_float(0.9, 1.0))
-				local gibs = particles_object("artefact\\artefact_mincer")
-				if gibs and not gibs:playing() then
-					gibs:play_at_pos(position)
-				end
-			else
-				play_sound_on_actor("perk_based_artefacts\\GNTEAR0" .. random(2), 0.75, random_float(0.9, 1.0))
-				local gibs = particles_object("artefact\\artefact_gravi")
-				if gibs and not gibs:playing() then
-					gibs:play_at_pos(position)
-				end
-			end
-
-			return true
-		end
-		trace("monster not dead yet")
-		return false
-	end
-	CreateTimeEvent(obj_id, obj_id, 0, fly, obj_id)
-
-	add_cooldown(1 + 1 * artefact_count, "af_ball")
-end
-
--- Patch for Ball for kicking monsters
-local monster_update = bind_monster.generic_object_binder.update
-bind_monster.generic_object_binder.update = function(self, delta)
-	monster_update(self, delta)
-	if not artefacts.af_ball or not self.object:alive() then return end
-
-	local monster_cls, monster_kind = get_monster_clsid_and_kind(self.object)
-	local af_ball = artefact_props.af_ball
-	if af_ball.monsters[monster_kind] or af_ball.monsters[monster_cls] then
-		self.object:set_callback(callback.use_object, self.use_kick, self)
-		self.object:set_tip_text(self.object:set_tip_text(game.translate_string("st_body_kick")))
-	end
-end
-
 -- Patch for First Person Death
 if ayykyu_fp_death and ayykyu_fp_death.actor_on_before_death then
 	local fp_death = ayykyu_fp_death.actor_on_before_death
@@ -5831,6 +5884,10 @@ function heli_on_hit_callback(heli, amount, unused, who, unused2)
 	process_artefacts(artefact_on_heli_hit_functions, heli, amount, who)
 end
 
+function on_key_press(key)
+	process_artefacts(artefact_on_key_press_functions, key)
+end
+
 function on_item_drag_dropped(obj_1, obj_2, slot_from, slot_to)
 	if not (obj_1 and obj_2) then 
 		trace("No obj_1 or obj_2 found, o1 %s, o2 %s", obj_1 and obj_1:section(), obj_2 and obj_2:section())
@@ -5944,7 +6001,7 @@ function actor_on_first_update()
 	RegisterScriptCallback("monster_on_death_callback", monster_on_death_callback)
 	RegisterScriptCallback("on_before_level_changing", on_before_level_changing)
 	RegisterScriptCallback("heli_on_hit_callback", heli_on_hit_callback)
-
+	RegisterScriptCallback("on_key_press", on_key_press)
 
 	-- 1.5.2
 	if _G.CHudItem__PlayHUDMotion then
