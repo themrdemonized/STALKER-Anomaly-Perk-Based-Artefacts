@@ -2120,33 +2120,53 @@ artefact_props = { -- Special props of artefacts that are used in processing
 	af_ball = {
 		monster_tiers = { -- Monster Tiers opening by artefact count
 			[1] = {
-				clsid.zombie_s,
-				clsid.fracture_s,
+				clsid.cat,
 				clsid.cat_s,
+				clsid.dog_black,
+				clsid.dog_red,
 				clsid.dog_s,
+				clsid.fracture,
+				clsid.fracture_s,
+				clsid.rat,
+				clsid.rat_s,
+				clsid.tushkano,
+				clsid.tushkano_s,
+				clsid.zombie,
+				clsid.zombie_s,
 				"SM_PIRANHA",
 			},
 			[2] = {
+				clsid.bloodsucker,
+				clsid.bloodsucker_s,
+				clsid.boar,
 				clsid.boar_s,
+				clsid.flesh,
 				clsid.flesh_s,
 				clsid.pseudodog_s,
 				clsid.psy_dog_s,
+				clsid.snork,
 				clsid.snork_s,
-				clsid.bloodsucker_s,
 				"SM_PSYSUCKER",
+				135, -- Borya
+				"SM_LURKER",
 			},
 			[3] = {
+				clsid.burer,
 				clsid.burer_s,
+				clsid.controller,
 				clsid.controller_s,
+				clsid.poltergeist,
+				clsid.poltergeist_s,
 				"SM_KARLIK",
-				"SM_LURKER",
 				"SM_VOLK",
 				"SM_POLTER_CORP",
-				135, -- Borya
+				
 			},
 			[4] = {
+				clsid.chimera,
 				clsid.chimera_s,
 				clsid.gigant_s,
+				clsid.pseudo_gigant,
 				"SM_MEDVED",
 				"SM_MONSTER_BOAR",
 				"SM_VENDIGO",
@@ -4903,18 +4923,36 @@ artefact_on_key_press_functions = {
 		if (bind == key_bindings.kUSE) then
 			local distance = math.huge
 			local target
-			level.iterate_nearest(actor:position(), af_ball.scan_radius, function(obj)
+			local pointed = level.get_target_obj()
+			level.iterate_nearest(actor:position(), af_ball.scan_radius + 1, function(obj)
 				if not 
 				(
-					(
-						IsMonster(obj) and 
+					obj:id() ~= AC_ID
+					and (
+						(IsMonster(obj) and 
 						(
-							af_ball.monsters[obj:clsid()] or af_ball.monsters[SYS_GetParam(2, obj:section(), "kind", "definitely_not_found_kind")]
-						)
-						or IsStalker(obj) and xr_combat_ignore.fighting_with_actor_npcs[obj:id()]
+							af_ball.monsters[obj:clsid()] or af_ball.monsters[SYS_GetParam(
+								2,
+								obj:section(),
+								"kind",
+								"definitely_not_found_kind"
+							)]
+						))
+						or (IsStalker(obj) and xr_combat_ignore.fighting_with_actor_npcs[obj:id()])
 					)
-					and obj:alive() and obj:position():distance_to(actor:position()) <= af_ball.scan_radius
-				) then return end
+					and obj:alive()
+					and obj:position():distance_to(actor:position()) <= af_ball.scan_radius
+				) then
+					-- printf("target %s is invalid", obj:name())
+					return
+				end
+
+				-- Pointed target takes priority
+				if pointed and pointed:id() == obj:id() then
+					-- printf("target %s is pointed", obj:name())
+					target = obj
+					return true
+				end
 
 				local pos = obj:position()
 
@@ -4925,11 +4963,17 @@ artefact_on_key_press_functions = {
 						return (see.x > 0 and see.x < 1024 and see.y > 0 and see.y < 1024)
 					end,
 					function()
-						local see = game.world2ui(utils_obj.safe_bone_pos(obj, "bip01_spine"))
+						local pos = utils_obj.safe_bone_pos(obj, "bip01_spine")
+						if not (pos and pos.x ~= 0 and pos.y ~= 0 and pos.z ~= 0) then return end
+
+						local see = game.world2ui(pos)
 						return (see.x > 0 and see.x < 1024 and see.y > 0 and see.y < 1024)
 					end,
 					function()
-						local see = game.world2ui(utils_obj.safe_bone_pos(obj, "bip01_head"))
+						local pos = utils_obj.safe_bone_pos(obj, "bip01_head")
+						if not (pos and pos.x ~= 0 and pos.y ~= 0 and pos.z ~= 0) then return end
+
+						local see = game.world2ui(pos)
 						return (see.x > 0 and see.x < 1024 and see.y > 0 and see.y < 1024)
 					end,
 				}
@@ -4940,16 +4984,46 @@ artefact_on_key_press_functions = {
 						break
 					end
 				end
-				if not see then return end
+				if not see then
+					-- printf("cant see")
+					return
+				end
 
-				-- Obstacle check
-				local ray = demonized_geometry_ray.geometry_ray({
-					ray_range = 200,
-					ignore_object = obj,
-					flags = 3,
-				})
-				local res = ray:get(pos, utils_obj.safe_bone_pos(actor, "bip01_spine"):sub(pos):normalize())
-				if not (res.result and res.result.object and res.result.object:id() == AC_ID) then return end
+				-- Obstacle check, rays
+				local obstacle_checks = {
+					function()
+						local ray = demonized_geometry_ray.geometry_ray({
+							ray_range = 200,
+							ignore_object = obj,
+							flags = 3,
+						})
+						local res = ray:get(pos, actor:position():sub(pos):normalize())
+						return res.result and res.result.object and res.result.object:id() == AC_ID
+					end,
+					function()
+						local p = utils_obj.safe_bone_pos(actor, "bip01_spine")
+						if not (p and p.x ~= 0 and p.y ~= 0 and p.z ~= 0) then return end
+
+						local ray = demonized_geometry_ray.geometry_ray({
+							ray_range = 200,
+							ignore_object = obj,
+							flags = 3,
+						})
+						local res = ray:get(pos, p:sub(pos):normalize())
+						return res.result and res.result.object and res.result.object:id() == AC_ID
+					end,
+				}
+				local no_obstacle = false
+				for i, v in ipairs(obstacle_checks) do
+					if v() then
+						no_obstacle = true
+						break
+					end
+				end
+				if not no_obstacle then
+					-- printf("obstacled")
+					return
+				end
 
 				local dist = pos:distance_to_sqr(actor:position())
 				if dist < distance then
