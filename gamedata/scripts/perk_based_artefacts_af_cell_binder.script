@@ -1,3 +1,66 @@
+-- Wrapper for AddUniqueCall that checks for time_global update before executing function
+local function throttle(func, tg_throttle)
+    local tg = 0
+    if not tg_throttle or tg_throttle == 0 then
+        return function(...)
+            local t = time_global()
+            if t ~= tg then
+                tg = t
+                return func(...)
+            end
+        end
+    elseif type(tg_throttle) == "function" then
+        return function(...)
+            -- If true - fire immediately
+            if tg_throttle(tg) == true then
+                return func(...)
+            end
+
+            -- If false/nil - don't fire
+            if not tg_throttle(tg) then
+                return
+            end
+
+            -- If number - throttle by that number
+            local t = time_global()
+            if t < tg then return end
+            tg = t + tg_throttle(tg)
+            return func(...)
+        end
+    else
+        return function(...)
+            local t = time_global()
+            if t < tg then return end
+            tg = t + tg_throttle
+            return func(...)
+        end
+    end
+end
+
+local function get_random_array_element(t)
+    return t[math.random(#t)]
+end
+
+local function get_time_elapsed()
+    --trace(time_factor)
+    return math.floor(game.get_game_time():diffSec(level.get_start_time()) / level.get_time_factor() * 10) * 0.1
+end
+
+local function play_sound_on_actor(snd, volume, frequency, looped)
+    if not snd then
+        trace("snd is nil")
+        return
+    end
+    local actor = db.actor
+    local snd = xr_sound.get_safe_sound_object(snd)
+    if snd then
+        snd:play(actor, 0, looped and (sound_object.s2d + sound_object.looped) or sound_object.s2d)
+        snd.volume = volume or 1
+        snd.frequency = frequency or 1
+        return snd
+    end
+end
+
 function bind(obj)
     obj:bind_object(af_cell_grenade_binder(obj))
 end
@@ -8,7 +71,7 @@ function af_cell_grenade_binder:__init(obj) super(obj)
     self.sec = self.object:section()
 
     -- Geometry ray instance
-    self.contact_range = SYS_GetParam(2, self.sec, "contact_range", 1)
+    self.contact_range = 1.1
     self.create_collision_ray = function()
         return demonized_geometry_ray.geometry_ray({
             ray_range = 1000,
@@ -32,17 +95,7 @@ function af_cell_grenade_binder:__init(obj) super(obj)
     self.travel_distance_threshold = 0
 
     -- After this time cocktail will blow up
-    self.destroy_time = 5000
-
-    -- Flag for can be shot
-    self.can_be_shot = false
-
-    -- Flag to allow panic for npcs
-    self.can_panic_npc = false
-
-    -- Flag to enable velocity check depending on a surface the molotov is flying to
-    -- Allows to simulate bouncing behaviour if projected speed to surface is low
-    self.advanced_velocity_check = SYS_GetParam(1, self.sec, "advanced_velocity_check")
+    self.destroy_time = 3000
 
     -- Flag to force destroy
     self.force_destroy = false
@@ -50,54 +103,13 @@ function af_cell_grenade_binder:__init(obj) super(obj)
     -- Flag of already destroyed
     self.destroyed = false
 
-    -- Damage params
-    self.hit_type                   = hit[SYS_GetParam(0, self.sec, "AOE_hit_type", "burn")] or hit["burn"]
-    self.damage                     = SYS_GetParam(2, self.sec, "AOE_damage", 0)
-    self.damage_drop                = SYS_GetParam(2, self.sec, "AOE_damage_drop", 0)
-    self.damage_period              = SYS_GetParam(2, self.sec, "AOE_damage_period", 200)
-
-    self.explosion_damage           = SYS_GetParam(2, self.sec, "AOE_explosion_damage", 0)
-    self.explosion_damage_drop      = SYS_GetParam(2, self.sec, "AOE_explosion_damage_drop", 0)
-    self.explosion_damage_type      = hit[SYS_GetParam(0, self.sec, "AOE_explosion_damage_type", "")] or self.hit_type
-    self.explosion_radius           = SYS_GetParam(2, self.sec, "AOE_explosion_radius", 0)
-    self.explosion_volumetric       = SYS_GetParam(1, self.sec, "AOE_explosion_volumetric")
-    self.explosion_sound            = SYS_GetParam(0, self.sec, "AOE_explosion_sound", "")
-    self.explosion_particles        = SYS_GetParam(0, self.sec, "AOE_explosion_particles") and string.len(SYS_GetParam(0, self.sec, "AOE_explosion_particles")) > 0 and SYS_GetParam(0, self.sec, "AOE_explosion_particles") ~= "" and SYS_GetParam(0, self.sec, "AOE_explosion_particles")
-    self.explosion_particles_offset = str_explode(SYS_GetParam(0, self.sec, "AOE_explosion_particles_offset", ""), ",")
-    if string.len(self.explosion_particles_offset[1]) == 0 then
-        self.explosion_particles_offset = nil
-    else
-        self.explosion_particles_offset[1] = self.explosion_particles_offset[1] and tonumber(self.explosion_particles_offset[1]) or 0
-        self.explosion_particles_offset[2] = self.explosion_particles_offset[2] and tonumber(self.explosion_particles_offset[2]) or 0
-        self.explosion_particles_offset[3] = self.explosion_particles_offset[3] and tonumber(self.explosion_particles_offset[3]) or 0
-    end
-
-    self.volumetric               = SYS_GetParam(1, self.sec, "AOE_volumetric")
-    self.ignore_actor             = SYS_GetParam(1, self.sec, "AOE_ignore_actor")
-    self.lifetime                 = SYS_GetParam(2, self.sec, "AOE_lifetime", 0)
-    self.lifetime_damage_drop     = SYS_GetParam(2, self.sec, "AOE_lifetime_damage_drop", 0)
-    self.dot_damage_time          = SYS_GetParam(2, self.sec, "AOE_dot_damage_time", 0)
-    self.radius                   = SYS_GetParam(2, self.sec, "AOE_radius", 0)
-    self.aoe_vanilla_actor_damage = SYS_GetParam(1, self.sec, "AOE_aoe_vanilla_actor_damage")
-    self.aoe_sound                = SYS_GetParam(0, self.sec, "AOE_aoe_sound", "")
-    self.aoe_hit_sound            = SYS_GetParam(0, self.sec, "AOE_aoe_hit_sound", "")
-    self.aoe_damage_actor_sound   = SYS_GetParam(0, self.sec, "AOE_aoe_damage_actor_sound", "")
-    self.particles                = SYS_GetParam(0, self.sec, "AOE_particles") and string.len(SYS_GetParam(0, self.sec, "AOE_particles")) > 0 and SYS_GetParam(0, self.sec, "AOE_particles") ~= "" and SYS_GetParam(0, self.sec, "AOE_particles")
-    self.particles_offset         = str_explode(SYS_GetParam(0, self.sec, "AOE_particles_offset", ""), ",")
-    if string.len(self.particles_offset[1]) == 0 then
-        self.particles_offset = nil
-    else
-        self.particles_offset[1] = self.particles_offset[1] and tonumber(self.particles_offset[1]) or 0
-        self.particles_offset[2] = self.particles_offset[2] and tonumber(self.particles_offset[2]) or 0
-        self.particles_offset[3] = self.particles_offset[3] and tonumber(self.particles_offset[3]) or 0
-    end
+    -- Flag of fused
+    self.fused = false
 
     -- Fastcall to collision detection check
     self.object:set_fastcall(self.fastcall, self)
-    SendScriptCallback("on_molotov_init", self)
 end
 
-local tg = 0
 function af_cell_grenade_binder:fastcall()
     local obj = self.object
     local id = obj:id()
@@ -113,17 +125,6 @@ function af_cell_grenade_binder:fastcall()
             self.tg_time = 0
             self.fused = nil
         end
-        if alife_molotovs[id] then
-            self.last_parent_id = obj:parent():id()
-        else
-            if not self.last_parent_id then
-                local p = obj:parent()
-                print_tip("fused molotov thrown %s, parent id %s", id, p and p:id())
-                if p and p:id() and alife_molotovs[p:id()] and alife_molotovs[p:id()].last_parent_id then
-                    self.last_parent_id = alife_molotovs[p:id()].last_parent_id
-                end
-            end
-        end
         return
     end
 
@@ -131,12 +132,10 @@ function af_cell_grenade_binder:fastcall()
     if not self.position then
         self.velocity = 0
         self.position = obj:position()
-        self.direction = VEC_GROUND
+        self.direction = vector():set(0, -1, 0)
         self.travel_distance = 0
         self.tg = 0
         self.tg_time = 0
-        molotovs_free[id] = self
-        switch_npc_check_approaching_molotov()
         return
     end
 
@@ -176,22 +175,9 @@ function af_cell_grenade_binder:fastcall()
     self.travel_distance = self.travel_distance + self.velocity
 
     local velocity = self.velocity
-    if self.advanced_velocity_check then
-
-        -- Get surface normal that molotov directed to
-        local surface_normal = demonized_geometry_ray.get_surface_normal(self.position, self.direction)
-
-        if surface_normal then
-            -- Invert the normal
-            surface_normal:invert()
-
-            -- Project velocity vector on normal
-            velocity = self.velocity * self.direction:dotproduct(surface_normal)
-        end
-    end
 
     -- Offset a bit position of ray to shoot
-    local ray_pos = vector():set(self.position):sub(vector():set(self.direction):mul(0.1))
+    local ray_pos = vector():set(self.position):mad(self.direction, -0.1)
     
     -- Shoot ray
     self.ray = self.create_collision_ray()
@@ -223,13 +209,186 @@ function af_cell_grenade_binder:fastcall()
 
     -- If ray in contact range and enough velocity and enough distance traveled - blow up
     -- Set flag to destroy so it postpones on next update
-    if res.in_contact and not_passable and self:can_be_blown(velocity)
+    if res.in_contact and not_passable
     then
-        print_tip("obj %s is in_contact %s, velocity %s", self:get_name(), res.in_contact, velocity)
+        -- print_tip("obj %s is in_contact %s, velocity %s", self.object:name(), res.in_contact, velocity)
         self.force_destroy = true
     end
+end
 
-    if self.fused then
-        SendScriptCallback("on_molotov_fused_update", self)
+function af_cell_grenade_binder:explode()
+    self.destroyed = true
+    CellProtectionField({position = self.object:position()})
+    self.object:destroy_object()
+end
+
+local CellProtectionFieldActiveActors = {[AC_ID] = {}}
+local CellProtectionFieldRegistry = {}
+class "CellProtectionField"
+function CellProtectionField:__init(args)
+    self.time_created = get_time_elapsed()
+    CellProtectionFieldRegistry[self] = self
+
+    -- Params
+    self.position = args.position
+    self.time_active = args.time_active or 60
+    self.radius = args.radius or 6
+    self.radius_sqr = self.radius ^ 2
+    
+    if args.particles and type(args.particles) ~= "table" then
+        args.particles = {args.particles}
     end
+    self.particles = args.particles or {[[perk_based_artefacts\anomaly2\anomaly_teleport]]}
+    self.particle_objects = {}
+    for _, v in ipairs(self.particles) do
+        local o = particles_object(v)
+        local e = throttle(function()
+            if not o:playing() then
+                o:play_at_pos(self.position)
+            end
+        end)
+        AddUniqueCall(e)
+        table.insert(self.particle_objects, {
+            object = o,
+            event = e
+        })
+    end
+
+    if args.sounds and type(args.sounds) ~= "table" then
+        args.sounds = {args.sounds}
+    end
+    self.sounds = args.sounds or {[[perk_based_artefacts\BFGIDLE]]}
+    self.sound_objects = {}
+    for _, v in ipairs(self.sounds) do
+        local o = sound_object(v)
+        o:play_at_pos(nil, self.position, 0, sound_object.s3d + sound_object.looped)
+        table.insert(self.sound_objects, o)
+    end
+    
+    self.delete_all_actors = function()
+        for id, binders in pairs(CellProtectionFieldActiveActors) do
+            binders[self] = nil
+        end
+    end
+
+    self.protection_field_iterate_func = function(obj)
+        if obj:id() ~= AC_ID and (IsMonster(obj) or IsStalker(obj)) and obj:alive() and obj:position():distance_to_sqr(self.position) <= self.radius_sqr then
+            CellProtectionFieldActiveActors[obj:id()] = CellProtectionFieldActiveActors[obj:id()] or {}
+            CellProtectionFieldActiveActors[obj:id()][self] = true
+        end
+    end
+
+    self.iterate_update = throttle(function()
+        self.delete_all_actors()
+        if db.actor:position():distance_to_sqr(self.position) <= self.radius_sqr then
+            CellProtectionFieldActiveActors[AC_ID][self] = true
+        end
+
+        -- Enable for making it for active for everyone
+        -- level.iterate_nearest(self.position, self.radius, self.protection_field_iterate_func)
+    end, 800)
+
+    self.update = throttle(function()
+        local time_elapsed = get_time_elapsed()
+        if time_elapsed > self.time_created + self.time_active then
+            self.destroy()
+            return true
+        end
+    end)
+
+    self.destroy = function()
+        self.delete_all_actors()
+        for k, v in pairs(self.particle_objects) do
+            v.object:stop()
+            RemoveUniqueCall(v.event)
+        end
+        for k, v in pairs(self.sound_objects) do
+            v:stop()
+        end
+        CellProtectionFieldRegistry[self] = nil
+        RemoveUniqueCall(self.update)
+        RemoveUniqueCall(self.iterate_update)
+        -- collectgarbage("collect")
+    end
+
+    AddUniqueCall(self.update)
+    AddUniqueCall(self.iterate_update)
+end
+
+function CellProtectionField:__finalize()
+    -- printf("CellProtectionField destroyed")
+end
+
+function on_before_hit(npc, s_hit, bone_id, flags)
+    if not perk_based_artefacts.artefact_props.af_cell.valid_hits[s_hit.type] then
+        return
+    end
+
+    if is_empty(CellProtectionFieldActiveActors[npc:id()]) then
+        return
+    end
+
+    local p = s_hit.power
+    s_hit.power = s_hit.power * random_float(0, 0.4)
+    local power = p - s_hit.power
+
+    if npc:id() == AC_ID then
+        local rad_amount = power * 0.02
+        db.actor:change_radiation(rad_amount)
+
+        local function rad_sound()
+            play_sound_on_actor("detectors\\geiger_" .. math.random(8), 1)
+            return true
+        end
+        for i = 1, 5 do
+            CreateTimeEvent(time_global() .. "af_cell" .. i, "af_cell" .. i, random_float(0.15, 0.3) * i, rad_sound)
+        end
+
+        play_sound_on_actor("anomaly\\electra_hit" .. get_random_array_element({"", "1"}), 1, 0.5)
+    end
+end
+
+function actor_on_before_hit(shit, bone_id, flags)
+    on_before_hit(db.actor, shit, bone_id, flags)
+end
+
+function save_state(m_data)
+    m_data.pba_CellProtectionFieldRegistry = empty_table(m_data.pba_CellProtectionFieldRegistry)
+    for k, v in pairs(CellProtectionFieldRegistry) do
+        local props = {
+            particles = k.particles,
+            position = utils_data.vector_to_string(k.position),
+            radius = k.radius,
+            sounds = k.sounds,
+            time_active = k.time_active,
+            time_created = k.time_created,
+        }
+        -- print_r(props)
+        table.insert(m_data.pba_CellProtectionFieldRegistry, props)
+    end
+end
+
+function load_state()
+    local m_data = alife_storage_manager.get_state()
+    if m_data.pba_CellProtectionFieldRegistry then
+        for _, v in ipairs(m_data.pba_CellProtectionFieldRegistry) do
+            -- print_r(v)
+            local c = CellProtectionField({
+                particles = v.particles,
+                position = utils_data.string_to_vector(v.position),
+                radius = v.radius,
+                sounds = v.sounds,
+                time_active = v.time_active,
+            })
+            c.time_created = v.time_created
+        end
+    end
+end
+
+function on_game_start()
+    RegisterScriptCallback("actor_on_before_hit", actor_on_before_hit)
+    RegisterScriptCallback("npc_on_before_hit", on_before_hit)
+    RegisterScriptCallback("monster_on_before_hit", on_before_hit)
+    RegisterScriptCallback("save_state", save_state)
+    RegisterScriptCallback("actor_on_first_update", load_state)
 end

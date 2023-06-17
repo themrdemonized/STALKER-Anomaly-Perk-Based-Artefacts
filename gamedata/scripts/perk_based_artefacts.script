@@ -5500,6 +5500,21 @@ af_medallion_engage_func = {
 }
 add_functor("pba_medallion", af_medallion_engage_func.check, af_medallion_engage_func.string, nil, af_medallion_engage_func.action)
 
+-- Functors for Cell
+-- Functors for Medallion
+af_cell_engage_func = {
+	check = function(obj, bag, mode)
+		return obj:section() == "af_cell"
+	end,
+	string = function(obj, bag, mode)
+		return "st_pba_engage"
+	end,
+	action = function(obj, bag, mode)
+		zzz_ui_inventory_arte_to_grenade.move_arte_to_grenade(obj)
+	end,
+}
+add_functor("pba_cell", af_cell_engage_func.check, af_cell_engage_func.string, nil, af_cell_engage_func.action)
+
 -- Functors for Lucifer
 lucifer_sacrifice_func = {
 	check_lucifer_condition = function(obj, bag, mode)

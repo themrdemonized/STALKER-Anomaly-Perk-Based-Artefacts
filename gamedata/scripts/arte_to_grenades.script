@@ -1,5 +1,6 @@
 arte_to_grenades = {
 	["af_medallion"] = "af_medallion_grenade",
+	["af_cell"] = "af_cell_grenade",
 }
 grenades_to_arte = invert_table(arte_to_grenades)
 grenades_to_arte_items = {}
