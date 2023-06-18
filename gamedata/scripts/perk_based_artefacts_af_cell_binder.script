@@ -71,7 +71,7 @@ function af_cell_grenade_binder:__init(obj) super(obj)
     self.sec = self.object:section()
 
     -- Geometry ray instance
-    self.contact_range = 1.1
+    self.contact_range = 1.15
     self.create_collision_ray = function()
         return demonized_geometry_ray.geometry_ray({
             ray_range = 1000,
@@ -229,7 +229,7 @@ function af_cell_grenade_binder:explode()
             local sounds = {
                 "perk_based_artefacts\\BFGBALL3",
                 "perk_based_artefacts\\GAUSSHUM",
-                "perk_based_artefacts\\BFGBALL1",
+                -- "perk_based_artefacts\\BFGBALL1",
                 "perk_based_artefacts\\BFGBALL2",
                 "perk_based_artefacts\\BFGIDLE",
             }
@@ -379,7 +379,7 @@ function CellProtectionField:__init(args)
         for _, v in ipairs(self.sound_objects_destroy) do
             v:play_at_pos(nil, self.position, 0, sound_object.s3d)
         end
-        
+
         CellProtectionFieldRegistry[self] = nil
         RemoveUniqueCall(self.update)
         RemoveUniqueCall(self.iterate_update)
