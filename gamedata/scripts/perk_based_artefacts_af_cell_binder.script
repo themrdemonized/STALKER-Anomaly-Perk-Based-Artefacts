@@ -227,11 +227,11 @@ function af_cell_grenade_binder:explode()
         sounds_idle = (function()
             local t = {}
             local sounds = {
-                "perk_based_artefacts\\BFGBALL3.ogg",
-                "perk_based_artefacts\\GAUSSHUM.ogg",
-                "perk_based_artefacts\\BFGBALL1.ogg",
-                "perk_based_artefacts\\BFGBALL2.ogg",
-                "perk_based_artefacts\\BFGIDLE.ogg",
+                "perk_based_artefacts\\BFGBALL3",
+                "perk_based_artefacts\\GAUSSHUM",
+                "perk_based_artefacts\\BFGBALL1",
+                "perk_based_artefacts\\BFGBALL2",
+                "perk_based_artefacts\\BFGIDLE",
             }
             t[#t + 1] = table.remove(sounds, math.random(#sounds))
             return t
@@ -320,7 +320,6 @@ function CellProtectionField:__init(args)
     self.sound_objects_destroy = {}
     for _, v in ipairs(self.sounds_destroy) do
         local o = sound_object(v)
-        o:play_at_pos(nil, self.position, 0, sound_object.s3d)
         table.insert(self.sound_objects_destroy, o)
     end
     
@@ -369,13 +368,18 @@ function CellProtectionField:__init(args)
 
     self.destroy = function()
         self.delete_all_actors()
-        for k, v in pairs(self.particle_objects) do
+
+        for _, v in ipairs(self.particle_objects) do
             v.object:stop()
             RemoveUniqueCall(v.event)
         end
-        for k, v in pairs(self.sound_objects) do
+        for _, v in ipairs(self.sound_objects_idle) do
             v:stop()
         end
+        for _, v in ipairs(self.sound_objects_destroy) do
+            v:play_at_pos(nil, self.position, 0, sound_object.s3d)
+        end
+        
         CellProtectionFieldRegistry[self] = nil
         RemoveUniqueCall(self.update)
         RemoveUniqueCall(self.iterate_update)
