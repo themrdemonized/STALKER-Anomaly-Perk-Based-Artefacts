@@ -5501,7 +5501,6 @@ af_medallion_engage_func = {
 add_functor("pba_medallion", af_medallion_engage_func.check, af_medallion_engage_func.string, nil, af_medallion_engage_func.action)
 
 -- Functors for Cell
--- Functors for Medallion
 af_cell_engage_func = {
 	check = function(obj, bag, mode)
 		return obj:section() == "af_cell"

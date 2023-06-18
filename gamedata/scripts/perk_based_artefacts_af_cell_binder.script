@@ -218,7 +218,44 @@ end
 
 function af_cell_grenade_binder:explode()
     self.destroyed = true
-    CellProtectionField({position = self.object:position()})
+
+    local o = sound_object([[perk_based_artefacts\BFGSTUNE]])
+    o:play_at_pos(self.object, self.object:position(), 0, sound_object.s3d)
+    
+    CellProtectionField({
+        position = self.object:position(),
+        sounds_idle = (function()
+            local t = {}
+            local sounds = {
+                "perk_based_artefacts\\BFGBALL3.ogg",
+                "perk_based_artefacts\\GAUSSHUM.ogg",
+                "perk_based_artefacts\\BFGBALL1.ogg",
+                "perk_based_artefacts\\BFGBALL2.ogg",
+                "perk_based_artefacts\\BFGIDLE.ogg",
+            }
+            t[#t + 1] = table.remove(sounds, math.random(#sounds))
+            return t
+        end)(),
+        sounds_destroy = (function() 
+            local t = {}
+            local sounds = {
+                "perk_based_artefacts\\PLSDTH01",
+                "perk_based_artefacts\\PLSDTH02",
+                "perk_based_artefacts\\PLSDTH03",
+                "perk_based_artefacts\\PLSDTH04",
+                "perk_based_artefacts\\PLSDTH05",
+                "perk_based_artefacts\\PLSDTH06",
+                "perk_based_artefacts\\PLSDTH07",
+                "perk_based_artefacts\\PLSDTH08",
+                "perk_based_artefacts\\PLSDTH09",
+                "perk_based_artefacts\\PLSDTH10",
+            }
+            for i = 1, math.random(3) do
+                t[#t + 1] = table.remove(sounds, math.random(#sounds))
+            end
+            return t
+        end)()
+    })
     self.object:destroy_object()
 end
 
@@ -254,20 +291,45 @@ function CellProtectionField:__init(args)
         })
     end
 
-    if args.sounds and type(args.sounds) ~= "table" then
-        args.sounds = {args.sounds}
+    if args.sounds_init and type(args.sounds_init) ~= "table" then
+        args.sounds_init = {args.sounds_init}
     end
-    self.sounds = args.sounds or {[[perk_based_artefacts\BFGIDLE]]}
-    self.sound_objects = {}
-    for _, v in ipairs(self.sounds) do
+    self.sounds_init = args.sounds_init or {[[perk_based_artefacts\BFGSTUNE]]}
+    self.sound_objects_init = {}
+    for _, v in ipairs(self.sounds_init) do
+        local o = sound_object(v)
+        o:play_at_pos(nil, self.position, 0, sound_object.s3d)
+        table.insert(self.sound_objects_init, o)
+    end
+
+    if args.sounds_idle and type(args.sounds_idle) ~= "table" then
+        args.sounds_idle = {args.sounds_idle}
+    end
+    self.sounds_idle = args.sounds_idle or {[[perk_based_artefacts\BFGIDLE]]}
+    self.sound_objects_idle = {}
+    for _, v in ipairs(self.sounds_idle) do
         local o = sound_object(v)
         o:play_at_pos(nil, self.position, 0, sound_object.s3d + sound_object.looped)
-        table.insert(self.sound_objects, o)
+        table.insert(self.sound_objects_idle, o)
+    end
+
+    if args.sounds_destroy and type(args.sounds_destroy) ~= "table" then
+        args.sounds_destroy = {args.sounds_destroy}
+    end
+    self.sounds_destroy = args.sounds_destroy or {[[perk_based_artefacts\BFGSTUNE]]}
+    self.sound_objects_destroy = {}
+    for _, v in ipairs(self.sounds_destroy) do
+        local o = sound_object(v)
+        o:play_at_pos(nil, self.position, 0, sound_object.s3d)
+        table.insert(self.sound_objects_destroy, o)
     end
     
     self.delete_all_actors = function()
         for id, binders in pairs(CellProtectionFieldActiveActors) do
             binders[self] = nil
+        end
+        if perk_based_artefacts_ui_effects.GUI and is_empty(CellProtectionFieldActiveActors[AC_ID]) then
+            perk_based_artefacts_ui_effects.GUI:RemoveIndicator("af_cell")
         end
     end
 
@@ -282,6 +344,15 @@ function CellProtectionField:__init(args)
         self.delete_all_actors()
         if db.actor:position():distance_to_sqr(self.position) <= self.radius_sqr then
             CellProtectionFieldActiveActors[AC_ID][self] = true
+            if perk_based_artefacts_ui_effects.GUI then
+                perk_based_artefacts_ui_effects.GUI:AddIndicator(
+                    "af_cell",
+                    false,
+                    "af_cell",
+                    function() return '' end,
+                    function() return true end
+                )
+            end
         end
 
         -- Enable for making it for active for everyone
@@ -340,7 +411,7 @@ function on_before_hit(npc, s_hit, bone_id, flags)
             play_sound_on_actor("detectors\\geiger_" .. math.random(8), 1)
             return true
         end
-        for i = 1, 5 do
+        for i = 1, 1 do
             CreateTimeEvent(time_global() .. "af_cell" .. i, "af_cell" .. i, random_float(0.15, 0.3) * i, rad_sound)
         end
 
@@ -359,7 +430,9 @@ function save_state(m_data)
             particles = k.particles,
             position = utils_data.vector_to_string(k.position),
             radius = k.radius,
-            sounds = k.sounds,
+            sounds_init = k.sounds_init,
+            sounds_idle = k.sounds_idle,
+            sounds_destroy = k.sounds_destroy,
             time_active = k.time_active,
             time_created = k.time_created,
         }
@@ -377,7 +450,9 @@ function load_state()
                 particles = v.particles,
                 position = utils_data.string_to_vector(v.position),
                 radius = v.radius,
-                sounds = v.sounds,
+                sounds_init = v.sounds_init,
+                sounds_idle = v.sounds_idle,
+                sounds_destroy = v.sounds_destroy,
                 time_active = v.time_active,
             })
             c.time_created = v.time_created
