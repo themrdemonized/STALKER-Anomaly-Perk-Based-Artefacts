@@ -924,8 +924,22 @@ end
 
 local weapon_modifiers = demonized_weapon_modifiers
 
--- local artefact_props
 artefact_props = { -- Special props of artefacts that are used in processing
+	af_signet = {
+		ui_text_func = function(self)
+			return ("T:%s"):format(ceil(get_status_effect_remaining_time("af_signet")))
+		end,
+		ui_validate_func = function(self)
+			return check_status_effect("af_signet")
+		end,
+		timed_effect_health_boost = 0.0004,
+		timed_effect_func = function(self)
+			db.actor:change_health(self.timed_effect_health_boost)
+			manage_psy_health()
+			manage_psy_health()
+			manage_psy_health()
+		end,
+	},
 	af_ear = {
 		sound = get_safe_sound_object("perk_based_artefacts\\heartbeat_pulse_loop"),
 		sound_play = function(self)
@@ -3589,6 +3603,26 @@ artefact_on_update_functions = {
 				manage_psy_health()
 			end
 			trace("firing Signet, health %s", actor.health)
+
+			local status_effect_time = get_status_effect_remaining_time("af_signet")
+			local time = status_effect_time + 2 * artefact_count
+			time = min(240 + 60 * artefact_count, time)
+			add_status_effect(time, nil, "af_signet")
+			add_ui_func(
+				"af_signet",
+				true,
+				"af_signet",
+				function() return perk_based_artefacts.artefact_props.af_signet:ui_text_func() end,
+				function() return perk_based_artefacts.artefact_props.af_signet:ui_validate_func() end
+			)
+			add_timed_effect(
+				time,
+				function() return perk_based_artefacts.artefact_props.af_signet:timed_effect_func() end,
+				nil,
+				nil,
+				nil,
+				"af_signet"
+			)
 		end
 	end,
 
@@ -3623,8 +3657,8 @@ artefact_on_update_functions = {
 
 	-- Sourpuss, Perk: What Colour Is Your Blood?
 	af_kislushka = function(actor, artefact_count, artefact_ids, artefact_names)
-		local bleeding_cure_boost = 0.00135 * artefact_count
-		local satiety_drain = -0.00125 * artefact_count
+		local bleeding_cure_boost = 0.00165 * artefact_count
+		local satiety_drain = -0.00115 * artefact_count
 
 		if actor.bleeding > 0 then
 			trace("before bleeding %s", actor.bleeding)
@@ -3685,10 +3719,10 @@ artefact_on_update_functions = {
 			end
 
 			trace("Chain, healing companion %s", heal_companion:id())
-			heal_companion:change_health(0.0015)
+			heal_companion:change_health(0.002)
 		else
-			local health_boost = 0.000075
-			local power_boost = 0.0011
+			local health_boost = 0.000055
+			local power_boost = 0.0005
 
 			actor:change_health(health_boost)
 			actor:change_power(power_boost)
@@ -4696,7 +4730,7 @@ artefact_on_trade_functions = {
 			local function cashback()
 				local money = actor:money()
 				trace("Actor last money %s, actor current money %s", actor_last_money, money)
-				local cashback = round((actor_last_money - money) * 0.04 * artefact_count)
+				local cashback = round((actor_last_money - money) * 0.08 * artefact_count)
 				if cashback < 1 then
 					trace("Fountain not fired, not enough money")
 					actor_last_money = money

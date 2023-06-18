@@ -177,7 +177,7 @@ function af_cell_grenade_binder:fastcall()
     local velocity = self.velocity
 
     -- Offset a bit position of ray to shoot
-    local ray_pos = vector():set(self.position):mad(self.direction, -0.1)
+    local ray_pos = vector():set(self.position):mad(self.direction, -0.15)
     
     -- Shoot ray
     self.ray = self.create_collision_ray()
