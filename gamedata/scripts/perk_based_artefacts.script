@@ -115,6 +115,7 @@ local load = loadstring
 local unpack = unpack
 
 local table_insert = table.insert
+local table_remove = table.remove
 local table_sort = table.sort
 
 local tg = 0 --time_global storage used for actor on update limiter
@@ -2227,8 +2228,8 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			self:event_reset()
 			--trace("Spike, weapon_shot %s", self.weapon_shot)
 		end,
-		psy_health_penalty_coeff = 0.15,
-		psy_health_restore_coeff = 0.07,
+		psy_health_penalty_coeff = 0.17,
+		psy_health_restore_coeff = 0.06,
 		hit_buff_coeff = 0.05,
 		critical_hit_buff_coeff = 0.15,
 		stacks = 0,
@@ -2245,14 +2246,41 @@ artefact_props = { -- Special props of artefacts that are used in processing
 				s_hit.type = hit.shock -- possible interference with Elektron and Sandstone, change to hit.telepatic if needed
 				s_hit.draftsman = db.actor
 				db.actor:hit(s_hit)
-				change_psy_health((self.damage_multiplier - 1) * -self.psy_health_penalty_coeff)
+				change_psy_health(max(-0.9, (self.damage_multiplier - 1) * -self.psy_health_penalty_coeff))
 				play_sound_on_actor("anomaly\\electra_hit1", 1, 1.5)
 			else
 				play_sound_on_actor("perk_based_artefacts\\quake3_hitsound", 0.75, 0.8)
 			end
 			self:stack_reset()
 		end,
+		bullet_groups = {},
 		hitted_bullets = {},
+		-- Iterate through bullet groups and insert all of bullets to work with shotguns
+		add_bullet_group_to_hitted_bullets = function(self, bullet)
+			for tg, t in pairs(self.bullet_groups) do
+				for i, v in ipairs(t) do
+					if v.bullet_id == bullet.bullet_id then
+						for i, v in ipairs(t) do
+							self.hitted_bullets[v.bullet_id] = v
+						end
+						return
+					end
+				end
+			end
+		end,
+		remove_bullet_from_bullet_group = function(self, bullet)
+			for tg, t in pairs(self.bullet_groups) do
+				for i = #t, 1, -1 do
+					local v = t[i]
+					if v and v.bullet_id == bullet.bullet_id then
+						table_remove(t, i)
+					end
+				end
+				if is_empty(t) then
+					self.bullet_groups[tg] = nil
+				end
+			end
+		end,
 		on_before_hit = function(self, actor, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
 			s_hit.power = s_hit.power * self.damage_multiplier
 			trace("Spike, Final Damage %s, bonus %s", s_hit.power, self.damage_multiplier)
@@ -4034,7 +4062,7 @@ artefact_on_weapon_fired_functions = {
 	-- Spike, Perk: Critical Ascensi0n
 	af_spaika = function(actor, artefact_count, artefact_ids, artefact_names, obj, wpn, ammo_elapsed, grenade_elapsed, ammo_type, grenade_type)
 		-- Return if bullet callbacks are available
-		if _G.CBulletOnImpact then
+		if _G.CBulletOnImpact and _G.CBulletOnInit then
 			return
 		end
 
@@ -4959,14 +4987,23 @@ artefact_on_hud_animation_play_functions = {
 }
 
 -- Functions for artefacts which provide perk bonuses for bullets
+artefact_bullet_on_init_functions = {
+	-- Spike
+	af_spaika = function(actor, artefact_count, artefact_ids, artefact_names, bullet)
+		local af_spaika = artefact_props.af_spaika
+		local tg = time_global()
+		af_spaika.bullet_groups[tg] = af_spaika.bullet_groups[tg] or {}
+		table_insert(af_spaika.bullet_groups[tg], bullet)
+	end,
+}
 artefact_bullet_on_impact_functions = {
 	-- Spike
 	af_spaika = function(actor, artefact_count, artefact_ids, artefact_names, bullet)
 		local af_spaika = artefact_props.af_spaika
-		local obj = level.object_by_id(bullet.target_id)
+		local obj = get_object_by_id(bullet.target_id)
 		trace("Spike, Bullet impact")
 		if obj and (IsMonster(obj) or IsStalker(obj)) and obj:alive() then
-			af_spaika.hitted_bullets[bullet.bullet_id] = bullet
+			af_spaika:add_bullet_group_to_hitted_bullets(bullet)
 		end
 	end,
 }
@@ -4980,6 +5017,7 @@ artefact_bullet_on_remove_functions = {
 		else
 			af_spaika:effect_reset()
 		end
+		af_spaika:remove_bullet_from_bullet_group(bullet)
 	end,
 }
 
@@ -5690,7 +5728,7 @@ end
 
 -- Patch to not trigger lighthouse for emission crow kills
 function make_dead_crow(id,powr)
-	local crow = id and level.object_by_id(id)
+	local crow = id and get_object_by_id(id)
 	if(crow and crow.alive and crow:alive() and powr) then
 		powr.draftsman = crow
 		crow:hit(powr)
@@ -5709,7 +5747,7 @@ function surge_manager.CSurgeManager:kill_crows_at_pos(pos,delay) -- hit all cro
 		if delay then
 			CreateTimeEvent("delay_kill_crow", id, random(3), make_dead_crow, id, h)
 		else
-			local crow = level.object_by_id(id)
+			local crow = get_object_by_id(id)
 			if (crow and crow.alive and crow:alive() and pos < crow:position().z) then
 				h.draftsman = crow
 				crow:hit(h)
@@ -5729,7 +5767,7 @@ function psi_storm_manager.CPsiStormManager:kill_crows_at_pos(pos)
 	for k,v in pairs(bind_crow.crow_storage) do
 		local obj = alife_object(v)
 		if obj then
-			local crow = level.object_by_id(obj.id)
+			local crow = get_object_by_id(obj.id)
 			if(crow and crow.alive and crow:alive() and distance_2d(pos, crow:position())<25) then
 				--crow:start_particles("crommcruac\\electrocute_crow","bip01_pelvis")
 				--self.crowParticles[k]=particles_object("crommcruac\\electrocute_crow")
@@ -6060,13 +6098,25 @@ function on_item_drag_dropped(obj_1, obj_2, slot_from, slot_to)
 	end
 end
 
+function bullet_on_init(bullet)
+	if bullet.parent_id == AC_ID then
+		local wpn = get_object_by_id(bullet.weapon_id)
+		if wpn and IsWeapon(wpn) then
+			process_artefacts(artefact_bullet_on_init_functions, bullet)
+		end
+	end
+end
+
 function bullet_on_impact(bullet)
 	if bullet.parent_id == AC_ID then
-		process_artefacts(artefact_bullet_on_impact_functions, bullet)
+		local wpn = get_object_by_id(bullet.weapon_id)
+		if wpn and IsWeapon(wpn) then
+			process_artefacts(artefact_bullet_on_impact_functions, bullet)
+		end
 	end
 
 	-- Add particles to bullets
-	local weapon = bullet.weapon_id and level.object_by_id(bullet.weapon_id)
+	local weapon = bullet.weapon_id and get_object_by_id(bullet.weapon_id)
 	if not weapon then return end
 
 	local actor_weapon = weapon:name()
@@ -6080,8 +6130,11 @@ function bullet_on_impact(bullet)
 end
 
 function bullet_on_remove(bullet)
-	if bullet.parent_id == AC_ID then
-		process_artefacts(artefact_bullet_on_remove_functions, bullet)
+	if bullet.parent_id == AC_ID and IsWeapon(get_object_by_id(bullet.weapon_id)) then
+		local wpn = get_object_by_id(bullet.weapon_id)
+		if wpn and IsWeapon(wpn) then
+			process_artefacts(artefact_bullet_on_remove_functions, bullet)
+		end
 	end
 end
 
@@ -6173,6 +6226,9 @@ function actor_on_first_update()
 	end
 
 	-- Modded exes
+	if _G.CBulletOnInit then
+		RegisterScriptCallback("bullet_on_init", bullet_on_init)
+	end
 	if _G.CBulletOnImpact then
 		RegisterScriptCallback("bullet_on_impact", bullet_on_impact)
 		RegisterScriptCallback("bullet_on_remove", bullet_on_remove)
