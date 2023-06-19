@@ -1590,15 +1590,26 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			["SM_CHICKEN"]					= "mutant_part_tushkano_meat",
 			["SM_LURKER"] 					= "mutant_part_lurker_meat",
 			["SM_PSYSUCKER"]				= "mutant_part_psysucker_meat",
+
+			[clsid.bloodsucker] 			= "mutant_part_krovosos_meat",
 			[clsid.bloodsucker_s] 			= "mutant_part_krovosos_meat",
+			[clsid.boar] 					= "mutant_part_boar_chop",
 			[clsid.boar_s] 					= "mutant_part_boar_chop",
+			[clsid.chimera]					= "mutant_part_chimera_meat",
 			[clsid.chimera_s]				= "mutant_part_chimera_meat",
+			[clsid.dog_black]				= "mutant_part_dog_meat",
+			[clsid.dog_red]					= "mutant_part_dog_meat",
 			[clsid.dog_s]					= "mutant_part_dog_meat",
+			[clsid.flesh]					= "mutant_part_flesh_meat",
 			[clsid.flesh_s]					= "mutant_part_flesh_meat",
 			[clsid.pseudodog_s]				= "mutant_part_psevdodog_meat",
 			[clsid.psy_dog_s]				= "mutant_part_psevdodog_meat",
+			[clsid.rat]						= "mutant_part_tushkano_meat",
 			[clsid.rat_s]					= "mutant_part_tushkano_meat",
-			[clsid.tushkano_s]				= "mutant_part_tushkano_meat"
+			[clsid.snork]					= "mutant_part_snork_hand",
+			[clsid.snork_s]					= "mutant_part_snork_hand",
+			[clsid.tushkano]				= "mutant_part_tushkano_meat",
+			[clsid.tushkano_s]				= "mutant_part_tushkano_meat",
 		},
 		valid_hits = { -- Valid hit types to trigger
 			[hit.wound] = true
@@ -2041,7 +2052,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 				return
 			end
 
-			if random() > 0.1 then
+			if random() > 0.07 then
 				trace("Dragon's Eye, heli not triggered")
 				return
 			end
@@ -5182,7 +5193,7 @@ artefact_binder_on_update_functions = {
 			binder.max_distance_from_actor_sqr = 80 ^ 2
 			binder.take_distance_sqr = 1.6 ^ 2
 
-			binder.homing_speed = 0.7
+			binder.homing_speed = 0.75
 			binder.speed = 120
 			binder.damage = 0.55
 
@@ -5497,7 +5508,7 @@ af_lighthouse_user_teleport_func = {
 		return obj:section() == "af_lighthouse"
 	end,
 	string = function(obj, bag, mode)
-		return "st_pba_teleport"
+		return "st_pba_engage"
 	end,
 	action = function(obj, bag, mode)
 		return perk_based_artefacts_af_choose_ui.start(obj, "st_pba_teleport_choose")

@@ -25,6 +25,7 @@
     %c[0,209,172,56]SPECIAL ABILITY: %c[d_orange]Disintegration Field\n
     %c[0,192,71,221] • %c[ui_gray_3]Throw the artefact to spawn a Disintegraiton Protection Field.\n
     %c[0,192,71,221] • %c[ui_gray_3]Disintegration Field reduces bullet damage by 60-100% in its vicinity with small radiation penalty.\n
+    %c[0,192,71,221] • %c[ui_gray_3]The field lasts 1 minute. \n
     %c[0,192,71,221] • %c[ui_gray_3]Move the artefact to grenade slot manually or Right Click-Engage on it and then throw it like a grenade. \n
     %c[0,192,71,221] • %c[ui_gray_3]The artefact is consumed upon use.
     </text>
@@ -43,7 +44,7 @@
     %c[0,81,63,22]  • %c[0,209,172,56]Critical hits (headshots) give 15% bonus.\n
     %c[0,81,63,22]  • %c[0,209,172,56]Missing the shot resets the bonus stack and gives psy damage penalty proportional to the stack you had.\n
     %c[0,81,63,22]  • %c[0,209,172,56]Bonus can be stacked infinitely as long as you don't miss.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Multiple artefacts double the bonus values.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Stacks with multiple artefacts.\n
     %c[0,81,63,22]  • %c[0,209,172,56]Unequipping all Spike artefacts will remove the stacks without penalties.
     </text>
   </string>
@@ -81,14 +82,15 @@
   <string id="st_pba_af_sun_perk">
     <text>
     %c[0,209,172,56]PERK: %c[d_orange]Solar Powered\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Gives health and stamina boost at clear weather, little stamina boost at partly clear and stamina penalty at not clear and at night from 21 to 5 o'clock.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Gives health and stamina boost at clear weather and little stamina boost at partly clear from 5 to 21 o'clock.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]At other time or weather conditions gives stamina penalty.\n
     %c[0,81,63,22]  • %c[0,209,172,56]Stacks with multiple artefacts.
     </text>
   </string>
   <string id="st_pba_af_ear_perk">
     <text>
     %c[0,209,172,56]PERK: %c[d_orange]Will to Live\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Gives stronger health regen the less health you have, up to 30%.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Gives stronger health regen the less health you have, beginning with 30%.\n
     %c[0,81,63,22]  • %c[0,209,172,56]If the health is below 30%, you receive up to 50% less damage depending on how low health you are.\n
     %c[0,81,63,22]  • %c[0,209,172,56]More artefacts increase the regen, upper health threshold for effect to start by 3% and max damage protection by 10%.
     </text>
@@ -120,9 +122,9 @@
     %c[0,81,63,22]  • %c[0,209,172,56]Does not stack.\n \n
     %c[0,209,172,56]SPECIAL ABILITY: %c[d_orange]Custom Teleport\n
     %c[0,192,71,221] • %c[ui_gray_3]Right Click-Engage on the artefact to choose the custom point to teleport.\n
-    %c[0,192,71,221] • %c[ui_gray_3]Due to Pauli Exclusion Principle, no two entities can be at the same place at the same time\n
-    %c[0,192,71,221] • %c[ui_gray_3]The artefact is consumed upon use.
-    %c[0,192,71,221] • %c[ui_gray_3]Press Escape to cancel the teleportation.\n
+    %c[0,192,71,221] • %c[ui_gray_3]Due to Pauli Exclusion Principle, no two entities can be at the same place at the same time.\n
+    %c[0,192,71,221] • %c[ui_gray_3]The artefact is consumed upon use.\n
+    %c[0,192,71,221] • %c[ui_gray_3]Press Escape to cancel the teleportation.
     </text>
   </string>
   <string id="st_pba_af_fire_loop_perk">
@@ -178,7 +180,7 @@
     <text>
     %c[0,209,172,56]PERK: %c[d_orange]Necessary Gluttony\n
     %c[0,81,63,22]  • %c[0,209,172,56]Upon consuming food, greatly increases health recovery.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Each second, 10% of calories are restored as health.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Each second, 10% of consumed calories are restored as health.\n
     %c[0,81,63,22]  • %c[0,209,172,56]Effect lasts for 5 seconds.\n
     %c[0,81,63,22]  • %c[0,209,172,56]Stacks with multiple artefacts.
     </text>
@@ -203,9 +205,9 @@
     %c[0,209,172,56]PERK: %c[d_orange]Chakram\n
     %c[0,81,63,22]  • %c[0,209,172,56]The artefact is a powerful throwing weapon.\n
     %c[0,81,63,22]  • %c[0,209,172,56]It will seek nearby foes and deal laceration damage upon contact.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]It has the ability to ricochet of the walls and the objects.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Has the ability to ricochet of the walls and the objects.\n
     %c[0,81,63,22]  • %c[0,209,172,56]After some time or if its too far away, it will return to the wielder.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Consumes 50% of condition of the artefact upon throwing.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Normally has 2 uses, denoted by the condition of the artefact.\n
     %c[0,81,63,22]  • %c[0,209,172,56]Move the artefact to grenade slot manually or Right Click-Engage on it and then throw it like a grenade.
     </text>
   </string>
@@ -269,7 +271,7 @@
     %c[0,81,63,22]  • %c[0,209,172,56]Does not stack.\n \n
     %c[d_orange]Effects: \n
           %c[0,192,71,221] -   Flesh meat: %c[ui_gray_3]3%/sec health regen, 33% bullet damage penalty.\n
-          %c[0,192,71,221] -   Boar meat: %c[ui_gray_3]50% damage reduction.\n
+          %c[0,192,71,221] -   Boar meat: %c[ui_gray_3]50% bullet and wound damage reduction.\n
           %c[0,192,71,221] -   Dog meat: %c[ui_gray_3]strong bleeding cure, 1%/sec psy regen.\n
           %c[0,192,71,221] -   Pseudodog: %c[ui_gray_3]3%/sec psy regen, 50% psy damage reduction.\n
           %c[0,192,71,221] -   Bloodsucker: %c[ui_gray_3]become invisible until shooting or hitting enemy, very strong bleeding cure.\n
@@ -302,7 +304,7 @@
     %c[0,192,71,221] • %c[ui_gray_3]Grants infinite sprint and bonus to speed movement.\n
     %c[0,192,71,221] • %c[ui_gray_3]Upon shooting the weapon, the artefact increases its charge, resulting in increasing fire rate and additional movement speed.\n
     %c[0,192,71,221] • %c[ui_gray_3]Slower to shoot guns provide stronger charge.\n
-    %c[0,192,71,221] • %c[ui_gray_3]When not shooting, artefact will gradually lose it charge.\n
+    %c[0,192,71,221] • %c[ui_gray_3]When not shooting, artefact will gradually lose it charge.
     </text>
   </string>
   <string id="st_pba_af_kogot_perk">
@@ -323,14 +325,15 @@
     %c[0,81,63,22]  • %c[0,209,172,56]The first shot that hits the enemy will make it violently explode.\n
     %c[0,81,63,22]  • %c[0,209,172,56]Explosion spawn meaty gibs and hurts everyone in the radius.\n
     %c[0,81,63,22]  • %c[0,209,172,56]User's discretion is advised.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]If you are lucky, you can hit helicopter's pilot and engage the artefact.\n
     %c[0,81,63,22]  • %c[0,209,172,56]Has 2 minutes cooldown.\n
     %c[0,81,63,22]  • %c[0,209,172,56]Each additional artefact decrease the cooldown by 3 times.\n \n
     %c[0,209,172,56]SPECIAL ABILITY: %c[d_orange]Exploderball\n
     %c[0,192,71,221] • %c[ui_gray_3]Right Click-Engage on the artefact to drop it and roll to the cursor position.\n
     %c[0,192,71,221] • %c[ui_gray_3]While rolling, press Right Click to perform small jump.\n
-    %c[0,192,71,221] • %c[ui_gray_3]While rolling, press Left Click to blow up the artefact.\n
+    %c[0,192,71,221] • %c[ui_gray_3]Press Left Click to blow up the artefact.\n
     %c[0,192,71,221] • %c[ui_gray_3]The artefact is consumed upon use.\n
-    %c[0,192,71,221] • %c[ui_gray_3]While rolling, press Escape to cancel.\n
+    %c[0,192,71,221] • %c[ui_gray_3]Press Escape to cancel.
     </text>
   </string>
 </string_table>

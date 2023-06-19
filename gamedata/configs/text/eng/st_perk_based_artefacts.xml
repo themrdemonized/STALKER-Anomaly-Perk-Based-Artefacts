@@ -10,6 +10,18 @@
 		<text>transmutate</text>
 	</string>
 
+	<string id="st_pba_engage">
+		<text>engage</text>
+	</string>
+
+	<string id="st_pba_teleport_choose">
+		<text>Choose teleport point. Left Click to teleport, Escape to cancel</text>
+	</string>
+
+	<string id="st_pba_dragon_eye_engage">
+		<text>Guide the artefact. Right click to jump, Left click to blow up, Escape to cancel</text>
+	</string>
+
 	<string id="st_af_lucifer_name">
 		<text>Lucifer</text>
 	</string>
@@ -17,7 +29,7 @@
 	<string id="st_af_lucifer_descr">
 		<text>
 			You signed a Pact with the Zone. You are being rewarded with amazing abilities in exchange for your life force. To prevent your demise and prolong your existence, you are given a chance to sacrifice other Zone's riches. The quality of the offering matters as you will be compensated appropriately. Do not slack off and remember - the clock is ticking.\n \n
-			%c[0,209,172,56]Perk: %c[d_orange]The Lucifer Effect\n 
+			%c[0,209,172,56]PERK: %c[d_orange]The Lucifer Effect\n 
 			%c[0,81,63,22]  • %c[0,209,172,56]Lucifer grants you immense strength and abilities, making you a demigod\n
 			%c[0,81,63,22]  • %c[0,209,172,56]At max condition you receive:\n
 			%c[0,192,71,221] -   50%%c[ui_gray_3] reduction of any damage\n
