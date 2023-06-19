@@ -42,6 +42,7 @@
     %c[0,209,172,56]PERK: %c[d_orange]Critical Ascensi0n\n
     %c[0,81,63,22]  • %c[0,209,172,56]Consecutive hits give 5% bonus to damage of your next shot.\n
     %c[0,81,63,22]  • %c[0,209,172,56]Critical hits (headshots) give 15% bonus.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Restores psy-health on each hit with amount depending on stacks.\n
     %c[0,81,63,22]  • %c[0,209,172,56]Missing the shot resets the bonus stack and gives psy damage penalty proportional to the stack you had.\n
     %c[0,81,63,22]  • %c[0,209,172,56]Bonus can be stacked infinitely as long as you don't miss.\n
     %c[0,81,63,22]  • %c[0,209,172,56]Stacks with multiple artefacts.\n

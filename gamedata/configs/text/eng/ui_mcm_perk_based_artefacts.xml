@@ -32,5 +32,45 @@
 	<string id="ui_mcm_perk_based_artefacts_timed_degradation_desc">
 		<text>Each 20 seconds perk artefacts will lose its condition by this percent</text>
 	</string>
+
+	<string id="ui_mcm_perk_based_artefacts_ui_enabled">
+		<text>Enable PBA UI</text>
+	</string>
+	<string id="ui_mcm_perk_based_artefacts_position">
+		<text>Adjust UI</text>
+	</string>
+	<string id="ui_mcm_perk_based_artefacts_test_elements">
+		<text>Elements To Test</text>
+	</string>
+	<string id="ui_mcm_perk_based_artefacts_scaling">
+		<text>Scaling</text>
+	</string>
+	<string id="ui_mcm_perk_based_artefacts_pos_x">
+		<text>X Position</text>
+	</string>
+	<string id="ui_mcm_perk_based_artefacts_pos_y">
+		<text>Y Position</text>
+	</string>
+	<string id="ui_mcm_perk_based_artefacts_indicator_margin">
+		<text>Indicators Margin</text>
+	</string>
+	<string id="ui_mcm_perk_based_artefacts_alignment">
+		<text>Indicators Alignment</text>
+	</string>
+	<string id="ui_mcm_perk_based_artefacts_icon_size">
+		<text>Icon Size</text>
+	</string>
+	<string id="ui_mcm_perk_based_artefacts_display_text">
+		<text>Display Text</text>
+	</string>
+	<string id="ui_mcm_perk_based_artefacts_text_margin">
+		<text>Text Margin</text>
+	</string>
+	<string id="ui_mcm_perk_based_artefacts_text_alignment">
+		<text>Text Alignment</text>
+	</string>
+	<string id="ui_mcm_perk_based_artefacts_text_font">
+		<text>Text Font</text>
+	</string>
 	
 </string_table>

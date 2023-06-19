@@ -32,5 +32,45 @@
 	<string id="ui_mcm_perk_based_artefacts_timed_degradation_desc">
 		<text>Каждые 20 секунд перк-артефакты будут терять состояние на данный процент</text>
 	</string>
+
+	<string id="ui_mcm_perk_based_artefacts_ui_enabled">
+		<text>Включить PBA UI</text>
+	</string>
+	<string id="ui_mcm_perk_based_artefacts_position">
+		<text>Настройка пользовательского интерфейса</text>
+	</string>
+	<string id="ui_mcm_perk_based_artefacts_test_elements">
+		<text>Элементы для тестирования</text>
+	</string>
+	<string id="ui_mcm_perk_based_artefacts_scaling">
+		<text>Масштабирование</text>
+	</string>
+	<string id="ui_mcm_perk_based_artefacts_pos_x">
+		<text>Положение X</text>
+	</string>
+	<string id="ui_mcm_perk_based_artefacts_pos_y">
+		<text>Положение Y</text>
+	</string>
+	<string id="ui_mcm_perk_based_artefacts_indicator_margin">
+		<text>Отступ индикаторов</text>
+	</string>
+	<string id="ui_mcm_perk_based_artefacts_alignment">
+		<text>Выравнивание индикаторов</text>
+	</string>
+	<string id="ui_mcm_perk_based_artefacts_icon_size">
+		<text>Размер иконки</text>
+	</string>
+	<string id="ui_mcm_perk_based_artefacts_display_text">
+		<text>Отобразить текст</text>
+	</string>
+	<string id="ui_mcm_perk_based_artefacts_text_margin">
+		<text>Отступ текста</text>
+	</string>
+	<string id="ui_mcm_perk_based_artefacts_text_alignment">
+		<text>Выравнивание текста</text>
+	</string>
+	<string id="ui_mcm_perk_based_artefacts_text_font">
+		<text>Шрифт текста</text>
+	</string>
 	
 </string_table>

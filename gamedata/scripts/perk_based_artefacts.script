@@ -2252,6 +2252,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			end
 			self:stack_reset()
 		end,
+		hitted_bullets = {},
 		on_before_hit = function(self, actor, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
 			s_hit.power = s_hit.power * self.damage_multiplier
 			trace("Spike, Final Damage %s, bonus %s", s_hit.power, self.damage_multiplier)
@@ -4032,6 +4033,11 @@ artefact_on_weapon_fired_functions = {
 
 	-- Spike, Perk: Critical Ascensi0n
 	af_spaika = function(actor, artefact_count, artefact_ids, artefact_names, obj, wpn, ammo_elapsed, grenade_elapsed, ammo_type, grenade_type)
+		-- Return if bullet callbacks are available
+		if _G.CBulletOnImpact then
+			return
+		end
+
 		local af_spaika = artefact_props.af_spaika
 		trace("Spike, on_weapon_fired weapon_shot %s", af_spaika.weapon_shot)
 
@@ -4952,9 +4958,29 @@ artefact_on_hud_animation_play_functions = {
 	end,
 }
 
--- Functions for artefacts which provide perk bonuses for bullet impacts
+-- Functions for artefacts which provide perk bonuses for bullets
 artefact_bullet_on_impact_functions = {
-
+	-- Spike
+	af_spaika = function(actor, artefact_count, artefact_ids, artefact_names, bullet)
+		local af_spaika = artefact_props.af_spaika
+		local obj = level.object_by_id(bullet.target_id)
+		trace("Spike, Bullet impact")
+		if obj and (IsMonster(obj) or IsStalker(obj)) and obj:alive() then
+			af_spaika.hitted_bullets[bullet.bullet_id] = bullet
+		end
+	end,
+}
+artefact_bullet_on_remove_functions = {
+	-- Spike
+	af_spaika = function(actor, artefact_count, artefact_ids, artefact_names, bullet)
+		local af_spaika = artefact_props.af_spaika
+		trace("Spike, Bullet remove")
+		if af_spaika.hitted_bullets[bullet.bullet_id] then
+			af_spaika.hitted_bullets[bullet.bullet_id] = nil
+		else
+			af_spaika:effect_reset()
+		end
+	end,
 }
 
 -- Functions for artefacts on key press
@@ -6054,6 +6080,12 @@ function bullet_on_impact(bullet)
 	artefact_props.af_sandstone:play_particles(effect, vector():set(bullet.position):mad(bullet.direction, -0.3))
 end
 
+function bullet_on_remove(bullet)
+	if bullet.parent_id == AC_ID then
+		process_artefacts(artefact_bullet_on_remove_functions, bullet)
+	end
+end
+
 function actor_on_hud_animation_play(anm_table, obj)
 	process_artefacts(artefact_on_hud_animation_play_functions, anm_table, obj)
 end
@@ -6144,6 +6176,7 @@ function actor_on_first_update()
 	-- Modded exes
 	if _G.CBulletOnImpact then
 		RegisterScriptCallback("bullet_on_impact", bullet_on_impact)
+		RegisterScriptCallback("bullet_on_remove", bullet_on_remove)
 	end
 end
 
