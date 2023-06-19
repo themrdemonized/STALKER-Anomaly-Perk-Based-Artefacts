@@ -5009,7 +5009,7 @@ artefact_on_key_press_functions = {
 								"definitely_not_found_kind"
 							)]
 						))
-						or (IsStalker(obj) and xr_combat_ignore.fighting_with_actor_npcs[obj:id()])
+						-- or (IsStalker(obj) and xr_combat_ignore.fighting_with_actor_npcs[obj:id()])
 					)
 					and obj:alive()
 					and obj:position():distance_to(actor:position()) <= af_ball.scan_radius
