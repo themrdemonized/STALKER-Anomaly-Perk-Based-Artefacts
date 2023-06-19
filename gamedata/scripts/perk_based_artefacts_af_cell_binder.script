@@ -111,6 +111,8 @@ function af_cell_grenade_binder:__init(obj) super(obj)
 end
 
 function af_cell_grenade_binder:fastcall()
+    if self.destroyed then return end
+
     local obj = self.object
     local id = obj:id()
 
@@ -269,7 +271,7 @@ function CellProtectionField:__init(args)
     -- Params
     self.position = args.position
     self.time_active = args.time_active or 60
-    self.radius = args.radius or 6
+    self.radius = args.radius or 5.5
     self.radius_sqr = self.radius ^ 2
     
     if args.particles and type(args.particles) ~= "table" then

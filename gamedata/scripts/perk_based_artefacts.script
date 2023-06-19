@@ -6061,7 +6061,6 @@ function on_item_drag_dropped(obj_1, obj_2, slot_from, slot_to)
 end
 
 function bullet_on_impact(bullet)
-
 	if bullet.parent_id == AC_ID then
 		process_artefacts(artefact_bullet_on_impact_functions, bullet)
 	end
