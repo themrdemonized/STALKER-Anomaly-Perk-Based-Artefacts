@@ -89,7 +89,7 @@ function af_cell_grenade_binder:__init(obj) super(obj)
     self.tg_time = 0
 
     -- Above this velocity cocktail will blow up
-    self.velocity_threshold = 0
+    self.velocity_threshold = 0.3
 
     -- After this distance cocktail will blow up
     self.travel_distance_threshold = 0
@@ -211,7 +211,7 @@ function af_cell_grenade_binder:fastcall()
 
     -- If ray in contact range and enough velocity and enough distance traveled - blow up
     -- Set flag to destroy so it postpones on next update
-    if res.in_contact and not_passable
+    if res.in_contact and not_passable and velocity > self.velocity_threshold
     then
         -- print_tip("obj %s is in_contact %s, velocity %s", self.object:name(), res.in_contact, velocity)
         self.force_destroy = true

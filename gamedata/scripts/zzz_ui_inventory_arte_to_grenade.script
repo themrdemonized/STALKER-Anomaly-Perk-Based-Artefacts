@@ -20,6 +20,9 @@ scopes_to_binocs = scopes_as_binocs and scopes_as_binocs.scopes_to_binocs
 artefacts_to_grenades = arte_to_grenades and arte_to_grenades.arte_to_grenades
 
 function move_arte_to_grenade(obj_from)
+	if db.actor:item_in_slot(4) then
+		db.actor:move_to_ruck(db.actor:item_in_slot(4))
+	end
 	-- Scope to Binoc Scope
 	if artefacts_to_grenades 
 	and artefacts_to_grenades[obj_from:section()] 
