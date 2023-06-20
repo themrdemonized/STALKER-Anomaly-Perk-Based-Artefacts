@@ -2249,7 +2249,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 				change_psy_health(max(-0.9, (self.damage_multiplier - 1) * -self.psy_health_penalty_coeff))
 				play_sound_on_actor("anomaly\\electra_hit1", 1, 1.5)
 			else
-				play_sound_on_actor("perk_based_artefacts\\quake3_hitsound", 0.75, 0.8)
+				-- play_sound_on_actor("perk_based_artefacts\\quake3_hitsound", 0.75, 0.8)
 			end
 			self:stack_reset()
 		end,
