@@ -1,4 +1,4 @@
-Perk Based Artefacts 2.0
+# Perk Based Artefacts 2.0
 A unique twist on overhauling old junk artefacts beyond the boundaries of simple stat changers.
 
 All 30+ Junk artefacts are no longer junk and received unique special abilities or Perks. The degree of perks vary from simple boosters to marvellous staff like recharging batteries by stepping in Electra, receiving Money on Headshots or Even Evading Death itself when all hope is lost.
