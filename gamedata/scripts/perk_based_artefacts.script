@@ -2282,6 +2282,9 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			end
 		end,
 		on_before_hit = function(self, actor, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
+			local wpn = actor:active_item()
+			if not (IsWeapon(wpn) and not IsMelee(wpn)) then return end 
+			
 			s_hit.power = s_hit.power * self.damage_multiplier
 			trace("Spike, Final Damage %s, bonus %s", s_hit.power, self.damage_multiplier)
 			play_sound_on_actor("perk_based_artefacts\\quake3_hitsound", 0.75, 1 + (self.damage_multiplier - 1) * 0.5)
@@ -6101,7 +6104,7 @@ end
 function bullet_on_init(bullet)
 	if bullet.parent_id == AC_ID then
 		local wpn = get_object_by_id(bullet.weapon_id)
-		if wpn and IsWeapon(wpn) then
+		if wpn and IsWeapon(wpn) and not IsMelee(wpn) then
 			process_artefacts(artefact_bullet_on_init_functions, bullet)
 		end
 	end
@@ -6110,7 +6113,7 @@ end
 function bullet_on_impact(bullet)
 	if bullet.parent_id == AC_ID then
 		local wpn = get_object_by_id(bullet.weapon_id)
-		if wpn and IsWeapon(wpn) then
+		if wpn and IsWeapon(wpn) and not IsMelee(wpn) then
 			process_artefacts(artefact_bullet_on_impact_functions, bullet)
 		end
 	end
@@ -6132,7 +6135,7 @@ end
 function bullet_on_remove(bullet)
 	if bullet.parent_id == AC_ID and IsWeapon(get_object_by_id(bullet.weapon_id)) then
 		local wpn = get_object_by_id(bullet.weapon_id)
-		if wpn and IsWeapon(wpn) then
+		if wpn and IsWeapon(wpn) and not IsMelee(wpn) then
 			process_artefacts(artefact_bullet_on_remove_functions, bullet)
 		end
 	end
