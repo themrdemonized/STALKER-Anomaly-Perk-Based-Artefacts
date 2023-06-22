@@ -165,7 +165,8 @@
   <string id="st_pba_af_kislushka_perk">
     <text>
     %c[0,209,172,56]PERK: %c[d_orange]What Colour Is Your Blood?\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Drains satiety to cure bleeding.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Greatly cures bleeding at the cost of satiety.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]The more wounds, the better healing it provides.\n
     %c[0,81,63,22]  • %c[0,209,172,56]Stacks with multiple artefacts.
     </text>
   </string>
