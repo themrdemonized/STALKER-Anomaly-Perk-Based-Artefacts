@@ -54,8 +54,8 @@ function actor_on_hud_animation_mark(state, mark)
     if obj and obj:section() == "af_medallion_grenade" and state == 7 then
         thrown_obj_id = obj:id()
         thrown_obj_state = zz_item_artefact.readValidMData(alife_object(thrown_obj_id)).state
-        print_r(thrown_obj_state)
-        printf("%s, %s", state, mark)
+        -- print_r(thrown_obj_state)
+        -- printf("%s, %s", state, mark)
     end
 end
 
