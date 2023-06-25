@@ -5261,7 +5261,7 @@ artefact_binder_on_update_functions = {
 			binder.take_distance_sqr = 1.6 ^ 2
 
 			binder.homing_speed = 0.75
-			binder.speed = 120
+			binder.speed = 12.5
 			binder.damage = 0.55
 
 			binder.invalid_try_max = 25
@@ -5495,7 +5495,10 @@ artefact_binder_on_update_functions = {
 				end
 
 				local dir = vector():set(binder.fly_direction):normalize()
-				obj:set_const_force(dir, binder.speed, device().time_delta)
+
+				local mass = obj:mass()
+				local speed = binder.speed * mass
+				obj:set_const_force(dir, speed, device().time_delta)
 
 				if settings.debug_mode then
 					-- level.set_cam_custom_position_direction(obj:position():mad(binder.fly_direction, -0.2), vector():set(binder.fly_direction:getH(), binder.fly_direction:getP(), 0))
