@@ -2,6 +2,9 @@ function false_func()
     return false
 end
 
+-- bandaid fix
+op = {gr={}}
+
 function on_mcm_load()
     op = {
         id = "perk_based_artefacts", sh = true, gr = {
