@@ -5496,9 +5496,9 @@ artefact_binder_on_update_functions = {
 
 				local dir = vector():set(binder.fly_direction):normalize()
 
-				local mass = obj:mass()
+				local mass = max(1, obj:mass())
 				local speed = binder.speed * mass
-				obj:set_const_force(dir, speed, device().time_delta)
+				obj:set_const_force(dir, speed, device().time_delta + 1)
 
 				if settings.debug_mode then
 					-- level.set_cam_custom_position_direction(obj:position():mad(binder.fly_direction, -0.2), vector():set(binder.fly_direction:getH(), binder.fly_direction:getP(), 0))
