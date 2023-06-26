@@ -2,38 +2,35 @@ function false_func()
     return false
 end
 
--- bandaid fix
-op = {gr={}}
+op = {
+    id = "perk_based_artefacts", sh = true, gr = {
+        {id = "banner", type = "slide", text = "ui_mcm_perk_based_artefacts_title", size = {512, 50}, spacing = 20},
+        {id = "debug_mode", type = "check", val = 1, def = false},
+        {id = "allow_arty_containers", type = "check", val = 1, def = false},
+        {id = "treasure_chance", type = "track", val = 2, min = 0, max = 100, step = 10, def = 30},
+        {id = "timed_degradation", type = "track", val = 2, min = 0, max = 5, step = 0.2, def = 0},
+
+        {id = "divider", type = "line"},
+
+        {id = "ui_enabled", type = "check", val = 1, def = true},
+        {id = "pos_x", type = "track", val = 2, min = 0, max = 1020, step = 5, def = 500, precondition = {false_func}},
+        {id = "pos_y", type = "track", val = 2, min = 0, max = 760, step = 5, def = 680, precondition = {false_func}},
+        {id = "scaling", type = "track", val = 2, min = 0.3, max = 1.5, step = 0.05, def = 0.7, precondition = {false_func}},
+        {id = "indicator_margin", type = "track", val = 2, min = 0, max = 40, step = 1, def = 15, precondition = {false_func}},
+        {id = "icon_size", type = "track", val = 2, min = 0.3, max = 1, step = 0.05, def = 0.8, precondition = {false_func}},
+        {id = "text_margin", type = "track", val = 2, min = 0, max = 100, step = 2, def = 24, precondition = {false_func}},
+        {id = "alignment", type = "track", val = 2, min = 0, max = 2, step = 1, def = 1, precondition = {false_func}},
+        {id = "display_text", type = "track", val = 2, min = 0, max = 1, step = 1, def = 1, precondition = {false_func}},
+        {id = "text_alignment", type = "track", val = 2, min = 0, max = 2, step = 1, def = 2, precondition = {false_func}},
+        {id = "text_font", type = "track", val = 2, min = 1, max = 10, step = 1, def = 3, precondition = {false_func}},
+
+        {id = "divider", type = "line", precondition = {function() return level_present() end}},
+        {id = "position", type = "button", functor_ui = {function(self) return start_ui(self) end}, precondition = {function() return level_present() end}},
+        {id = "divider", type = "line", precondition = {function() return level_present() end}}
+    }
+}
 
 function on_mcm_load()
-    op = {
-        id = "perk_based_artefacts", sh = true, gr = {
-            {id = "banner", type = "slide", text = "ui_mcm_perk_based_artefacts_title", size = {512, 50}, spacing = 20},
-            {id = "debug_mode", type = "check", val = 1, def = false},
-            {id = "allow_arty_containers", type = "check", val = 1, def = false},
-            {id = "treasure_chance", type = "track", val = 2, min = 0, max = 100, step = 10, def = 30},
-            {id = "timed_degradation", type = "track", val = 2, min = 0, max = 5, step = 0.2, def = 0},
-
-            {id = "divider", type = "line"},
-
-            {id = "ui_enabled", type = "check", val = 1, def = true},
-            {id = "pos_x", type = "track", val = 2, min = 0, max = 1020, step = 5, def = 500, precondition = {false_func}},
-            {id = "pos_y", type = "track", val = 2, min = 0, max = 760, step = 5, def = 680, precondition = {false_func}},
-            {id = "scaling", type = "track", val = 2, min = 0.3, max = 1.5, step = 0.05, def = 0.7, precondition = {false_func}},
-            {id = "indicator_margin", type = "track", val = 2, min = 0, max = 40, step = 1, def = 15, precondition = {false_func}},
-            {id = "icon_size", type = "track", val = 2, min = 0.3, max = 1, step = 0.05, def = 0.8, precondition = {false_func}},
-            {id = "text_margin", type = "track", val = 2, min = 0, max = 100, step = 2, def = 24, precondition = {false_func}},
-            {id = "alignment", type = "track", val = 2, min = 0, max = 2, step = 1, def = 1, precondition = {false_func}},
-            {id = "display_text", type = "track", val = 2, min = 0, max = 1, step = 1, def = 1, precondition = {false_func}},
-            {id = "text_alignment", type = "track", val = 2, min = 0, max = 2, step = 1, def = 2, precondition = {false_func}},
-            {id = "text_font", type = "track", val = 2, min = 1, max = 10, step = 1, def = 3, precondition = {false_func}},
-
-            {id = "divider", type = "line", precondition = {level_present}},
-            {id = "position", type = "button", functor_ui = {start_ui}, precondition = {level_present}},
-            {id = "divider", type = "line", precondition = {level_present}}
-        }
-    }
-
     -- Special
     function start_ui(self)
         self:On_Cancel()
