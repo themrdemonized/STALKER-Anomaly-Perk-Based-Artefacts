@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="windows-1251"?>
+
+<string_table>
+	
+	<string id="ui_mcm_item_artefact_title">
+		<text>Estado Del Artefacto</text>
+	</string>
+	<string id="ui_mcm_menu_item_artefact">
+		<text>Condicion Del Artefacto</text>
+	</string>
+	<string id="ui_mcm_item_artefact_enable_condition_bar">
+		<text>Habilitar barra de condiciones</text>
+	</string>
+	<string id="ui_mcm_item_artefact_enable_degraded_drops">
+		<text>Habilitar el botín degradado de artefactos/accesorios/pieles</text>
+	</string>
+	<string id="ui_mcm_item_artefact_mutant_part_condition_min">
+		<text>Condicion minima de las pieles de mutantes despellejados o pieles de mutantes saqueadas.</text>
+	</string>
+	<string id="ui_mcm_item_artefact_mutant_part_condition_max">
+		<text>Condicion maxima de las pieles de mutantes despellejados o pieles de mutantes saqueadas.</text>
+	</string>
+	
+	
+</string_table>

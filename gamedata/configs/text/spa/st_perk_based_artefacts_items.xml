@@ -224,35 +224,35 @@
     <text>Basilisk</text>
   </string>
   <string id="st_af_vaselisk_descr">
-    <text>One of the few artefacts in the Zone which copes well with all kinds of physical influences on its owner.\n \n
-    %c[ui_gray_2]PROPERTIES:\n
-    %c[ui_cyan] • %c[ui_gray_2] inert artefact\n
-    %c[d_cyan] • %c[ui_gray_2] valuable</text>
+    <text>Uno de los pocos artefactos en la Zona que soporta bien todo tipo de influencias fisicas sobre su dueno.\n \n
+    %c[ui_gray_2]PROPIEDADES:\n
+    %c[ui_cyan] • %c[ui_gray_2] Artefacto Inerte\n
+    %c[d_cyan] • %c[ui_gray_2] Valioso</text>
   </string>
   <string id="st_af_geliy_name">
     <text>Helium</text>
   </string>
   <string id="st_af_geliy_descr">
-    <text>A bright (literally) representative of the family of electrostatic artefacts. It gives off a gaseous substance that has a beneficial effect on the body. Due to its high efficiency, it is in large demand.\n \n
-    %c[ui_gray_2]PROPERTIES:\n
-    %c[ui_cyan] • %c[ui_gray_2] inert artefact\n
-    %c[d_cyan] • %c[ui_gray_2] valuable</text>
+    <text>Un representante brillante (literalmente) de la familia de artefactos electrostaticos. Desprende una sustancia gaseosa que tiene un efecto beneficioso sobre el organismo. Debido a su alta eficiencia, tiene una gran demanda.\n \n
+    %c[ui_gray_2]PROPIEDADES:\n
+    %c[ui_cyan] • %c[ui_gray_2] Artefacto Inerte\n
+    %c[d_cyan] • %c[ui_gray_2] Valioso</text>
   </string>
   <string id="st_af_gimlet_name">
     <text>Gimlet </text>
   </string>
   <string id="st_af_gimlet_descr">
     <text>The bowl-shaped petals of this artefact can release a powerful stimulant vapor which can alter the balance of human hormones. Of little use to stalkers, it is very much sought after for medical research. \n \n
-    %c[ui_gray_2]PROPERTIES:\n
-    %c[ui_cyan] • %c[ui_gray_2] inert artefact\n
-    %c[d_cyan] • %c[ui_gray_2] valuable</text>
+    %c[ui_gray_2]PROPIEDADES:\n
+    %c[ui_cyan] • %c[ui_gray_2] Artefacto Inerte\n
+    %c[d_cyan] • %c[ui_gray_2] Valioso</text>
   </string>
   <string id="st_arty_save">
     <text>Ojo de la Noosfera</text>
   </string>
   <string id="st_arty_save_descr">
     <text>Uno de los artefactos mas misteriosos de la Zona, el Ojo de la Noosfera puede transportar a su portador al pasado, incluso para escapar de la muerte. Un apreton fuerte del artefacto activa su habilidad, creando un punto de restauracion al que volver al activarse o morir. El uso frecuente puede hacer que el artefacto cambie de color, pero si se descarga con demasiada frecuencia puede dejar de funcionar por completo. El Ojo restaura gradualmente su poder con el tiempo, supuestamente alimentado por la energia anomala de la Zona.\n \n
-    %c[ui_gray_2]PROPERTIES:\n
-    %c[0,81,63,22] • %c[0,255,215,0] superartefact</text>
+    %c[ui_gray_2]PROPIEDADES:\n
+    %c[0,81,63,22] • %c[0,255,215,0] Super Artefacto</text>
   </string>
 </string_table>

@@ -32,5 +32,45 @@
 	<string id="ui_mcm_perk_based_artefacts_timed_degradation_desc">
 		<text>Cada 20 segundos los artefactos de perk perderan su condiciùn en este porcentaje</text>
 	</string>
+
+	<string id="ui_mcm_perk_based_artefacts_ui_enabled">
+		<text>Habilitar la interfaz de usuario de PBA</text>
+	</string>
+	<string id="ui_mcm_perk_based_artefacts_position">
+		<text>Ajustar la interfaz de usuario</text>
+	</string>
+	<string id="ui_mcm_perk_based_artefacts_test_elements">
+		<text>Elementos a probar</text>
+	</string>
+	<string id="ui_mcm_perk_based_artefacts_scaling">
+		<text>Escalada</text>
+	</string>
+	<string id="ui_mcm_perk_based_artefacts_pos_x">
+		<text>Posicion X</text>
+	</string>
+	<string id="ui_mcm_perk_based_artefacts_pos_y">
+		<text>Posicion Y</text>
+	</string>
+	<string id="ui_mcm_perk_based_artefacts_indicator_margin">
+		<text>Indicadores Margen</text>
+	</string>
+	<string id="ui_mcm_perk_based_artefacts_alignment">
+		<text>Alineacion de Indicadores</text>
+	</string>
+	<string id="ui_mcm_perk_based_artefacts_icon_size">
+		<text>Tamano de icono</text>
+	</string>
+	<string id="ui_mcm_perk_based_artefacts_display_text">
+		<text>Mostrar texto</text>
+	</string>
+	<string id="ui_mcm_perk_based_artefacts_text_margin">
+		<text>Margen de texto</text>
+	</string>
+	<string id="ui_mcm_perk_based_artefacts_text_alignment">
+		<text>Alineacion del texto</text>
+	</string>
+	<string id="ui_mcm_perk_based_artefacts_text_font">
+		<text>Tipografia del texto</text>
+	</string>
 	
 </string_table>

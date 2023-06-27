@@ -10,6 +10,18 @@
 		<text>Transmutar</text>
 	</string>
 
+	<string id="st_pba_engage">
+		<text>Activar Artefacto</text>
+	</string>
+
+	<string id="st_pba_teleport_choose">
+		<text>Elija el punto de teletransporte. Clic izquierdo para teletransportarse, Esc para cancelar</text>
+	</string>
+
+	<string id="st_pba_dragon_eye_engage">
+		<text>Guia el artefacto. Clic derecho para saltar, Clic izquierdo para explotar, Esc para cancelar</text>
+	</string>
+
 	<string id="st_af_lucifer_name">
 		<text>Lucifer</text>
 	</string>
