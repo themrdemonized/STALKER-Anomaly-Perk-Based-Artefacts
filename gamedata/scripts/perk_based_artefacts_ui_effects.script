@@ -363,7 +363,7 @@ function PBAUI:Update(force)
 	self:Hide()
 
 	if not self.test_mode then
-		if not (ui_mcm.get("perk_based_artefacts/ui_enabled") and main_hud_shown()) then
+		if not (ui_mcm.get("perk_based_artefacts/ui_enabled")) then
 			return
 		end
 	end
