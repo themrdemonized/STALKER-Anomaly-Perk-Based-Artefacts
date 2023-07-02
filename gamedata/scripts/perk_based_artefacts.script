@@ -1985,7 +1985,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 
 			s_hit.power = 1000
 
-			local next_time = (60 * 2) / (3 ^ (artefact_count - 1))
+			local next_time = (60 * 3) / (3 ^ (artefact_count - 1))
 			add_cooldown(next_time, self.cooldown_name)
 			add_ui_func(
 				self.cooldown_name,

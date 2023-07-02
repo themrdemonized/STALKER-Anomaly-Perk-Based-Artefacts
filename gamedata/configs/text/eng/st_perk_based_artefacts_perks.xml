@@ -328,7 +328,7 @@
     %c[0,81,63,22]  • %c[0,209,172,56]Explosion spawn meaty gibs and hurts everyone in the radius.\n
     %c[0,81,63,22]  • %c[0,209,172,56]User's discretion is advised.\n
     %c[0,81,63,22]  • %c[0,209,172,56]If you are lucky, you can hit helicopter's pilot and engage the artefact.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Has 2 minutes cooldown.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Has 3 minutes cooldown.\n
     %c[0,81,63,22]  • %c[0,209,172,56]Each additional artefact decrease the cooldown by 3 times.\n \n
     %c[0,209,172,56]SPECIAL ABILITY: %c[d_orange]Exploderball\n
     %c[0,192,71,221] • %c[ui_gray_3]Right Click-Engage on the artefact to drop it and roll to the cursor position.\n
