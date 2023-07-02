@@ -18,6 +18,10 @@
 		<text>Выберите точку телепортации. Щелкните левой кнопкой мыши для телепортации, Escape - для отмены.</text>
 	</string>
 
+	<string id="st_pba_teleport_cooldown">
+		<text>Телепорт недоступен, куллдаун</text>
+	</string>
+
 	<string id="st_pba_dragon_eye_engage">
 		<text>Направляйте артефакт. Щелкните правой кнопкой мыши для прыжка, левой - для взрыва, Escape - для отмены.</text>
 	</string>

@@ -18,6 +18,10 @@
 		<text>Choose teleport point. Left Click to teleport, Escape to cancel</text>
 	</string>
 
+	<string id="st_pba_teleport_cooldown">
+		<text>Teleport is on cooldown</text>
+	</string>
+
 	<string id="st_pba_dragon_eye_engage">
 		<text>Guide the artefact. Right click to jump, Left click to blow up, Escape to cancel</text>
 	</string>
