@@ -86,7 +86,6 @@ local tg_lag = 0 --stores the time_global on game start and then used to correct
 
 local time_elapsed = 0 -- Time from game start used for effects and cooldowns
 local saved_time_elapsed = 0 -- time_elapsed at the end of update
-local time_factor = 6 -- Default time_factor
 
 local actor_is_dying = false
 
@@ -280,8 +279,8 @@ function throttle(func, tg_throttle)
 end
 
 function get_time_elapsed()
-	--trace(time_factor)
-	return floor(get_game_time():diffSec(get_start_time()) / time_factor * 10) * 0.1
+	--trace(get_time_factor())
+	return floor(get_game_time():diffSec(get_start_time()) / get_time_factor() * 10) * 0.1
 end
 
 function get_object_by_id(id) -- same as _g.script one but without spamming in console
@@ -2317,7 +2316,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 		},
 		valid_hits_table = nil, -- Table of valid hits to choose from, updates each hour
 		get_seed = function(self)
-			return ceil(time_elapsed * time_factor / 60 / 60)
+			return ceil(time_elapsed * get_time_factor() / 60 / 60)
 		end,
 		new_fixed_random_table = function(self)
 			local a = {}
@@ -3307,7 +3306,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			self.randomseed = self.randomseed or mdata_load("af_bat_randomseed")
 			self.randomseed_update_time = self.randomseed_update_time or mdata_load("af_bat_randomseed_update_time")
 
-			local seed = ceil(time_elapsed * time_factor / 60 / 60)
+			local seed = ceil(time_elapsed * get_time_factor() / 60 / 60)
 			if self.randomseed_update_time ~= seed then
 				self.randomseed = seed
 				self.randomseed_update_time = seed
@@ -3434,7 +3433,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 		condition = 1,
 		degradation_rate = 0.0000038, --25% per day is 0.0000029
 		get_degradation_rate = function(self)
-			return self.degradation_rate * time_factor
+			return self.degradation_rate * get_time_factor()
 		end,
 		check_lucifer = function(self)
 			-- return has_alife_info("lucifer_active") and db.actor:object("af_lucifer")
@@ -6253,7 +6252,6 @@ function actor_on_first_update()
 	exec_console_cmd("time_factor 1")
 	if level.set_music_volume then level.set_music_volume(1) end
 
-	time_factor = get_time_factor()
 	force_refresh_state()
 	local tg_now = time_global()
 	local tg_add = (tg_now - tg_lag) * 0.001
