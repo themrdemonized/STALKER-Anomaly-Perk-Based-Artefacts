@@ -927,18 +927,22 @@ local weapon_modifiers = demonized_weapon_modifiers
 
 artefact_props = { -- Special props of artefacts that are used in processing
 	af_atom = {
+		sections = {af_atom = true},
 		power_boost = 0.02,
 		radiation_cure =  -0.00005,
 	},
 	af_generator = {
+		sections = {af_generator = true},
 		charge_boost = 0.000015,
 		charge_threshold = 0.05, -- Below this charge the item has no battery
 	},
 	af_kislushka = {
+		sections = {af_kislushka = true},
 		bleeding_cure_boost = 0.00165,
 		satiety_drain = -0.00115,
 	},
 	af_signet = {
+		sections = {af_signet = true},
 		health_boost = 0.001,
 		status_effect_time_increment = function(self, actor, artefact, artefact_count, artefact_ids, artefact_names)
 			return 2 * artefact_count
@@ -961,6 +965,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 		end,
 	},
 	af_ear = {
+		sections = {af_ear = true},
 		sound = get_safe_sound_object("perk_based_artefacts\\heartbeat_pulse_loop"),
 		sound_play = function(self)
 			self.sound:play(db.actor, 0, sound_object.s2d + sound_object.looped)
@@ -1352,6 +1357,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 		end,
 	},
 	af_tapeworm = {
+		sections = {af_tapeworm = true},
 		valid_hits = { -- Valid hit types to trigger
 			[hit.wound] = true,
 			[hit.strike] = true
@@ -1528,6 +1534,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 		end,
 	},
 	af_sun = {
+		sections = {af_sun = true},
 		valid_hits = { -- Valid hit types to trigger
 			[hit.fire_wound] = true,
 			[hit.wound] = true,
@@ -1565,6 +1572,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 		end
 	},
 	af_peas = {
+		sections = {af_peas = true},
 		bleeding_cure_boost = 0.0015,
 		moon_sleep_decrease = { -- Mock item to send to actor_status_sleep to decrease sleep
 			sec = "moon_sleep_decrease",
@@ -1902,6 +1910,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 		end,
 	},
 	af_star_phantom = {
+		sections = {af_star_phantom = true},
 		weapon_hidden = false, -- Check for weapon is hidden
 		hidden_num = 1,
 		sound_start = get_safe_sound_object("perk_based_artefacts\\CTIMSTRT"),
@@ -2338,6 +2347,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 		end
 	},
 	af_sandstone = {
+		sections = {af_sandstone = true},
 		valid_hits = { -- Valid hit types to trigger
 			[hit.light_burn] = true,
 			[hit.burn] = true,
@@ -2809,6 +2819,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 		end
 	},
 	af_chelust = {
+		sections = {af_chelust = true},
 		valid_communities = { -- Valid communities to trigger
 			actor_greh = true
 		},
@@ -2822,6 +2833,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 		heal_companion_boost = 0.002,
 	},
 	af_zhelch = {
+		sections = {af_zhelch = true},
 		health_boost = 0.003,
 		psy_drain = -0.00125,
 		psy_boost = 0.0035,
@@ -3377,6 +3389,14 @@ artefact_props = { -- Special props of artefacts that are used in processing
 		end,
 	},
 	af_lucifer = {
+		sections = {af_lucifer = true},
+		health_boost = 0.001,
+		psy_boost = 0.003,
+		power_boost = 0.01,
+		bleeding_cure_boost = 0.0025,
+		speed_boost = 0,
+		weight_boost = 50,
+		weight_overcharge_boost = 30,
 		allow_artefacts = (function()
 			local t = {}
 			ini_sys:section_for_each(function(sec)
@@ -3575,7 +3595,7 @@ artefact_on_update_functions = {
 
 	-- Sun, Perk: Solar Powered
 	af_sun = {
-		sections = {af_sun = true},
+		sections = artefact_props.af_sun.sections,
 		func = function(self, actor, artefact, artefact_count, artefact_ids, artefact_names)
 			local hours = get_time_hours()
 			local af_sun = artefact_props.af_sun
@@ -3616,7 +3636,7 @@ artefact_on_update_functions = {
 
 	-- Tapeworm, Perk: Stunner
 	af_tapeworm = {
-		sections = {af_tapeworm = true},
+		sections = artefact_props.af_tapeworm.sections,
 		func = function(self, actor, artefact, artefact_count, artefact_ids, artefact_names)
 			local af_tapeworm = artefact_props.af_tapeworm
 			if not check_cooldown("af_tapeworm") then
@@ -3632,7 +3652,7 @@ artefact_on_update_functions = {
 
 	-- Heart, Perk: Will to Live
 	af_ear = {
-		sections = {af_ear = true},
+		sections = artefact_props.af_ear.sections,
 		func = function(self, actor, artefact, artefact_count, artefact_ids, artefact_names)
 			local af_ear = artefact_props.af_ear
 			local health_threshold = af_ear.health_threshold[min(5, artefact_count)]
@@ -3655,7 +3675,7 @@ artefact_on_update_functions = {
 
 	-- Moon, Perk: Friend of the Night
 	af_peas = {
-		sections = {af_peas = true},
+		sections = artefact_props.af_peas.sections,
 		func = function(self, actor, artefact, artefact_count, artefact_ids, artefact_names)
 			local af_peas = artefact_props.af_peas
 			local hours = get_time_hours()
@@ -3682,7 +3702,7 @@ artefact_on_update_functions = {
 
 	-- Signet, Perk: Light of Tranquility
 	af_signet = {
-		sections = {af_signet = true},
+		sections = artefact_props.af_signet.sections,
 		func = function(actor, artefact, artefact_count, artefact_ids, artefact_names)
 			local af_signet = artefact_props.af_signet
 			local health_boost = af_signet.health_boost
@@ -3725,7 +3745,7 @@ artefact_on_update_functions = {
 
 	-- Atom, Perk: Arszi's Blessing
 	af_atom = {
-		sections = {af_atom = true},
+		sections = artefact_props.af_atom.sections,
 		func = function(self, actor, artefact, artefact_count, artefact_ids, artefact_names)
 			local af_atom = artefact_props.af_atom
 			local power_boost = af_atom.power_boost
@@ -3739,7 +3759,7 @@ artefact_on_update_functions = {
 
 	-- Generator, Perk: Godzilla is Approaching
 	af_generator = {
-		sections = {af_generator = true},
+		sections = artefact_props.af_generator.sections,
 		func = function(self, actor, artefact, artefact_count, artefact_ids, artefact_names)
 			local af_generator = artefact_props.af_generator
 			local charge_boost = af_generator.charge_boost
@@ -3762,7 +3782,7 @@ artefact_on_update_functions = {
 
 	-- Sourpuss, Perk: What Colour Is Your Blood?
 	af_kislushka = {
-		sections = {af_kislushka = true},
+		sections = artefact_props.af_kislushka.sections,
 		func = function(self, actor, artefact, artefact_count, artefact_ids, artefact_names)
 			local af_kislushka = artefact_props.af_kislushka
 			local bleeding_cure_boost = af_kislushka.bleeding_cure_boost * artefact_count
@@ -3779,7 +3799,7 @@ artefact_on_update_functions = {
 
 	-- Сhain, Perk: The Weight Of Devotion
 	af_chelust = {
-		sections = {af_chelust = true},
+		sections = artefact_props.af_chelust.sections,
 		func = function(self, actor, artefact, artefact_count, artefact_ids, artefact_names)
 			local actor_community = actor:character_community()
 			trace("Chain, actor community %s", actor_community)
@@ -3844,7 +3864,7 @@ artefact_on_update_functions = {
 
 	-- Scar, Perk: That Insane Stalker from the Freedom Faction
 	af_zhelch = {
-		sections = {af_zhelch = true},
+		sections = artefact_props.af_zhelch.sections,
 		func = function(self, actor, artefact, artefact_count, artefact_ids, artefact_names)
 			local af_zhelch = artefact_props.af_zhelch
 			local af_lucifer = artefact_props.af_lucifer
@@ -3878,7 +3898,7 @@ artefact_on_update_functions = {
 
 	-- Phantom Star, Perk: Phantom Pacifist
 	af_star_phantom = {
-		sections = {af_star_phantom = true},
+		sections = artefact_props.af_star_phantom.sections,
 		func = function(self, actor, artefact, artefact_count, artefact_ids, artefact_names)
 			local af_star_phantom = artefact_props.af_star_phantom
 			for k, v in pairs(artefact_ids) do
@@ -3896,7 +3916,7 @@ artefact_on_update_functions = {
 
 	-- Sandstone
 	af_sandstone = {
-		sections = {af_sandstone = true},
+		sections = artefact_props.af_sandstone.sections,
 		func = function(self, actor, artefact, artefact_count, artefact_ids, artefact_names)
 			local af_sandstone = artefact_props.af_sandstone
 			local wpn = actor:active_item()
@@ -3918,116 +3938,99 @@ artefact_on_update_functions = {
 	},
 
 	-- Lucifer, Perk: The Lucifer Effect
-	af_lucifer = function(actor, artefact, artefact_count, artefact_ids, artefact_names)
-		if not artefact_ids[1] then return end
+	af_lucifer = {
+		sections = artefact_props.af_lucifer.sections,
+		func = function(self, actor, artefact, artefact_count, artefact_ids, artefact_names)
+			if not artefact_ids[1] then return end
 
-		local af_lucifer = get_object_by_id(artefact_ids[1])
-		local _self = artefact_props.af_lucifer
-		local condition = _self.condition
+			local af_lucifer = get_object_by_id(artefact_ids[1])
+			local _self = artefact_props.af_lucifer
+			local condition = _self.condition
 
-		local health_boost = 0.001
-		local psy_boost = 0.003
-		local power_boost = 0.01
-		local bleeding_cure_boost = 0.0025
-		local speed_boost = 0
+			local health_boost = _self.health_boost
+			local psy_boost = _self.psy_boost
+			local power_boost = _self.power_boost
+			local bleeding_cure_boost = _self.bleeding_cure_boost
+			local speed_boost = _self.speed_boost
 
-		af_lucifer:set_condition(condition) -- Double set to set initial condition after loading state
+			af_lucifer:set_condition(condition) -- Double set to set initial condition after loading state
 
-		if condition > 0.5 then
-			local overcharge = _self:get_overcharge()
-			local normal_condition = normalize(condition, 0.5, 1)
-			actor:change_health(health_boost * normal_condition + health_boost * 0.5 * overcharge)
-			actor:change_power(power_boost * normal_condition + power_boost * overcharge)
-			actor.bleeding = bleeding_cure_boost * normal_condition + bleeding_cure_boost * overcharge
-			change_psy_health(psy_boost * normal_condition + psy_boost * overcharge)
-			speed_boost = speed_boosts.af_lucifer.boost * normal_condition
-			add_weight("af_lucifer_weight", 50 * normal_condition + 20 * overcharge, true)
-		else
-			local normal_condition = normalize(condition, 0, 0.5) - 1
-			actor:change_power(power_boost * normal_condition * 0.5)
-			if condition < 0.35 then
-				actor:change_health(health_boost * normal_condition * 0.27)
-			end
-			if condition < 0.0001 then
-				condition = 0.011
-				_self:set_condition(condition, artefact_ids[1])
-				actor:set_health_ex(0)
-				return
-			end
+			if condition > 0.5 then
+				local overcharge = _self:get_overcharge()
+				local normal_condition = normalize(condition, 0.5, 1)
+				actor:change_health(health_boost * normal_condition + health_boost * 0.5 * overcharge)
+				actor:change_power(power_boost * normal_condition + power_boost * overcharge)
+				actor.bleeding = bleeding_cure_boost * normal_condition + bleeding_cure_boost * overcharge
+				change_psy_health(psy_boost * normal_condition + psy_boost * overcharge)
+				speed_boost = speed_boosts.af_lucifer.boost * normal_condition
+				add_weight("af_lucifer_weight", _self.weight_boost * normal_condition + _self.weight_overcharge_boost * overcharge, true)
+			else
+				local normal_condition = normalize(condition, 0, 0.5) - 1
+				actor:change_power(power_boost * normal_condition * 0.3)
+				if condition < 0.35 then
+					actor:change_health(health_boost * normal_condition * 0.27)
+				end
+				if condition < 0.0001 then
+					condition = 0.03
+					_self:set_condition(condition, artefact_ids[1])
+					actor:set_health_ex(0)
+					return
+				end
 
-			if check_cooldown("af_lucifer_action") then
-				local dice_roll = random() * 100
-				local chance = 0.5
-				if dice_roll <= chance then
-					local function blood_sky()
-						local function modify_val_vec(name, add_R, add_G, add_B)
-							local get_val_vec = weather.get_value_vector(name)
-							local mod_R = clamp(get_val_vec.x + add_R, 0, 1)
-							local mod_G = clamp(get_val_vec.y + add_G, 0, 1)
-							local mod_B = clamp(get_val_vec.z + add_B, 0, 1)
-							trace("sky color %s, %s, %s", mod_R, mod_G, mod_B)
-							weather.set_value_vector(name, mod_R, mod_G, mod_B)
-						end
+				if check_cooldown("af_lucifer_action") then
+					local dice_roll = random() * 100
+					local chance = 0.5
+					if dice_roll <= chance then
+						local function blood_sky()
+							local function modify_val_vec(name, add_R, add_G, add_B)
+								local get_val_vec = weather.get_value_vector(name)
+								local mod_R = clamp(get_val_vec.x + add_R, 0, 1)
+								local mod_G = clamp(get_val_vec.y + add_G, 0, 1)
+								local mod_B = clamp(get_val_vec.z + add_B, 0, 1)
+								trace("sky color %s, %s, %s", mod_R, mod_G, mod_B)
+								weather.set_value_vector(name, mod_R, mod_G, mod_B)
+							end
 
-						local sounds = {
-							"perk_based_artefacts\\dream_sequence_example1",
-						}
-						play_sound_on_actor(get_random_array_element(sounds), 0.66, random_float(0.95, 1))
-						change_psy_health(-random_float(0.25, 0.4))
+							local sounds = {
+								"perk_based_artefacts\\dream_sequence_example1",
+							}
+							play_sound_on_actor(get_random_array_element(sounds), 0.66, random_float(0.95, 1))
+							change_psy_health(-random_float(0.25, 0.4))
 
-						local get_val_vec = weather.get_value_vector("sky_color")
-						local r = 0
-						local g = 0
-						local b = 0
-						register_callback("actor_on_update", function()
-							r = r - 0.0015
-							g = g - 0.0015
-							b = b + 0.0015
-							modify_val_vec("sky_color", r, g, b)
-						end, function()
-							add_pp_effector("black_infinite.ppe", c_id_ppe.black_infinite, true)
-							CreateTimeEvent("af_lucifer_black", "af_lucifer_black", 0.5, function()
-								weather.set_value_vector("sky_color", get_val_vec.x, get_val_vec.y, get_val_vec.z)
-								remove_pp_effector(c_id_ppe.black_infinite)
+							local get_val_vec = weather.get_value_vector("sky_color")
+							local r = 0
+							local g = 0
+							local b = 0
+							register_callback("actor_on_update", function()
+								r = r - 0.0015
+								g = g - 0.0015
+								b = b + 0.0015
+								modify_val_vec("sky_color", r, g, b)
+							end, function()
+								add_pp_effector("black_infinite.ppe", c_id_ppe.black_infinite, true)
+								CreateTimeEvent("af_lucifer_black", "af_lucifer_black", 0.5, function()
+									weather.set_value_vector("sky_color", get_val_vec.x, get_val_vec.y, get_val_vec.z)
+									remove_pp_effector(c_id_ppe.black_infinite)
+									return true
+								end)
+							end, "af_lucifer_sky_color")
+
+							CreateTimeEvent("af_lucifer_remove", "af_lucifer_remove", 7, function()
+								unregister_callback("af_lucifer_sky_color")
 								return true
 							end)
-						end, "af_lucifer_sky_color")
+						end
 
-						CreateTimeEvent("af_lucifer_remove", "af_lucifer_remove", 7, function()
-							unregister_callback("af_lucifer_sky_color")
-							return true
-						end)
-					end
-
-					if condition > 0.4 then
-						local sounds = {
-							"perk_based_artefacts\\heartbeat_pulse_loop",
-							"perk_based_artefacts\\heartbeat_pulse_loop",
-							"perk_based_artefacts\\heartbeat_loop",
-							"perk_based_artefacts\\heartbeat_loop",
-							"perk_based_artefacts\\startlevel",
-							"perk_based_artefacts\\startlevel",
-							"perk_based_artefacts\\churchbell_loop",
-							"perk_based_artefacts\\churchbell_loop",
-							"perk_based_artefacts\\churchbell_loop",
-							"perk_based_artefacts\\death_chant",
-							"perk_based_artefacts\\death_chant2",
-							"perk_based_artefacts\\devil_prayer",
-							"perk_based_artefacts\\devil_prayer2",
-							"perk_based_artefacts\\devil_prayer3",
-							"perk_based_artefacts\\dream_sequence_example1",
-							"perk_based_artefacts\\dream_sequence_example1",
-						}
-						play_sound_on_actor(get_random_array_element(sounds), max(0.25, 1 - normalize(condition, 0, 0.5)), random_float(0.95, 1))
-						change_psy_health(-random_float(0.1, 0.15))
-					elseif condition > 0.25 then
-						if random(100) <= 25 then
-							blood_sky()
-						else
+						if condition > 0.4 then
 							local sounds = {
 								"perk_based_artefacts\\heartbeat_pulse_loop",
+								"perk_based_artefacts\\heartbeat_pulse_loop",
+								"perk_based_artefacts\\heartbeat_loop",
 								"perk_based_artefacts\\heartbeat_loop",
 								"perk_based_artefacts\\startlevel",
+								"perk_based_artefacts\\startlevel",
+								"perk_based_artefacts\\churchbell_loop",
+								"perk_based_artefacts\\churchbell_loop",
 								"perk_based_artefacts\\churchbell_loop",
 								"perk_based_artefacts\\death_chant",
 								"perk_based_artefacts\\death_chant2",
@@ -4035,57 +4038,76 @@ artefact_on_update_functions = {
 								"perk_based_artefacts\\devil_prayer2",
 								"perk_based_artefacts\\devil_prayer3",
 								"perk_based_artefacts\\dream_sequence_example1",
-								"perk_based_artefacts\\helpme",
-								"perk_based_artefacts\\creepy_moaning",
-								"perk_based_artefacts\\crying_01",
-								"perk_based_artefacts\\crying_03",
-								"perk_based_artefacts\\devilbaby_01",
-								"perk_based_artefacts\\tortured_voices",
-								"perk_based_artefacts\\ohgodplease",
-								"perk_based_artefacts\\screams_01",
+								"perk_based_artefacts\\dream_sequence_example1",
 							}
 							play_sound_on_actor(get_random_array_element(sounds), max(0.25, 1 - normalize(condition, 0, 0.5)), random_float(0.95, 1))
-							change_psy_health(-random_float(0.15, 0.25))
-						end
-					else
-						if random(100) <= 50 then
-							blood_sky()
+							change_psy_health(-random_float(0.1, 0.15))
+						elseif condition > 0.25 then
+							if random(100) <= 25 then
+								blood_sky()
+							else
+								local sounds = {
+									"perk_based_artefacts\\heartbeat_pulse_loop",
+									"perk_based_artefacts\\heartbeat_loop",
+									"perk_based_artefacts\\startlevel",
+									"perk_based_artefacts\\churchbell_loop",
+									"perk_based_artefacts\\death_chant",
+									"perk_based_artefacts\\death_chant2",
+									"perk_based_artefacts\\devil_prayer",
+									"perk_based_artefacts\\devil_prayer2",
+									"perk_based_artefacts\\devil_prayer3",
+									"perk_based_artefacts\\dream_sequence_example1",
+									"perk_based_artefacts\\helpme",
+									"perk_based_artefacts\\creepy_moaning",
+									"perk_based_artefacts\\crying_01",
+									"perk_based_artefacts\\crying_03",
+									"perk_based_artefacts\\devilbaby_01",
+									"perk_based_artefacts\\tortured_voices",
+									"perk_based_artefacts\\ohgodplease",
+									"perk_based_artefacts\\screams_01",
+								}
+								play_sound_on_actor(get_random_array_element(sounds), max(0.25, 1 - normalize(condition, 0, 0.5)), random_float(0.95, 1))
+								change_psy_health(-random_float(0.15, 0.25))
+							end
 						else
-							local sounds = {
-								"perk_based_artefacts\\startlevel",
-								"perk_based_artefacts\\churchbell_loop",
-								"perk_based_artefacts\\helpme",
-								"perk_based_artefacts\\creepy_moaning",
-								"perk_based_artefacts\\crying_01",
-								"perk_based_artefacts\\crying_03",
-								"perk_based_artefacts\\devilbaby_01",
-								"perk_based_artefacts\\tortured_voices",
-								"perk_based_artefacts\\ohgodplease",
-								"perk_based_artefacts\\screams_01",
-							}
-							play_sound_on_actor(get_random_array_element(sounds), max(0.25, 1 - normalize(condition, 0, 0.5)), random_float(0.95, 1))
-							change_psy_health(-random_float(0.15, 0.35))
+							if random(100) <= 50 then
+								blood_sky()
+							else
+								local sounds = {
+									"perk_based_artefacts\\startlevel",
+									"perk_based_artefacts\\churchbell_loop",
+									"perk_based_artefacts\\helpme",
+									"perk_based_artefacts\\creepy_moaning",
+									"perk_based_artefacts\\crying_01",
+									"perk_based_artefacts\\crying_03",
+									"perk_based_artefacts\\devilbaby_01",
+									"perk_based_artefacts\\tortured_voices",
+									"perk_based_artefacts\\ohgodplease",
+									"perk_based_artefacts\\screams_01",
+								}
+								play_sound_on_actor(get_random_array_element(sounds), max(0.25, 1 - normalize(condition, 0, 0.5)), random_float(0.95, 1))
+								change_psy_health(-random_float(0.15, 0.35))
+							end
 						end
+						add_cooldown(180, "af_lucifer_action")
 					end
-					add_cooldown(180, "af_lucifer_action")
+				else
+					-- trace("Lucifer, action is in cooldown")
 				end
-			else
-				-- trace("Lucifer, action is in cooldown")
 			end
-		end
 
-		add_speed(speed_boosts.af_lucifer.name, 1 + speed_boost, true, true)
-		add_speed(speed_boosts.af_lucifer.name, 1 + speed_boost, false, true)
+			add_speed(speed_boosts.af_lucifer.name, 1 + speed_boost, true, true)
+			add_speed(speed_boosts.af_lucifer.name, 1 + speed_boost, false, true)
 
-		local degradation_rate = _self:get_degradation_rate()
-		local adjust_condition = max(0, saved_time_elapsed > 0 and time_elapsed > 0 and degradation_rate * (time_elapsed - saved_time_elapsed) or degradation_rate * 0.1)
-		_self.condition = condition - adjust_condition
-		af_lucifer:set_condition(_self.condition)
-		if settings.debug_mode then
-			trace("Lucifer, time %s, last time %s, degradation %s, cond %s, new_cond %s", time_elapsed, saved_time_elapsed, round_idp(adjust_condition, 8), round_idp(condition, 4), round_idp(_self.condition, 4))
-		end
-	end,
-
+			local degradation_rate = _self:get_degradation_rate()
+			local adjust_condition = max(0, saved_time_elapsed > 0 and time_elapsed > 0 and degradation_rate * (time_elapsed - saved_time_elapsed) or degradation_rate * 0.1)
+			_self.condition = condition - adjust_condition
+			af_lucifer:set_condition(_self.condition)
+			if settings.debug_mode then
+				trace("Lucifer, time %s, last time %s, degradation %s, cond %s, new_cond %s", time_elapsed, saved_time_elapsed, round_idp(adjust_condition, 8), round_idp(condition, 4), round_idp(_self.condition, 4))
+			end
+		end,
+	},
 }
 
 --Functions for artefacts which provide perk bonuses after weapon fired
