@@ -4150,17 +4150,20 @@ artefact_on_weapon_fired_functions = {
 	},
 
 	-- Sandstone, perk: Zone Infusion
-	af_sandstone = function(actor, artefact, artefact_count, artefact_ids, artefact_names, obj, wpn, ammo_elapsed, grenade_elapsed, ammo_type, grenade_type)
-		local actor_weapon = actor:active_item():name()
-		if not check_status_effect("af_sandstone" .. actor_weapon) then
-			trace("Sandstone, weapon %s not infused", actor_weapon)
-			return
-		end
+	af_sandstone = {
+		sections = artefact_props.af_sandstone.sections,
+		func = function(self, actor, artefact, artefact_count, artefact_ids, artefact_names, obj, wpn, ammo_elapsed, grenade_elapsed, ammo_type, grenade_type)
+			local actor_weapon = actor:active_item():name()
+			if not check_status_effect("af_sandstone" .. actor_weapon) then
+				trace("Sandstone, weapon %s not infused", actor_weapon)
+				return
+			end
 
-		local hit_type = status_effects["af_sandstone" .. actor_weapon].effect.hit_type
-		local af_sandstone = artefact_props.af_sandstone
-		play_sound_on_actor(get_random_array_element(af_sandstone.hit_types_sounds[hit_type]), 0.5, random_float(0.95, 1.05))
-	end
+			local hit_type = status_effects["af_sandstone" .. actor_weapon].effect.hit_type
+			local af_sandstone = artefact_props.af_sandstone
+			play_sound_on_actor(get_random_array_element(af_sandstone.hit_types_sounds[hit_type]), 0.5, random_float(0.95, 1.05))
+		end,
+	},
 }
 
 -- Functions for artefacts which provide perk bonuses on item use
