@@ -3558,7 +3558,7 @@ artefact_on_update_functions = {
 
 	-- Sun, Perk: Solar Powered
 	af_sun = {
-		sections = artefact_props.af_sun.sections,
+		get_sections = function(artefact) return artefact_props.af_sun.sections end,
 		func = function(self, actor, artefact, artefact_count, artefact_ids, artefact_names)
 			local hours = get_time_hours()
 			local af_sun = artefact_props.af_sun
@@ -3599,7 +3599,7 @@ artefact_on_update_functions = {
 
 	-- Tapeworm, Perk: Stunner
 	af_tapeworm = {
-		sections = artefact_props.af_tapeworm.sections,
+		get_sections = function(artefact) return artefact_props.af_tapeworm.sections end,
 		func = function(self, actor, artefact, artefact_count, artefact_ids, artefact_names)
 			local af_tapeworm = artefact_props.af_tapeworm
 			if not check_cooldown("af_tapeworm") then
@@ -3615,7 +3615,7 @@ artefact_on_update_functions = {
 
 	-- Heart, Perk: Will to Live
 	af_ear = {
-		sections = artefact_props.af_ear.sections,
+		get_sections = function(artefact) return artefact_props.af_ear.sections end,
 		func = function(self, actor, artefact, artefact_count, artefact_ids, artefact_names)
 			local af_ear = artefact_props.af_ear
 			local health_threshold = af_ear.health_threshold[min(5, artefact_count)]
@@ -3638,7 +3638,7 @@ artefact_on_update_functions = {
 
 	-- Moon, Perk: Friend of the Night
 	af_peas = {
-		sections = artefact_props.af_peas.sections,
+		get_sections = function(artefact) return artefact_props.af_peas.sections end,
 		func = function(self, actor, artefact, artefact_count, artefact_ids, artefact_names)
 			local af_peas = artefact_props.af_peas
 			local hours = get_time_hours()
@@ -3665,7 +3665,7 @@ artefact_on_update_functions = {
 
 	-- Signet, Perk: Light of Tranquility
 	af_signet = {
-		sections = artefact_props.af_signet.sections,
+		get_sections = function(artefact) return artefact_props.af_signet.sections end,
 		func = function(actor, artefact, artefact_count, artefact_ids, artefact_names)
 			local af_signet = artefact_props.af_signet
 			local health_boost = af_signet.health_boost
@@ -3708,7 +3708,7 @@ artefact_on_update_functions = {
 
 	-- Atom, Perk: Arszi's Blessing
 	af_atom = {
-		sections = artefact_props.af_atom.sections,
+		get_sections = function(artefact) return artefact_props.af_atom.sections end,
 		func = function(self, actor, artefact, artefact_count, artefact_ids, artefact_names)
 			local af_atom = artefact_props.af_atom
 			local power_boost = af_atom.power_boost
@@ -3722,7 +3722,7 @@ artefact_on_update_functions = {
 
 	-- Generator, Perk: Godzilla is Approaching
 	af_generator = {
-		sections = artefact_props.af_generator.sections,
+		get_sections = function(artefact) return artefact_props.af_generator.sections end,
 		func = function(self, actor, artefact, artefact_count, artefact_ids, artefact_names)
 			local af_generator = artefact_props.af_generator
 			local charge_boost = af_generator.charge_boost
@@ -3745,7 +3745,7 @@ artefact_on_update_functions = {
 
 	-- Sourpuss, Perk: What Colour Is Your Blood?
 	af_kislushka = {
-		sections = artefact_props.af_kislushka.sections,
+		get_sections = function(artefact) return artefact_props.af_kislushka.sections end,
 		func = function(self, actor, artefact, artefact_count, artefact_ids, artefact_names)
 			local af_kislushka = artefact_props.af_kislushka
 			local bleeding_cure_boost = af_kislushka.bleeding_cure_boost * artefact_count
@@ -3762,7 +3762,7 @@ artefact_on_update_functions = {
 
 	-- Сhain, Perk: The Weight Of Devotion
 	af_chelust = {
-		sections = artefact_props.af_chelust.sections,
+		get_sections = function(artefact) return artefact_props.af_chelust.sections end,
 		func = function(self, actor, artefact, artefact_count, artefact_ids, artefact_names)
 			local actor_community = actor:character_community()
 			trace("Chain, actor community %s", actor_community)
@@ -3827,7 +3827,7 @@ artefact_on_update_functions = {
 
 	-- Scar, Perk: That Insane Stalker from the Freedom Faction
 	af_zhelch = {
-		sections = artefact_props.af_zhelch.sections,
+		get_sections = function(artefact) return artefact_props.af_zhelch.sections end,
 		func = function(self, actor, artefact, artefact_count, artefact_ids, artefact_names)
 			local af_zhelch = artefact_props.af_zhelch
 			local af_lucifer = artefact_props.af_lucifer
@@ -3861,7 +3861,7 @@ artefact_on_update_functions = {
 
 	-- Phantom Star, Perk: Phantom Pacifist
 	af_star_phantom = {
-		sections = artefact_props.af_star_phantom.sections,
+		get_sections = function(artefact) return artefact_props.af_star_phantom.sections end,
 		func = function(self, actor, artefact, artefact_count, artefact_ids, artefact_names)
 			local af_star_phantom = artefact_props.af_star_phantom
 			for k, v in pairs(artefact_ids) do
@@ -3879,7 +3879,7 @@ artefact_on_update_functions = {
 
 	-- Sandstone
 	af_sandstone = {
-		sections = artefact_props.af_sandstone.sections,
+		get_sections = function(artefact) return artefact_props.af_sandstone.sections end,
 		func = function(self, actor, artefact, artefact_count, artefact_ids, artefact_names)
 			local af_sandstone = artefact_props.af_sandstone
 			local wpn = actor:active_item()
@@ -3902,7 +3902,7 @@ artefact_on_update_functions = {
 
 	-- Lucifer, Perk: The Lucifer Effect
 	af_lucifer = {
-		sections = artefact_props.af_lucifer.sections,
+		get_sections = function(artefact) return artefact_props.af_lucifer.sections end,
 		func = function(self, actor, artefact, artefact_count, artefact_ids, artefact_names)
 			if not artefact_ids[1] then return end
 
@@ -4127,7 +4127,7 @@ artefact_on_weapon_fired_functions = {
 
 	-- Spike, Perk: Critical Ascensi0n
 	af_spaika = {
-		sections = artefact_props.af_spaika.sections,
+		get_sections = function(artefact) return artefact_props.af_spaika.sections end,
 		func = function(self, actor, artefact, artefact_count, artefact_ids, artefact_names, obj, wpn, ammo_elapsed, grenade_elapsed, ammo_type, grenade_type)
 			-- Return if bullet callbacks are available
 			if _G.CBulletOnImpact and _G.CBulletOnInit then
@@ -4153,7 +4153,7 @@ artefact_on_weapon_fired_functions = {
 
 	-- Sandstone, perk: Zone Infusion
 	af_sandstone = {
-		sections = artefact_props.af_sandstone.sections,
+		get_sections = function(artefact) return artefact_props.af_sandstone.sections end,
 		func = function(self, actor, artefact, artefact_count, artefact_ids, artefact_names, obj, wpn, ammo_elapsed, grenade_elapsed, ammo_type, grenade_type)
 			local actor_weapon = actor:active_item():name()
 			if not check_status_effect("af_sandstone" .. actor_weapon) then
@@ -4173,7 +4173,7 @@ artefact_on_item_use_functions = {
 
 	-- Grapes, Perk: Necessary Gluttony
 	af_grapes = {
-		sections = artefact_props.af_grapes.sections,
+		get_sections = function(artefact) return artefact_props.af_grapes.sections end,
 		func = function(self, actor, artefact, artefact_count, artefact_ids, artefact_names, obj)
 			if not obj then
 				trace("Food object not found")
@@ -4205,7 +4205,7 @@ artefact_on_item_use_functions = {
 
 	-- Moss, Perk: Culinary Hyperversity
 	af_moh = {
-		sections = artefact_props.af_moh.sections,
+		get_sections = function(artefact) return artefact_props.af_moh.sections end,
 		func = function(self, actor, artefact, artefact_count, artefact_ids, artefact_names, obj)
 			if not obj then
 				trace("Food object not found")
@@ -5898,7 +5898,8 @@ end
 process_artefacts = function(perk_table, ...)
 	for artefact, props in pairs(artefacts) do
 		for perk, t in pairs(perk_table) do
-			if t.sections[artefact] then
+			local sections = t.get_sections(artefact)
+			if sections[artefact] then
 				trace("artefact %s", artefact)
 				t:func(db.actor, artefact, props.count, props.ids, props.names, ...)
 				break
