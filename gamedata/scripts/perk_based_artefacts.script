@@ -925,6 +925,32 @@ end
 
 local weapon_modifiers = demonized_weapon_modifiers
 
+function has_artefacts_for_prop(artefact)
+	if not (artefact_props[artefact] and artefact_props[artefact].sections) then
+		return false
+	end
+
+	for k, v in pairs(artefact_props[artefact].sections) do
+		if artefacts[k] then
+			return true
+		end
+	end
+
+	return false
+end
+
+function get_first_artefact_for_prop(artefact)
+	if not (artefact_props[artefact] and artefact_props[artefact].sections) then
+		return
+	end
+
+	for k, v in pairs(artefact_props[artefact].sections) do 
+		if artefacts[k] then
+			return artefacts[k]
+		end
+	end
+end
+
 artefact_props = { -- Special props of artefacts that are used in processing
 	af_atom = {
 		sections = {af_atom = true},
@@ -2247,6 +2273,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 		end,	
 	},
 	af_spaika = {
+		sections = {af_spaika = true},
 		weapon_shot = false,
 		damage_multiplier = 1,
 		event_reset = function(self)
@@ -2336,9 +2363,9 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			change_psy_health((self.damage_multiplier - 1) * self.psy_health_restore_coeff)
 
 			add_ui_func(
-				"af_spaika",
+				artefact,
 				true,
-				"af_spaika",
+				artefact,
 				function() return perk_based_artefacts.artefact_props.af_spaika:ui_text_func() end,
 				function() return perk_based_artefacts.artefact_props.af_spaika:ui_validate_func() end
 			)
@@ -4164,27 +4191,30 @@ artefact_on_weapon_fired_functions = {
 	-- end
 
 	-- Spike, Perk: Critical Ascensi0n
-	af_spaika = function(actor, artefact, artefact_count, artefact_ids, artefact_names, obj, wpn, ammo_elapsed, grenade_elapsed, ammo_type, grenade_type)
-		-- Return if bullet callbacks are available
-		if _G.CBulletOnImpact and _G.CBulletOnInit then
-			return
-		end
+	af_spaika = {
+		sections = artefact_props.af_spaika.sections,
+		func = function(self, actor, artefact, artefact_count, artefact_ids, artefact_names, obj, wpn, ammo_elapsed, grenade_elapsed, ammo_type, grenade_type)
+			-- Return if bullet callbacks are available
+			if _G.CBulletOnImpact and _G.CBulletOnInit then
+				return
+			end
 
-		local af_spaika = artefact_props.af_spaika
-		trace("Spike, on_weapon_fired weapon_shot %s", af_spaika.weapon_shot)
+			local af_spaika = artefact_props.af_spaika
+			trace("Spike, on_weapon_fired weapon_shot %s", af_spaika.weapon_shot)
 
-		if af_spaika.weapon_shot then
-			af_spaika:effect_reset()
-			return
-		end
+			if af_spaika.weapon_shot then
+				af_spaika:effect_reset()
+				return
+			end
 
-		af_spaika.weapon_shot = true
-		CreateTimeEvent("af_spaika", "af_spaika_reset", 2, function()
-			trace("Spike, Creating time event")
-			af_spaika:effect_reset()
-			return true
-		end)
-	end,
+			af_spaika.weapon_shot = true
+			CreateTimeEvent("af_spaika", "af_spaika_reset", 2, function()
+				trace("Spike, Creating time event")
+				af_spaika:effect_reset()
+				return true
+			end)
+		end,
+	},
 
 	-- Sandstone, perk: Zone Infusion
 	af_sandstone = function(actor, artefact, artefact_count, artefact_ids, artefact_names, obj, wpn, ammo_elapsed, grenade_elapsed, ammo_type, grenade_type)
@@ -5772,7 +5802,7 @@ if enhanced_animations and enhanced_animations.use_item and enhanced_animations.
 
 	local fdda_use_item = enhanced_animations.use_item
 	enhanced_animations.use_item = function(obj)
-		if artefacts.af_star_phantom then
+		if has_artefacts_for_prop("af_star_phantom") then
 			trace("restoring item")
 			af_star_phantom:restore_weapon()
 		end
@@ -5782,7 +5812,7 @@ if enhanced_animations and enhanced_animations.use_item and enhanced_animations.
 	local fdda_call_my_slot_back = enhanced_animations.call_my_slot_back
 	enhanced_animations.call_my_slot_back = function()
 		fdda_call_my_slot_back()
-		if artefacts.af_star_phantom then
+		if has_artefacts_for_prop("af_star_phantom") then
 			trace("hiding item")
 			af_star_phantom:hide_weapon()
 		end
@@ -5799,7 +5829,7 @@ if zzz_ea_addon_backpack and zzz_ea_addon_backpack.call_my_slot_back then
 	local call_my_slot_back = zzz_ea_addon_backpack.call_my_slot_back
 	zzz_ea_addon_backpack.call_my_slot_back = function()
 		call_my_slot_back()
-		if artefacts.af_star_phantom then
+		if has_artefacts_for_prop("af_star_phantom") then
 			af_star_phantom:hide_weapon()
 		end
 		return true
@@ -5810,7 +5840,7 @@ end
 -- Patch for Quick Throw
 local quick_throw = actor_effects.Hit_GrenadeQuickthrow
 actor_effects.Hit_GrenadeQuickthrow = function()
-	if artefacts.af_star_phantom then return end -- Phantom Pacifist perk to prevent quick throwing a grenade
+	if has_artefacts_for_prop("af_star_phantom") then return end -- Phantom Pacifist perk to prevent quick throwing a grenade
 	quick_throw()
 end
 
@@ -5818,7 +5848,7 @@ end
 if quickdraw and quickdraw.hit_key then
 	local quick_melee = quickdraw.hit_key
 	quickdraw.hit_key = function()
-		if artefacts.af_star_phantom then return end -- Phantom Pacifist perk to prevent quick melee with that mod enabled
+		if has_artefacts_for_prop("af_star_phantom") then return end -- Phantom Pacifist perk to prevent quick melee with that mod enabled
 		quick_melee()
 	end
 end
@@ -5826,8 +5856,8 @@ end
 -- Patch for crow binder
 local crow_death = bind_crow.crow_binder.death_callback
 bind_crow.crow_binder.death_callback = function(self, victim, who)
-	if artefacts.af_lighthouse and who and who:id() == AC_ID and victim then
-		local props = artefacts.af_lighthouse
+	if has_artefacts_for_prop("af_lighthouse") and who and who:id() == AC_ID and victim then
+		local props = get_first_artefact_for_prop("af_lighthouse")
 		artefact_props.af_lighthouse:on_death(db.actor, props.count, props.ids, props.names, victim, who, nil, nil)
 	end	
 	crow_death(self, victim, who)
@@ -5889,7 +5919,7 @@ end
 -- Disable talk possibility for Phantom Pacifist
 local process_npc_usability = xr_meet.process_npc_usability
 xr_meet.process_npc_usability = function(npc)
-	if artefacts.af_star_phantom or check_status_effect("af_moh_invisibility") then
+	if has_artefacts_for_prop("af_star_phantom") or check_status_effect("af_moh_invisibility") then
 		npc:disable_talk()
 		return
 	end
@@ -5899,14 +5929,14 @@ end
 -- Disable npc evaluation for Phantom Pacifist
 local evaluate = xr_meet.evaluator_contact.evaluate
 xr_meet.evaluator_contact.evaluate = function(self)
-	if artefacts.af_star_phantom or check_status_effect("af_moh_invisibility") then return false end
+	if has_artefacts_for_prop("af_star_phantom") or check_status_effect("af_moh_invisibility") then return false end
 	return evaluate(self)
 end
 
 -- Azazel mode patching
 local azazel_on_before_death = gamemode_azazel.actor_on_before_death
 gamemode_azazel.actor_on_before_death = function(whoID,flags)
-	if artefacts.af_serofim then
+	if has_artefacts_for_prop("af_serofim") then
 		return
 	end
 	remove_lucifer()
@@ -5916,7 +5946,7 @@ end
 
 -- Removing stack effects on refreshing artefacts
 function remove_stack_effects()
-	if not artefacts.af_spaika then
+	if not has_artefacts_for_prop("af_spaika") then
 		artefact_props.af_spaika:stack_reset()
 	end
 end
@@ -5964,7 +5994,7 @@ end
 -- Sanity check for unwanted effects
 function sanity_check()
 	check_status_effect("af_moh_invisibility")
-	if not artefacts.af_star_phantom then
+	if not has_artefacts_for_prop("af_star_phantom") then
 		unregister_on_equip_callback("af_star_phantom")
 		local af_star_phantom = artefact_props.af_star_phantom
 		af_star_phantom:reset_state()
