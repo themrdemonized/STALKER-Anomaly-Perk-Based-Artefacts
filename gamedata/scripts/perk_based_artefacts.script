@@ -2523,6 +2523,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 	},
 	-- Moss, Perk: Culinary Hyperversity
 	af_moh = { -- Mutant parts bonuses
+		sections = {af_moh = true},
 		add_speed = function(self, amount, is_sprint)
 			add_speed("af_moh", 1 + amount, is_sprint, true)
 		end,
@@ -2745,7 +2746,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 		ui_validate_func = function(self)
 			return time_elapsed < self.effect_time_trigger
 		end,
-		activate_effect = function(self, actor, food_section)
+		activate_effect = function(self, actor, food_section, artefact)
 			if self[food_section] then
 				trace("Moss, Eating food %s", food_section)
 
@@ -2764,9 +2765,9 @@ artefact_props = { -- Special props of artefacts that are used in processing
 
 				self.effect_time_trigger = time_elapsed + 60
 				add_ui_func(
-					"af_moh",
+					artefact,
 					true,
-					"af_moh",
+					artefact,
 					function() return perk_based_artefacts.artefact_props.af_moh:ui_text_func() end,
 					function() return perk_based_artefacts.artefact_props.af_moh:ui_validate_func() end,
 					{
@@ -3340,6 +3341,8 @@ artefact_props = { -- Special props of artefacts that are used in processing
 		end
 	},
 	af_grapes = {
+		sections = {af_grapes = true},
+		health_boost = 0.01,
 		status_effect_key = "af_grapes_effect",
 		ui_text_func = function(self)
 			return ("T:%s"):format(ceil(get_status_effect_remaining_time(self.status_effect_key)))
@@ -4079,7 +4082,6 @@ artefact_on_weapon_fired_functions = {
 	-- The effect is short timed, if you missed the opportunity - too bad
 	-- Weapons with no mags or only one bullet in the mag are ignored
 	-- Multiple artefacts increase the magnitude of effect and slightly increase the duration
-	-- SCRAPPED: no possibility to manipulate time factor outside of debug mode
 
 	-- af_fire_loop = function(actor, artefact, artefact_count, artefact_ids, artefact_names, obj, wpn, ammo_elapsed, grenade_elapsed, ammo_type, grenade_type)
 	-- 	local current_weapon = actor:active_item()
@@ -4170,44 +4172,49 @@ artefact_on_weapon_fired_functions = {
 artefact_on_item_use_functions = {
 
 	-- Grapes, Perk: Necessary Gluttony
-	af_grapes = function(actor, artefact, artefact_count, artefact_ids, artefact_names, obj)
-		if not obj then
-			trace("Food object not found")
-			return
-		end
-
-		local health_boost = 0.01
-
-		local sec = obj:section()
-		local satiety_increase = SYS_GetParam(2, sec, "eat_satiety", 0) * health_boost
-		if satiety_increase > 0 then
-			add_timed_effect(5 * artefact_count, function(satiety_increase)
-				db.actor:change_health(satiety_increase)
-				_G.printf("health increased by %s", satiety_increase)
-			end, {satiety_increase})
+	af_grapes = {
+		sections = artefact_props.af_grapes.sections,
+		func = function(self, actor, artefact, artefact_count, artefact_ids, artefact_names, obj)
+			if not obj then
+				trace("Food object not found")
+				return
+			end
 
 			local af_grapes = artefact_props.af_grapes
-			add_status_effect(5 * artefact_count, nil, af_grapes.status_effect_key)
-			add_ui_func(
-				af_grapes.status_effect_key,
-				true,
-				"af_grapes",
-				function() return perk_based_artefacts.artefact_props.af_grapes:ui_text_func() end,
-				function() return perk_based_artefacts.artefact_props.af_grapes:ui_validate_func() end
-			)
-		end
-	end,
+			local health_boost = af_grapes.health_boost
+
+			local sec = obj:section()
+			local satiety_increase = SYS_GetParam(2, sec, "eat_satiety", 0) * health_boost
+			if satiety_increase > 0 then
+				add_timed_effect(5 * artefact_count, function(satiety_increase)
+					db.actor:change_health(satiety_increase)
+					_G.printf("health increased by %s", satiety_increase)
+				end, {satiety_increase})
+
+				add_status_effect(5 * artefact_count, nil, af_grapes.status_effect_key)
+				add_ui_func(
+					af_grapes.status_effect_key,
+					true,
+					artefact,
+					function() return perk_based_artefacts.artefact_props.af_grapes:ui_text_func() end,
+					function() return perk_based_artefacts.artefact_props.af_grapes:ui_validate_func() end
+				)
+			end
+		end,
+	},
 
 	-- Moss, Perk: Culinary Hyperversity
-	af_moh = function(actor, artefact, artefact_count, artefact_ids, artefact_names, obj)
-		if not obj then
-			trace("Food object not found")
-			return
-		end
+	af_moh = {
+		sections = artefact_props.af_moh.sections,
+		func = function(self, actor, artefact, artefact_count, artefact_ids, artefact_names, obj)
+			if not obj then
+				trace("Food object not found")
+				return
+			end
 
-		artefact_props.af_moh:activate_effect(actor, obj:section())
-	end
-
+			artefact_props.af_moh:activate_effect(actor, obj:section(), artefact)
+		end,
+	},
 }
 
 function af_serofim_cheat_death()
