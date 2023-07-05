@@ -6,25 +6,6 @@
 -- Inspired by Fallout, Borderlands, Dark Souls games and Stalker mods like Golden Sphere (Золотой шар) and others
 -- Written by demonized
 
-
-local get_console = get_console
-local has_alife_info = has_alife_info
-local ipairs = ipairs
-local is_empty = is_empty
-local is_not_empty = is_not_empty
-local normalize = normalize
-local pairs = pairs
-local particles_object = particles_object
-local printf = printf
-local random_float = random_float
-
-local round_100 = round_100
-local script_light = script_light
-local time_global = time_global
-local vector_rotate_y = vector_rotate_y
-
-local manage_psy_health = arszi_psy.manage_psy_health
-
 -- Get psy table to manipulate psy health values
 local actor_psy_table = {}
 function get_actor_psy_table()
@@ -53,11 +34,6 @@ function change_psy_health(amount)
 	end
 end
 
-local dismiss_special_squad = axr_companions.dismiss_special_squad
-local remove_from_actor_squad = axr_companions.remove_from_actor_squad
-
-local get_nearby_campfire = bind_campfire.get_nearby_campfire
-
 local CreateTimeEvent = demonized_time_events.CreateTimeEvent
 local RemoveTimeEvent = demonized_time_events.RemoveTimeEvent
 local ResetTimeEvent = demonized_time_events.ResetTimeEvent
@@ -83,29 +59,13 @@ local get_weather_manager = level_weathers.get_weather_manager
 local get_game_time = game.get_game_time
 local translate_string = game.translate_string
 
-local get_game_factor = game_difficulties.get_game_factor
-
 local is_critical_bone = perk_based_artefacts_bone_mapper.is_critical_bone
-
-local refresh_health_bar = ui_enemy_health.on_hit
-
-local get_nearest_stalker = utils_obj.get_nearest_stalker
-local safe_bone_pos = utils_obj.safe_bone_pos
-
-local play_snd = xr_effects.play_snd
-
-local get_safe_sound_object = xr_sound.get_safe_sound_object
-local set_sound_play = xr_sound.set_sound_play
 
 local ceil = math.ceil
 local floor = math.floor
 local max = math.max
 local min = math.min
 local random = math.random
-
-local function round(amount)
-	return floor(amount + 0.5)
-end
 
 local string_find = string.find
 local string_gsub = string.gsub
@@ -164,57 +124,31 @@ local indoor_levels = {
 	labx8				 	= true
 }
 
-local settings = {
-	debug_mode = false,
-	allow_arty_containers = false,
-	timed_degradation = 1,
-}
-
--- Utils
-local function print_table(table, subs)
-	
-	local sub
-	if subs ~= nil then
-		sub = subs
-	else
-		sub = ""
-	end
-	for k,v in pairs(table) do
-		if type(v) == "table" then
-			print_table(v, sub.."["..k.."]----->")
-		elseif type(v) == "function" then
-			printf(sub.."%s = function",k)
-		elseif type(v) == "userdata" then
-			if (v.x) then
-				printf(sub.."%s = %s",k,utils_data.vector_to_string(v))
-			else
-				printf(sub.."%s = userdata", k)
-			end
-		elseif type(v) == "boolean" then
-					if v == true then
-							if(type(k)~="userdata") then
-									printf(sub.."%s = true",k)
-							else
-									printf(sub.."userdata = true")
-							end
-					else
-							if(type(k)~="userdata") then
-									printf(sub.."%s = false", k)
-							else
-									printf(sub.."userdata = false")
-							end
-					end
-		else
-			if v ~= nil then
-				printf(sub.."%s = %s", k,v)
-			else
-				printf(sub.."%s = nil", k,v)
-			end
+-- MCM
+function load_defaults()
+	local t = {}
+	local op = perk_based_artefacts_mcm.op
+	for i, v in ipairs(op.gr) do
+		if v.def ~= nil then
+			t[v.id] = v.def
 		end
 	end
-	
+	return t
 end
 
+settings = load_defaults()
+
+function load_settings()
+	settings = load_defaults()
+	if ui_mcm then
+		for k, v in pairs(settings) do
+			settings[k] = ui_mcm.get("perk_based_artefacts/" .. k)
+		end
+	end
+	return settings
+end
+
+-- Utils
 local function trace(str, ...)
 	if settings.debug_mode then
 		printf("Perk Based Artefacts: " .. str, ...)
@@ -232,7 +166,7 @@ end
 local function trace_table(t)
 	if settings.debug_mode then
 		printf("Perk Based Artefacts: Table Print")
-		print_table(t)
+		print_r(t)
 	end
 end
 
@@ -404,7 +338,7 @@ function play_sound_on_actor(snd, volume, frequency, looped)
 		return
 	end
 	local actor = db.actor
-	local snd = get_safe_sound_object(snd)
+	local snd = xr_sound.get_safe_sound_object(snd)
 	if snd then
 		snd:play(actor, 0, looped and (sound_object.s2d + sound_object.looped) or sound_object.s2d)
 		snd.volume = volume or 1
@@ -430,7 +364,7 @@ end
 
 function look_at_nearest_npc(npc, actor)
 	local actor = actor or db.actor
-	local npc = npc or get_nearest_stalker(actor)
+	local npc = npc or utils_obj.get_nearest_stalker(actor)
 	if npc then
 		local npc_position = npc:bone_position("bip01_head")
 		local actor_position = device().cam_pos
@@ -448,7 +382,7 @@ function look_at_nearest_npc(npc, actor)
 end
 
 function change_sleep(item)
-	if get_game_factor("sleep") then
+	if game_difficulties.get_game_factor("sleep") then
 		actor_status_sleep.actor_on_item_use(item)
 	end
 end
@@ -985,14 +919,14 @@ artefact_props = { -- Special props of artefacts that are used in processing
 		timed_effect_health_boost = 0.0004,
 		timed_effect_func = function(self)
 			db.actor:change_health(self.timed_effect_health_boost)
-			manage_psy_health()
-			manage_psy_health()
-			manage_psy_health()
+			arszi_psy.manage_psy_health()
+			arszi_psy.manage_psy_health()
+			arszi_psy.manage_psy_health()
 		end,
 	},
 	af_ear = {
 		sections = {af_ear = true},
-		sound = get_safe_sound_object("perk_based_artefacts\\heartbeat_pulse_loop"),
+		sound = xr_sound.get_safe_sound_object("perk_based_artefacts\\heartbeat_pulse_loop"),
 		sound_play = function(self)
 			self.sound:play(db.actor, 0, sound_object.s2d + sound_object.looped)
 		end,
@@ -1249,7 +1183,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 							local h = dir:getH()
 							local d = vector():setHP(h, 0)
 							gibs:play_at_pos(p:mad(d, 0.3))
-							local snd = get_safe_sound_object("perk_based_artefacts\\XDEATH" .. random(5))
+							local snd = xr_sound.get_safe_sound_object("perk_based_artefacts\\XDEATH" .. random(5))
 							snd:play_at_pos(npc_target, position, 0, sound_object.s3d)
 							snd.frequency = random_float(0.95, 1.05)
 							snd.volume = 0.7
@@ -1291,7 +1225,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 		valid_hits = { -- Valid hit types to trigger
 			[hit.shock] = true
 		},
-		sound_idle = get_safe_sound_object("perk_based_artefacts\\VIOLLOOP"),
+		sound_idle = xr_sound.get_safe_sound_object("perk_based_artefacts\\VIOLLOOP"),
 		rpm_coeff = 1.25,
 		min_rpm_coeff = 1.25,
 		max_rpm_coeff = 3,
@@ -1501,7 +1435,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 				local function hit_enemy(time)
 					who_position = who:position()
 
-					local snd = get_safe_sound_object("anomaly\\electra_hit" .. get_random_array_element({"", "1"}))
+					local snd = xr_sound.get_safe_sound_object("anomaly\\electra_hit" .. get_random_array_element({"", "1"}))
 					snd:play_at_pos(who, who_position, 0, sound_object.s3d)
 					snd.frequency = random_float(0.95, 1.05)
 
@@ -1528,7 +1462,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 					CreateTimeEvent("af_tapeworm" .. who_id, "af_tapeworm" .. who_id .. i, i, hit_enemy, i)
 				end
 			else
-				local snd = get_safe_sound_object("anomaly\\electra_blast")
+				local snd = xr_sound.get_safe_sound_object("anomaly\\electra_blast")
 				snd:play_at_pos(who, who_position, 0, sound_object.s3d)
 				snd.volume = 0.7
 				snd.frequency = random_float(1.1, 1.2)
@@ -1747,7 +1681,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 				local gibs = particles_object("new_effects\\krovisha_main")
 				if gibs and not gibs:playing() then
 					gibs:play_at_pos(monster_position)
-					local snd = get_safe_sound_object("perk_based_artefacts\\XDEATH" .. random(5))
+					local snd = xr_sound.get_safe_sound_object("perk_based_artefacts\\XDEATH" .. random(5))
 					snd:play_at_pos(monster, monster_position, 0, sound_object.s3d)
 					snd.frequency = random_float(0.95, 1.05)
 				else
@@ -1939,9 +1873,9 @@ artefact_props = { -- Special props of artefacts that are used in processing
 		sections = {af_star_phantom = true},
 		weapon_hidden = false, -- Check for weapon is hidden
 		hidden_num = 1,
-		sound_start = get_safe_sound_object("perk_based_artefacts\\CTIMSTRT"),
-		sound_idle = get_safe_sound_object("perk_based_artefacts\\CTIMLOOP"),
-		sound_stop = get_safe_sound_object("perk_based_artefacts\\CTIMSTOP"),
+		sound_start = xr_sound.get_safe_sound_object("perk_based_artefacts\\CTIMSTRT"),
+		sound_idle = xr_sound.get_safe_sound_object("perk_based_artefacts\\CTIMLOOP"),
+		sound_stop = xr_sound.get_safe_sound_object("perk_based_artefacts\\CTIMSTOP"),
 		saved_volume_snd = 1,
 		saved_volume_music = 1,
 		degradation_rate = 0.00036,
@@ -2085,7 +2019,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 						local gibs = particles_object("new_effects\\krovisha_main")
 						if gibs and not gibs:playing() then
 							gibs:play_at_pos(npc_position)
-							local snd = get_safe_sound_object("perk_based_artefacts\\XDEATH" .. random(5))
+							local snd = xr_sound.get_safe_sound_object("perk_based_artefacts\\XDEATH" .. random(5))
 							snd:play_at_pos(npc, npc_position, 0, sound_object.s3d)
 							snd.frequency = random_float(0.95, 1.05)
 						else
@@ -2169,7 +2103,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			)
 		end,
 		manual_explode = function(self, obj)
-			local snd = get_safe_sound_object("perk_based_artefacts\\SPHNEXP")
+			local snd = xr_sound.get_safe_sound_object("perk_based_artefacts\\SPHNEXP")
 			snd:play_at_pos(obj, obj:position(), 0, sound_object.s3d)
 
 			local mass = obj:mass()
@@ -2520,7 +2454,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 				if npc.health > 0 then
 					CreateTimeEvent("af_thistle_hud", "af_thistle_hud", 0, function()
 						if npc.health > 0 then
-							refresh_health_bar(npc, nil, local_direction, who, bone_index)
+							ui_enemy_health.on_hit(npc, nil, local_direction, who, bone_index)
 						end
 						return true
 					end)
@@ -3736,14 +3670,14 @@ artefact_on_update_functions = {
 			local status_effect_time_increment = af_signet:status_effect_time_increment(actor, artefact, artefact_count, artefact_ids, artefact_names)
 			local status_effect_time_max = af_signet:status_effect_time_max(actor, artefact, artefact_count, artefact_ids, artefact_names)
 
-			local nearby_camp = get_nearby_campfire(5, true)
+			local nearby_camp = bind_campfire.get_nearby_campfire(5, true)
 			if nearby_camp and nearby_camp:is_on() then
 				for i = 1, artefact_count do
 					actor:change_health(health_boost)
-					manage_psy_health()
-					manage_psy_health()
-					manage_psy_health()
-					manage_psy_health()
+					arszi_psy.manage_psy_health()
+					arszi_psy.manage_psy_health()
+					arszi_psy.manage_psy_health()
+					arszi_psy.manage_psy_health()
 				end
 				trace("firing Signet, health %s", actor.health)
 
@@ -3837,8 +3771,8 @@ artefact_on_update_functions = {
 				local power_boost = af_chelust.power_boost_valid
 				actor:change_health(health_boost)
 				actor:change_power(power_boost)
-				manage_psy_health()
-				manage_psy_health()
+				arszi_psy.manage_psy_health()
+				arszi_psy.manage_psy_health()
 
 				--get all companions
 				local c = dup_table(axr_companions.non_task_companions)
@@ -4360,7 +4294,7 @@ artefact_on_before_death_functions = {
 
 		revive()
 		CreateTimeEvent("af_serofim_break_sound", "af_serofim_break_sound", 1.3, function()
-			play_snd(actor, nil, {[1] = "material\\bottle\\collide\\bottle_break_1"})
+			xr_effects.play_snd(actor, nil, {[1] = "material\\bottle\\collide\\bottle_break_1"})
 			return true
 		end)
 		CreateTimeEvent("af_serofim", "af_serofim", 2, function()
@@ -4483,7 +4417,7 @@ artefact_on_before_hit_functions = {
 	-- 			if random(100) < (10 / squad_member_count) then
 	-- 				trace("Medallion, squad %s became enemy", squad_id)
 	-- 				squad:set_squad_relation("enemy")
-	-- 				dismiss_special_squad(squad)
+	-- 				axr_companions.dismiss_special_squad(squad)
 	-- 				for k, v in pairs(squad_member_ids) do
 	-- 					local obj = get_object_by_id(k)
 	-- 					if obj and obj:alive() then
@@ -4496,7 +4430,7 @@ artefact_on_before_hit_functions = {
 	-- 		else
 	-- 			if random(100) < 10 then
 	-- 				trace("Medallion, companion became enemy")
-	-- 				remove_from_actor_squad(member)
+	-- 				axr_companions.remove_from_actor_squad(member)
 
 	-- 				if member:alive() then
 	-- 					trace("Medallion, member %s became enemy", member:id())
@@ -4922,7 +4856,7 @@ artefact_on_trade_functions = {
 				local news_text = translate_string(tostring(cashback))
 				local news_caption = translate_string("general_in_money")
 				local news_ico = "ui_inGame2_Dengi_polucheni"
-				set_sound_play(AC_ID, "pda_tips")
+				xr_sound.set_sound_play(AC_ID, "pda_tips")
 				actor:give_game_news(news_caption, news_text, news_ico, 0, 7000, 0)
 
 				af_fountain.cashback_triggered = false
@@ -6455,9 +6389,7 @@ end
 
 function on_option_change()
 	if ui_mcm then
-		for k, v in pairs(settings) do
-			settings[k] = ui_mcm.get("perk_based_artefacts/" .. k)
-		end
+		load_settings()
 		force_refresh_state()
 	end
 end
