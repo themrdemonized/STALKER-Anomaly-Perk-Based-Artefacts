@@ -4621,78 +4621,86 @@ artefact_on_before_hit_functions = {
 artefact_on_hit_functions = {
 
 	-- Black Angel, perk: Dodge This
-	af_black_angel = function(actor, artefact, artefact_count, artefact_ids, artefact_names, obj, amount, who, last_hit)
-		local af_black_angel = artefact_props.af_black_angel
-		if af_black_angel.dice_roll > af_black_angel.reflect_chance[min(5, artefact_count)] then
-			trace("Black Angel not triggered, dice roll %s, chance %s", af_black_angel.dice_roll, af_black_angel.reflect_chance[min(5, artefact_count)])
-			return
-		end
-		if not (
-			last_hit and
-			af_black_angel.valid_hits[last_hit.type] and
-			who and
-			obj
-		) then
-			trace("Black Angel not triggered, not valid hit")
-			return
-		end
+	af_black_angel = {
+		get_sections = function(self, artefact) return artefact_props.af_black_angel.sections end,
+		func = function(self, actor, artefact, artefact_count, artefact_ids, artefact_names, obj, amount, who, last_hit)
+			local af_black_angel = artefact_props.af_black_angel
+			if af_black_angel.dice_roll > af_black_angel.reflect_chance[min(5, artefact_count)] then
+				trace("Black Angel not triggered, dice roll %s, chance %s", af_black_angel.dice_roll, af_black_angel.reflect_chance[min(5, artefact_count)])
+				return
+			end
+			if not (
+				last_hit and
+				af_black_angel.valid_hits[last_hit.type] and
+				who and
+				obj
+			) then
+				trace("Black Angel not triggered, not valid hit")
+				return
+			end
 
-		local s_hit = hit(last_hit)
-		s_hit.power = s_hit.power * 0.35
-		s_hit.draftsman = who
+			local s_hit = hit(last_hit)
+			s_hit.power = s_hit.power * 0.35
+			s_hit.draftsman = who
 
-		who:hit(s_hit)
-		trace("hit %s, last_hit %s", s_hit.power, last_hit.power)
-	end,
+			who:hit(s_hit)
+			trace("hit %s, last_hit %s", s_hit.power, last_hit.power)
+		end,
+	},
 
 	-- Tapeworm, Perk: Stunner
-	af_tapeworm = function(actor, artefact, artefact_count, artefact_ids, artefact_names, obj, amount, who, last_hit)
-		local af_tapeworm = artefact_props.af_tapeworm
-		if not check_cooldown("af_tapeworm") then
-			trace("Tapeworm not triggered, cooldown active")
-			return
-		end
+	af_tapeworm = {
+		get_sections = function(self, artefact) return artefact_props.af_tapeworm.sections end,
+		func = function(self, actor, artefact, artefact_count, artefact_ids, artefact_names, obj, amount, who, last_hit)
+			local af_tapeworm = artefact_props.af_tapeworm
+			if not check_cooldown("af_tapeworm") then
+				trace("Tapeworm not triggered, cooldown active")
+				return
+			end
 
-		if not (
-			last_hit and
-			af_tapeworm.valid_hits[last_hit.type] and
-			who and
-			not IsAnomaly(who) and
-			obj
-		) then
-			trace("Tapeworm not triggered, not valid hit")
-			return
-		end
+			if not (
+				last_hit and
+				af_tapeworm.valid_hits[last_hit.type] and
+				who and
+				not IsAnomaly(who) and
+				obj
+			) then
+				trace("Tapeworm not triggered, not valid hit")
+				return
+			end
 
-		af_tapeworm:stun_func(actor, artefact, artefact_count, artefact_ids, artefact_names, obj, amount, who, last_hit)
-	end,
+			af_tapeworm:stun_func(actor, artefact, artefact_count, artefact_ids, artefact_names, obj, amount, who, last_hit)
+		end,
+	},
 
 	-- Sandstone, perk: Zone Infusion
-	af_sandstone = function(actor, artefact, artefact_count, artefact_ids, artefact_names, obj, amount, who, last_hit)
-		local af_sandstone = artefact_props.af_sandstone
-		if not (last_hit and af_sandstone.valid_hits[last_hit.type]) then
-			trace("Sandstone, not valid hit type")
-			return
-		end
+	af_sandstone = {
+		get_sections = function(self, artefact) return artefact_props.af_sandstone.sections end,
+		func = function(self, actor, artefact, artefact_count, artefact_ids, artefact_names, obj, amount, who, last_hit)
+			local af_sandstone = artefact_props.af_sandstone
+			if not (last_hit and af_sandstone.valid_hits[last_hit.type]) then
+				trace("Sandstone, not valid hit type")
+				return
+			end
 
-		if not (who and IsAnomaly(who)) then
-			trace("Sandstone, not Anomaly %s", who:section())
-			return
-		end
+			if not (who and IsAnomaly(who)) then
+				trace("Sandstone, not Anomaly %s", who:section())
+				return
+			end
 
-		local actor_weapon = actor:active_item()
-		if not actor_weapon then
-			trace("Sandstone, no active actor_weapon")
-			return
-		end
+			local actor_weapon = actor:active_item()
+			if not actor_weapon then
+				trace("Sandstone, no active actor_weapon")
+				return
+			end
 
-		add_status_effect(180, {
-			weapon_name = actor_weapon:name(),
-			hit_type = last_hit.type,
-			hit_type_icon = af_sandstone.hit_types_icons[last_hit.type],
-		}, "af_sandstone" .. actor_weapon:name(), true)
-	end,
-
+			add_status_effect(180, {
+				weapon_name = actor_weapon:name(),
+				hit_type = last_hit.type,
+				hit_type_icon = af_sandstone.hit_types_icons[last_hit.type],
+			}, "af_sandstone" .. actor_weapon:name(), true)
+		end,
+	},
 }
 
 -- Functions for artefacts which provide perk bonuses on before npc hit
