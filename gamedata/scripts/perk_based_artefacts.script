@@ -1156,7 +1156,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			end)
 			return true
 		end,
-		manual_teleport = function(self, position, npc_target)
+		manual_teleport = function(self, artefact, position, npc_target)
 			-- Mock object
 			local npc = {
 				position = function(self)
@@ -1528,7 +1528,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 		ui_validate_func = function(self)
 			return artefacts[artefact_on_update_functions.af_sun.section]
 		end,
-		ui_func = function(self, artefact, eff)
+		ui_func = function(self, eff, artefact)
 			add_ui_func(
 				artefact,
 				eff ~= self.eff,

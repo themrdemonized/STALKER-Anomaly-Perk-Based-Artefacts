@@ -95,7 +95,7 @@ function AfChooseUI:__init(af_obj, msg) super()
 
 	self.af_action_funcs = {
 		af_lighthouse = function(self)
-			if perk_based_artefacts.artefact_props.af_lighthouse:manual_teleport(self.worldPos, self.obj) then
+			if perk_based_artefacts.artefact_props.af_lighthouse:manual_teleport(self.af_obj:section(), self.worldPos, self.obj) then
 				alife_release(self.af_obj)
 				self:Close()
 			else
