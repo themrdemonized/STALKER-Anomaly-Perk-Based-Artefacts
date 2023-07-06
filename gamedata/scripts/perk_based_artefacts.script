@@ -997,6 +997,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 	-- 	}
 	-- },
 	af_lighthouse = {
+		sections = {af_lighthouse = true},
 		sounds = {
 			"perk_based_artefacts\\TELEPRT1",
 			"perk_based_artefacts\\TELEPRT2",
@@ -1103,7 +1104,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 						add_ui_func(
 							self.cooldown_name,
 							false,
-							"af_lighthouse",
+							artefact,
 							function() return perk_based_artefacts.artefact_props.af_lighthouse:ui_text_func() end,
 							function() return perk_based_artefacts.artefact_props.af_lighthouse:ui_validate_func() end
 						)
@@ -1826,6 +1827,8 @@ artefact_props = { -- Special props of artefacts that are used in processing
 		end
 	},
 	af_skull_miser = {
+		sections = {af_skull_miser = true},
+		money_items_num = 3,
 		money_items = (function() -- Money items to choose and spawn
 			local t = {}
 			insert_n_times(t, "roubles", 90)
@@ -4766,64 +4769,75 @@ artefact_on_npc_hit_functions = {
 artefact_on_npc_death_functions = {
 
 	-- Miser's Skull, Perk: Crack the jackpot
-	af_skull_miser = function(actor, artefact, artefact_count, artefact_ids, artefact_names, npc, who, last_npc_hit, last_npc_hit_bone_index)
-		local af_skull_miser = artefact_props.af_skull_miser
-		if not (last_npc_hit and last_npc_hit_bone_index and af_skull_miser.head_bones[last_npc_hit_bone_index]) then
-			trace("Miser's Skull not triggered, bone index %s", last_npc_hit_bone_index)
-			return
-		end
-
-		local npc_level_vertex_id = npc:level_vertex_id()
-		local npc_game_vertex_id = npc:game_vertex_id()
-
-		local money_items = af_skull_miser.money_items
-		local money_fountain_minimal_force = 125
-		local money_fountain_force = 200
-
-		local function money_fountain(money_item_id)
-			local money = get_object_by_id(money_item_id)
-			if money then
-				trace("money spawned")
-				local random_force = random()
-				money:get_physics_shell():apply_force(
-					money_fountain_minimal_force + random_force * money_fountain_force,
-					(money_fountain_minimal_force + random_force * money_fountain_force) * 5,
-					money_fountain_minimal_force + random_force * money_fountain_force)
-				return true
+	af_skull_miser = {
+		get_sections = function(self, artefact) return artefact_props.af_skull_miser.sections end,
+		func = function(self, actor, artefact, artefact_count, artefact_ids, artefact_names, npc, who, last_npc_hit, last_npc_hit_bone_index)
+			local af_skull_miser = artefact_props.af_skull_miser
+			if not (last_npc_hit and last_npc_hit_bone_index and af_skull_miser.head_bones[last_npc_hit_bone_index]) then
+				trace("Miser's Skull not triggered, bone index %s", last_npc_hit_bone_index)
+				return
 			end
-			trace("money not spawned yet")
-			return false
-		end
 
-		for i = 1, artefact_count * 3 do
-			local money_position = npc:position()
-			local money_direction = npc:direction()
-			money_direction = vector_rotate_y(money_direction, random(-180, 180))
-			money_position.x = money_position.x + money_direction.x * random_float(0.3, 0.5)
-			money_position.y = money_position.y + money_direction.y + 2
-			money_position.z = money_position.z + money_direction.z * random_float(0.3, 0.5)
-			local money_item = alife_create_item(get_random_array_element(money_items), {money_position, npc_level_vertex_id, npc_game_vertex_id, nil})
-			CreateTimeEvent(money_item.id, money_item.id, 0, money_fountain, money_item.id)
-		end
+			local npc_level_vertex_id = npc:level_vertex_id()
+			local npc_game_vertex_id = npc:game_vertex_id()
 
-		artefact_props.af_lucifer:change_condition(0.005)
-	end,
+			local money_items = af_skull_miser.money_items
+			local money_fountain_minimal_force = 125
+			local money_fountain_force = 200
+
+			local function money_fountain(money_item_id)
+				local money = get_object_by_id(money_item_id)
+				if money then
+					trace("money spawned")
+					local random_force = random()
+					money:get_physics_shell():apply_force(
+						money_fountain_minimal_force + random_force * money_fountain_force,
+						(money_fountain_minimal_force + random_force * money_fountain_force) * 5,
+						money_fountain_minimal_force + random_force * money_fountain_force)
+					return true
+				end
+				trace("money not spawned yet")
+				return false
+			end
+
+			for i = 1, artefact_count * af_skull_miser.money_items_num do
+				local money_position = npc:position()
+				local money_direction = npc:direction()
+				money_direction = vector_rotate_y(money_direction, random(-180, 180))
+				money_position.x = money_position.x + money_direction.x * random_float(0.3, 0.5)
+				money_position.y = money_position.y + money_direction.y + 2
+				money_position.z = money_position.z + money_direction.z * random_float(0.3, 0.5)
+				local money_item = alife_create_item(get_random_array_element(money_items), {money_position, npc_level_vertex_id, npc_game_vertex_id, nil})
+				CreateTimeEvent(money_item.id, money_item.id, 0, money_fountain, money_item.id)
+			end
+
+			artefact_props.af_lucifer:change_condition(0.005)
+		end,
+	},
 
 	-- Claw, Perk: Bloodlust
-	af_kogot = function(actor, artefact, artefact_count, artefact_ids, artefact_names, npc, who, last_npc_hit, last_npc_hit_bone_index)
-		artefact_props.af_kogot:on_death(actor, artefact, artefact_count, artefact_ids, artefact_names, npc, who, last_npc_hit, last_npc_hit_bone_index)
-	end,
+	af_kogot = {
+		get_sections = function(self, artefact) return artefact_props.af_kogot.sections end,
+		func = function(self, actor, artefact, artefact_count, artefact_ids, artefact_names, npc, who, last_npc_hit, last_npc_hit_bone_index)
+			artefact_props.af_kogot:on_death(actor, artefact, artefact_count, artefact_ids, artefact_names, npc, who, last_npc_hit, last_npc_hit_bone_index)
+		end,
+	},
 
 	-- Dragon's Eye, Perk: Good ol' Ultra-Violence
-	af_dragon_eye = function(actor, artefact, artefact_count, artefact_ids, artefact_names, npc, who, last_npc_hit, last_npc_hit_bone_index)
-		artefact_props.af_dragon_eye:on_death(actor, artefact, artefact_count, artefact_ids, artefact_names, npc, who, last_npc_hit, last_npc_hit_bone_index)
-	end,
+	af_dragon_eye = {
+		get_sections = function(self, artefact) return artefact_props.af_dragon_eye.sections end,
+		func = function(self, actor, artefact, artefact_count, artefact_ids, artefact_names, npc, who, last_npc_hit, last_npc_hit_bone_index)
+			artefact_props.af_dragon_eye:on_death(actor, artefact, artefact_count, artefact_ids, artefact_names, npc, who, last_npc_hit, last_npc_hit_bone_index)
+		end,
+	},
 
 	-- Beacon, Perk: The Unorthodox Way of Travelling
-	af_lighthouse = function(actor, artefact, artefact_count, artefact_ids, artefact_names, npc, who, last_npc_hit, last_npc_hit_bone_index)
-		artefact_props.af_lighthouse:on_death(actor, artefact, artefact_count, artefact_ids, artefact_names, npc, who, last_npc_hit, last_npc_hit_bone_index)
-	end,
-
+	af_lighthouse = {
+		get_sections = function(self, artefact) return artefact_props.af_lighthouse.sections end,
+		func = function(self, actor, artefact, artefact_count, artefact_ids, artefact_names, npc, who, last_npc_hit, last_npc_hit_bone_index)
+			artefact_props.af_lighthouse:on_death(actor, artefact, artefact_count, artefact_ids, artefact_names, npc, who, last_npc_hit, last_npc_hit_bone_index)
+		end,
+	},
 }
 
 -- Functions for artefacts which provide perk bonuses on before monster hit
