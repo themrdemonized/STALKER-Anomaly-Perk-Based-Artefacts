@@ -1574,6 +1574,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 		end
 	},
 	af_kogot = {
+		sections = {af_kogot = true},
 		monster_to_meat = { -- Associations of meat chunk to its monster (clsid or kind)
 			["SM_GERMAN_SHEPHERD"] 			= "mutant_part_dog_meat",
 			["SM_FOX"] 	 					= "mutant_part_dog_meat",
@@ -1654,7 +1655,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			add_ui_func(
 				"af_kogot_boost",
 				true,
-				"af_kogot",
+				artefact,
 				function() return perk_based_artefacts.artefact_props.af_kogot:ui_text_func() end,
 				function() return perk_based_artefacts.artefact_props.af_kogot:ui_validate_func() end
 			)
@@ -1960,6 +1961,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 		end,
 	},
 	af_dragon_eye = {
+		sections = {af_dragon_eye = true},
 		trigger = false,
 		cooldown_name = "af_dragon_eye",
 		ui_text_func = function(self)
@@ -1987,7 +1989,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			add_ui_func(
 				self.cooldown_name,
 				false,
-				"af_dragon_eye",
+				artefact,
 				function() return perk_based_artefacts.artefact_props.af_dragon_eye:ui_text_func() end,
 				function() return perk_based_artefacts.artefact_props.af_dragon_eye:ui_validate_func() end
 			)
@@ -2430,6 +2432,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 		end
 	},
 	af_repei = {
+		sections = {af_repei = true},
 		effect_time = 6,
 		bleed_coeff = 0.0023, -- Bigger number => bigger bleeding damage
 		hit_coeff_max = 0.4,
@@ -4707,40 +4710,56 @@ artefact_on_hit_functions = {
 artefact_on_npc_before_hit_functions = {
 
 	-- Claw, Perk: Bloodlust
-	af_kogot = function(actor, artefact, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
-		artefact_props.af_kogot:on_before_hit(actor, artefact, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
-	end,
+	af_kogot = {
+		get_sections = function(self, artefact) return artefact_props.af_kogot.sections end,
+		func = function(self, actor, artefact, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
+			artefact_props.af_kogot:on_before_hit(actor, artefact, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
+		end,
+	},
 
 	-- Dragon's Eye, Perk: Good ol' Ultra-Violence
-	af_dragon_eye = function(actor, artefact, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
-		artefact_props.af_dragon_eye:on_before_hit(actor, artefact, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
-	end,
+	af_dragon_eye = {
+		get_sections = function(self, artefact) return artefact_props.af_dragon_eye.sections end,
+		func = function(self, actor, artefact, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
+			artefact_props.af_dragon_eye:on_before_hit(actor, artefact, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
+		end,
+	},
 
 	-- Spike, Perk: Critical Ascensi0n
-	af_spaika = function(actor, artefact, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
-		artefact_props.af_spaika:on_before_hit(actor, artefact, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
-	end,
+	af_spaika = {
+		get_sections = function(self, artefact) return artefact_props.af_spaika.sections end,
+		func = function(self, actor, artefact, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
+			artefact_props.af_spaika:on_before_hit(actor, artefact, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
+		end,
+	},
 
 	-- Sandstone, perk: Zone Infusion
-	af_sandstone = function(actor, artefact, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
-		artefact_props.af_sandstone:on_before_hit(actor, artefact, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
-	end,
+	af_sandstone = {
+		get_sections = function(self, artefact) return artefact_props.af_sandstone.sections end,
+		func = function(self, actor, artefact, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
+			artefact_props.af_sandstone:on_before_hit(actor, artefact, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
+		end,
+	},
 
 	-- Thistle, perk: Minor Laceration
-	af_repei = function(actor, artefact, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
-		artefact_props.af_repei:on_before_hit(actor, artefact, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
-	end,
-
+	af_repei = {
+		get_sections = function(self, artefact) return artefact_props.af_repei.sections end,
+		func = function(self, actor, artefact, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
+			artefact_props.af_repei:on_before_hit(actor, artefact, artefact_count, artefact_ids, artefact_names, npc, s_hit, bone_id, flags)
+		end,
+	},
 }
 
 -- Functions for artefacts which provide perk bonuses on npc hit
 artefact_on_npc_hit_functions = {
 
 	-- Thistle, perk: Minor Laceration
-	af_repei = function(actor, artefact, artefact_count, artefact_ids, artefact_names, npc, amount, local_direction, who, bone_index, last_npc_hit)
-		artefact_props.af_repei:on_hit(actor, artefact, artefact_count, artefact_ids, artefact_names, npc, amount, local_direction, who, bone_index, last_npc_hit)
-	end,
-
+	af_repei = {
+		get_sections = function(self, artefact) return artefact_props.af_repei.sections end,
+		func = function(self, actor, artefact, artefact_count, artefact_ids, artefact_names, npc, amount, local_direction, who, bone_index, last_npc_hit)
+			artefact_props.af_repei:on_hit(actor, artefact, artefact_count, artefact_ids, artefact_names, npc, amount, local_direction, who, bone_index, last_npc_hit)
+		end,
+	},
 }
 
 -- Functions for artefacts which provide perk bonuses on npc death
