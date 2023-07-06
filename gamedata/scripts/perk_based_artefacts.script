@@ -6609,5 +6609,7 @@ function spawn_perk_artefacts()
 	end
 end
 
-artefact_props.af_tapeworm.sections = {af_medusa = true}
-artefact_props.af_sandstone.sections = {af_night_star = true}
+function test_replace_artefacts()
+	artefact_props.af_tapeworm.sections = {af_medusa = true}
+	artefact_props.af_sandstone.sections = {af_night_star = true}
+end
