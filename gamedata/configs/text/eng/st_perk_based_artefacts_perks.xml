@@ -278,7 +278,7 @@
           %c[0,192,71,221] -   Pseudodog: %c[ui_gray_3]3%/sec psy regen, 50% psy damage reduction.\n
           %c[0,192,71,221] -   Bloodsucker: %c[ui_gray_3]become invisible until shooting or hitting enemy, very strong bleeding cure.\n
           %c[0,192,71,221] -   Psysucker: %c[ui_gray_3]become invisible until shooting or hitting enemy, 8%/sec psy regen.\n
-          %c[0,192,71,221] -   Snork: %c[ui_gray_3]50% radiation damage reduction, 10%/sec stamina regen, 10msv/sec radiation cure, big satiety decrease.\n
+          %c[0,192,71,221] -   Snork: %c[ui_gray_3]50% radiation damage reduction, 10%/sec stamina regen, 50msv/sec radiation cure, big satiety decrease and moderate thirst decrease.\n
           %c[0,192,71,221] -   Chimera: %c[ui_gray_3]8%/sec health regen, 15%/sec stamina regen, 33% raditation damage reduction.\n
           %c[0,192,71,221] -   Lurker: %c[ui_gray_3]66% chem/fire/electric anomaly damage reduction.\n
           %c[0,192,71,221] -   Tushkano: %c[ui_gray_3]30% speed increase, 20% melee damage penalty.

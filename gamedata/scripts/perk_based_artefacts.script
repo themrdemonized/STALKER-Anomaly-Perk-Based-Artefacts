@@ -387,6 +387,12 @@ function change_sleep(item)
 	end
 end
 
+function change_thirst(item)
+	if game_difficulties.get_game_factor("thirst") then
+		actor_status_thirst.actor_on_item_use(item)
+	end
+end
+
 function add_pp_effector_const_smooth(ppfile, id, looped, time)
 	add_pp_effector(ppfile, id, looped)
 	local factor = 0.0001
@@ -2554,6 +2560,18 @@ artefact_props = { -- Special props of artefacts that are used in processing
 	-- Moss, Perk: Culinary Hyperversity
 	af_moh = { -- Mutant parts bonuses
 		sections = {af_moh = true},
+		af_moh_snork_thirst_increase = { -- Mock item to send to actor_status_thirst to increase thirst
+			sec = "af_moh_snork_thirst_increase",
+			section = function(self)
+				return self.sec
+			end
+		},
+		af_moh_snork_thirst_decrease = { -- Mock item to send to actor_status_thirst to decrease thirst
+			sec = "af_moh_snork_thirst_decrease",
+			section = function(self)
+				return self.sec
+			end
+		},
 		add_speed = function(self, amount, is_sprint)
 			add_speed("af_moh", 1 + amount, is_sprint, true)
 		end,
@@ -2714,7 +2732,8 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			self:add_effect(function()
 				actor:change_power(0.01)
 				actor:change_satiety(-0.001)
-				actor:change_radiation(-0.00036)
+				actor:change_radiation(-0.0015)
+				change_thirst(self.af_moh_snork_thirst_increase)
 			end)
 
 			self:register("actor_on_before_hit", function(s_hit, bone_id, flags)
@@ -3703,7 +3722,7 @@ artefact_on_update_functions = {
 	-- Signet, Perk: Light of Tranquility
 	af_signet = {
 		get_sections = function(self, artefact) return artefact_props.af_signet.sections end,
-		func = function(actor, artefact, artefact_count, artefact_ids, artefact_names)
+		func = function(self, actor, artefact, artefact_count, artefact_ids, artefact_names)
 			local af_signet = artefact_props.af_signet
 			local health_boost = af_signet.health_boost
 			local status_effect_time_increment = af_signet:status_effect_time_increment(actor, artefact, artefact_count, artefact_ids, artefact_names)
