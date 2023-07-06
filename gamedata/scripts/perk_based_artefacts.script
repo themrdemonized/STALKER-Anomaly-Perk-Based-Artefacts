@@ -1221,6 +1221,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 	},
 	af_cell = {
 		sections = {af_cell = true},
+		rad_amount_coeff = 0.1,
 		reduction_coeff = (function() -- LUT with reduction coeffs by artefact count
 			local t = {}
 			for artefact_count = 1, 5 do
@@ -2167,6 +2168,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 	af_fountain = {
 		sections = {af_fountain = true},
 		cashback_triggered = false, -- Trigger flag to reset time event
+		cashback_bonus = 0.08
 	},
 	af_ball = {
 		sections = {af_ball = true},
@@ -2847,6 +2849,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 		health_boost = 0.003,
 		psy_drain = -0.00125,
 		psy_boost = 0.0035,
+		psy_damage_reduction = 0.66,
 		cooldown_time = 60,
 		chance = function(self, actor, artefact, artefact_count, artefact_ids, artefact_names)
 			 return 0.25 + 2.5 * (1 - get_psy_health())
@@ -3399,6 +3402,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 	af_grapes = {
 		sections = {af_grapes = true},
 		health_boost = 0.01,
+		health_boost_time = 5,
 		status_effect_key = "af_grapes_effect",
 		ui_text_func = function(self)
 			return ("T:%s"):format(ceil(get_status_effect_remaining_time(self.status_effect_key)))
@@ -4238,16 +4242,17 @@ artefact_on_item_use_functions = {
 
 			local af_grapes = artefact_props.af_grapes
 			local health_boost = af_grapes.health_boost
+			local health_boost_time = af_grapes.health_boost_time
 
 			local sec = obj:section()
 			local satiety_increase = SYS_GetParam(2, sec, "eat_satiety", 0) * health_boost
 			if satiety_increase > 0 then
-				add_timed_effect(5 * artefact_count, function(satiety_increase)
+				add_timed_effect(health_boost_time * artefact_count, function(satiety_increase)
 					db.actor:change_health(satiety_increase)
 					_G.printf("health increased by %s", satiety_increase)
 				end, {satiety_increase})
 
-				add_status_effect(5 * artefact_count, nil, af_grapes.status_effect_key)
+				add_status_effect(health_boost_time * artefact_count, nil, af_grapes.status_effect_key)
 				add_ui_func(
 					af_grapes.status_effect_key,
 					true,
@@ -4588,7 +4593,7 @@ artefact_on_before_hit_functions = {
 			local power = s_hit.power
 			s_hit.power = s_hit.power * (1 - rad_k)
 			power = power - s_hit.power
-			local rad_amount = power * 0.1
+			local rad_amount = power * af_cell.rad_amount_coeff
 			trace("Cell: resulted radiation %s", rad_amount)
 			actor:change_radiation(rad_amount)
 			play_sound_on_actor("anomaly\\electra_hit" .. get_random_array_element({"", "1"}), 1, 1 - artefact_count * 0.1)
@@ -4628,7 +4633,7 @@ artefact_on_before_hit_functions = {
 				return
 			end
 
-			s_hit.power = s_hit.power * 0.66
+			s_hit.power = s_hit.power * af_zhelch.psy_damage_reduction
 		end,
 	},
 
@@ -4991,7 +4996,7 @@ artefact_on_trade_functions = {
 				local function cashback()
 					local money = actor:money()
 					trace("Actor last money %s, actor current money %s", actor_last_money, money)
-					local cashback = round((actor_last_money - money) * 0.08 * artefact_count)
+					local cashback = round((actor_last_money - money) * af_fountain.cashback_bonus * artefact_count)
 					if cashback < 1 then
 						trace("Fountain not fired, not enough money")
 						actor_last_money = money
