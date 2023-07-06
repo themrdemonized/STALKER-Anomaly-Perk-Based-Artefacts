@@ -961,7 +961,8 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			[hit.fire_wound] = true
 		}
 	},
-	-- af_medallion = {
+	af_medallion = {
+		sections = {af_medallion = true},
 	-- 	enemy_squad_member_ids = {},
 	-- 	on_enemy_eval = function(obj, enemy, flags)  -- Force former companions to become enemies and shoot
 	-- 		local _self = artefact_props.af_medallion
@@ -999,7 +1000,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 	-- 	valid_hits = { -- Valid hit types to trigger
 	-- 		[hit.fire_wound] = true
 	-- 	}
-	-- },
+	},
 	af_lighthouse = {
 		sections = {af_lighthouse = true},
 		sounds = {
@@ -2111,7 +2112,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			add_ui_func(
 				self.cooldown_name,
 				false,
-				"af_dragon_eye",
+				artefact,
 				function() return perk_based_artefacts.artefact_props.af_dragon_eye:ui_text_func() end,
 				function() return perk_based_artefacts.artefact_props.af_dragon_eye:ui_validate_func() end
 			)
@@ -3266,7 +3267,13 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			return t
 		end)(),
 		check_bat = function(self)
-			return db.actor:object("af_bat")
+			for k, v in pairs(self.sections) do
+				local obj = db.actor:object(k)
+				if obj then
+					return obj
+				end
+			end
+			return false
 		end,
 		get_random_artefact = function(self, sec, arts_table)
 			local arts_table = arts_table or self.tier_artefacts[2]
@@ -3310,7 +3317,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 		end,
 		transmutate = function(self, obj, new_artefact)
 			local actor = db.actor
-			local af_bat = actor:object("af_bat")
+			local af_bat = self:check_bat()
 			play_sound_on_actor("perk_based_artefacts\\transmute")
 			CloseAll_UI()
 			add_pp_effector("teleport.ppe", c_id_ppe.transmutate, false)
@@ -3333,7 +3340,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 				self.randomseed_update_time = seed
 			else
 				math.randomseed(self.randomseed)
-				self.randomseed = self.randomseed + math.random(100,200) + math.random()
+				self.randomseed = self.randomseed + math.random(100, 200) + math.random()
 			end
 			math.randomseed(self.randomseed)
 
@@ -5796,7 +5803,7 @@ add_functor("pba_bat", bat_transmutate_func.check_transmutate, bat_transmutate_f
 -- Functors for Beacon
 af_lighthouse_user_teleport_func = {
 	check = function(obj, bag, mode)
-		return obj:section() == "af_lighthouse"
+		return artefact_props.af_lighthouse.sections[obj:section()]
 	end,
 	string = function(obj, bag, mode)
 		return "st_pba_engage"
@@ -5810,7 +5817,7 @@ add_functor("pba_lighthouse", af_lighthouse_user_teleport_func.check, af_lightho
 -- Functors for Dragon Eye
 af_dragon_eye_engage_func = {
 	check = function(obj, bag, mode)
-		return obj:section() == "af_dragon_eye"
+		return artefact_props.af_dragon_eye.sections[obj:section()]
 	end,
 	string = function(obj, bag, mode)
 		return "st_pba_engage"
@@ -5825,7 +5832,7 @@ add_functor("pba_dragon_eye", af_dragon_eye_engage_func.check, af_dragon_eye_eng
 -- Functors for Medallion
 af_medallion_engage_func = {
 	check = function(obj, bag, mode)
-		return obj:section() == "af_medallion"
+		return artefact_props.af_medallion.sections[obj:section()]
 	end,
 	string = function(obj, bag, mode)
 		return "st_pba_engage"
@@ -5839,7 +5846,7 @@ add_functor("pba_medallion", af_medallion_engage_func.check, af_medallion_engage
 -- Functors for Cell
 af_cell_engage_func = {
 	check = function(obj, bag, mode)
-		return obj:section() == "af_cell"
+		return artefact_props.af_cell.sections[obj:section()]
 	end,
 	string = function(obj, bag, mode)
 		return "st_pba_engage"
