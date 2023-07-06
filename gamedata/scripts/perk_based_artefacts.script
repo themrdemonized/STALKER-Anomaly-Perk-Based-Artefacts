@@ -1526,7 +1526,12 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			return self.eff
 		end,
 		ui_validate_func = function(self)
-			return artefacts[artefact_on_update_functions.af_sun.section]
+			for k, v in pairs(self.sections) do
+				if artefacts[k] then
+					return true
+				end
+			end
+			return false
 		end,
 		ui_func = function(self, eff, artefact)
 			add_ui_func(
@@ -1566,7 +1571,12 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			return self.eff
 		end,
 		ui_validate_func = function(self)
-			return artefacts[artefact_on_update_functions.af_peas.section]
+			for k, v in pairs(self.sections) do
+				if artefacts[k] then
+					return true
+				end
+			end
+			return false
 		end,
 		ui_func = function(self, eff, artefact)
 			add_ui_func(
@@ -6586,3 +6596,18 @@ end
 function set_lucifer_condition(condition)
 	artefact_props.af_lucifer:set_condition(condition)
 end
+
+function spawn_perk_artefacts()
+	for k, v in pairs(artefact_props) do
+		if v.sections then
+			for sec, _ in pairs(v.sections) do
+				if sec ~= "af_lucifer" then
+					alife_create_item(sec, db.actor)
+				end
+			end
+		end
+	end
+end
+
+artefact_props.af_tapeworm.sections = {af_medusa = true}
+artefact_props.af_sandstone.sections = {af_night_star = true}

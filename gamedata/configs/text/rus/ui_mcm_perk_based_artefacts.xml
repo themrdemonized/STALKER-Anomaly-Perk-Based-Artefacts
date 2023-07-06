@@ -3,10 +3,10 @@
 <string_table>
 	
 	<string id="ui_mcm_perk_based_artefacts_title">
-		<text>Артефактные перки</text>
+		<text>Perk Based Artefacts</text>
 	</string>
 	<string id="ui_mcm_menu_perk_based_artefacts">
-		<text>Артефактные перки</text>
+		<text>PBA</text>
 	</string>
 	<string id="ui_mcm_perk_based_artefacts_debug_mode">
 		<text>Дебаг режим</text>

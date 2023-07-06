@@ -7,6 +7,19 @@ ui_item.build_desc_footer = function(obj, sec, str)
 	local str = build_desc_footer(obj, sec, str)
 	sec = get_artefact_from_container(sec)
 	sec = sec:gsub("_grenade$", "")
+	local found = false
+	for k, v in pairs(perk_based_artefacts.artefact_props) do
+		if v.sections and v.sections[sec] then
+			sec = k
+			found = true
+			break
+		end
+	end
+
+	if not found then
+		return str
+	end
+	
 	local s = "st_pba_" .. sec .. "_perk"
 	local translation = gc(s)
 	if s == translation then
