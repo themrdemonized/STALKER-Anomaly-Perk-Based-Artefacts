@@ -1851,10 +1851,10 @@ artefact_props = { -- Special props of artefacts that are used in processing
 	},
 	af_skull_miser = {
 		sections = {af_skull_miser = true},
-		money_items_num = 3,
+		money_items_num = 4,
 		money_items = (function() -- Money items to choose and spawn
 			local t = {}
-			insert_n_times(t, "roubles", 90)
+			insert_n_times(t, "roubles", 85)
 			insert_n_times(t, "money_10_50", 12)
 			insert_n_times(t, "money_50_100", 8)
 			insert_n_times(t, "money_100_200", 6)
