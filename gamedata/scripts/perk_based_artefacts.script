@@ -85,6 +85,7 @@ local actor_on_update_time = 0
 local tg_lag = 0 --stores the time_global on game start and then used to correct timers for loaded time effects
 
 local time_elapsed = 0 -- Time from game start used for effects and cooldowns
+local time_factor = 6
 local saved_time_elapsed = 0 -- time_elapsed at the end of update
 
 local actor_is_dying = false
@@ -280,7 +281,7 @@ end
 
 function get_time_elapsed()
 	--trace(get_time_factor())
-	return floor(get_game_time():diffSec(get_start_time()) / get_time_factor() * 10) * 0.1
+	return floor(get_game_time():diffSec(get_start_time()) / time_factor * 10) * 0.1
 end
 
 function get_object_by_id(id) -- same as _g.script one but without spamming in console
@@ -897,7 +898,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 	af_atom = {
 		sections = {af_atom = true},
 		power_boost = 0.02,
-		radiation_cure = -0.00005,
+		radiation_cure =  -0.00005,
 	},
 	af_generator = {
 		sections = {af_generator = true},
@@ -2376,7 +2377,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 		},
 		valid_hits_table = nil, -- Table of valid hits to choose from, updates each hour
 		get_seed = function(self)
-			return ceil(time_elapsed * get_time_factor() / 60 / 60)
+			return ceil(time_elapsed * time_factor / 60 / 60)
 		end,
 		new_fixed_random_table = function(self)
 			local a = {}
@@ -3390,7 +3391,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			self.randomseed = self.randomseed or mdata_load("af_bat_randomseed")
 			self.randomseed_update_time = self.randomseed_update_time or mdata_load("af_bat_randomseed_update_time")
 
-			local seed = ceil(time_elapsed * get_time_factor() / 60 / 60)
+			local seed = ceil(time_elapsed * time_factor / 60 / 60)
 			if self.randomseed_update_time ~= seed then
 				self.randomseed = seed
 				self.randomseed_update_time = seed
@@ -3521,7 +3522,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 		condition = 1,
 		degradation_rate = 0.0000038, --25% per day is 0.0000029
 		get_degradation_rate = function(self)
-			return self.degradation_rate * get_time_factor()
+			return self.degradation_rate * time_factor
 		end,
 		check_lucifer = function(self)
 			-- return has_alife_info("lucifer_active") and db.actor:object("af_lucifer")
@@ -6505,6 +6506,7 @@ function actor_on_first_update()
 	trace("tg_now %s, tg_add %s", tg_now, tg_add)
 
 	actor_level = level_name()
+	time_factor = get_time_factor()
 
 	for key, effect in pairs(timed_effects) do
 		effect.timer = effect.timer + tg_add
