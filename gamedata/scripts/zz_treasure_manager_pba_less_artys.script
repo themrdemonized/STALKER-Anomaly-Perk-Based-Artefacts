@@ -19,7 +19,7 @@ local function load_defaults()
 	return t
 end
 
-local settings
+local settings = load_defaults()
 function load_settings()
 	settings = load_defaults()
 	return settings
