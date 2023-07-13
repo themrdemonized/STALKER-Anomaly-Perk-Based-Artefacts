@@ -898,7 +898,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 	af_atom = {
 		sections = {af_atom = true},
 		power_boost = 0.02,
-		radiation_cure =  -0.00005,
+		radiation_cure = -0.00005,
 	},
 	af_generator = {
 		sections = {af_generator = true},
