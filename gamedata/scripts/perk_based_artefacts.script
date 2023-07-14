@@ -5562,7 +5562,7 @@ artefact_binder_on_update_functions = {
 			binder.take_distance_sqr = 1.6 ^ 2
 
 			binder.homing_speed = 0.75
-			binder.speed = 12.5
+			binder.speed = 13
 			binder.damage = 0.55
 
 			binder.invalid_try_max = 25
@@ -5594,10 +5594,21 @@ artefact_binder_on_update_functions = {
 				then
 					local distance = distance_to_xz_sqr(obj:position(), binder.get_target_pos(target))
 					if distance <= binder.target_radius_sqr then
-						binder.target_list[target:id()] = true
+						binder.target_list[target:id()] = distance
 						if distance < closest_distance then
-							closest_distance = distance
-							binder.target_current_id = target:id()
+
+							-- Check for obstacles
+							local ray = demonized_geometry_ray.geometry_ray({
+								ray_range = binder.target_radius,
+								ignore_object = obj,
+								flags = 3,
+								visualize = false,
+							})
+							local res = ray:get(obj:position(), binder.get_target_pos(target):sub(obj:position()):normalize())
+							if res.in_contact and res.result and res.result.object and res.result.object:id() == target:id() then
+								closest_distance = distance
+								binder.target_current_id = target:id()
+							end
 						end
 					end
 				end
@@ -5615,6 +5626,17 @@ artefact_binder_on_update_functions = {
 				closest_distance = math.huge
 				empty_table(binder.target_list)
 				level.iterate_nearest(obj:position(), 150, binder.target_list_func)
+
+				-- If there is closest target but havent chosen because of obstacles, fly towards first found one
+				if not binder.target_current_id and is_not_empty(binder.target_list) then
+					local dist = math.huge
+					for id, distance in pairs(binder.target_list) do
+						if distance < dist then
+							dist = distance
+							binder.target_current_id = id
+						end
+					end
+				end
 			end, 400)
 
 			binder.target_attack_func = throttle(function()
@@ -5830,7 +5852,31 @@ artefact_binder_on_update_functions = {
 				end
 
 				binder.destroyed = true
-				alife_release_id(id)
+
+				-- Play destroy sound
+				local t = {}
+	            local sounds = {
+	                "perk_based_artefacts\\PLSDTH01",
+	                "perk_based_artefacts\\PLSDTH02",
+	                "perk_based_artefacts\\PLSDTH03",
+	                "perk_based_artefacts\\PLSDTH04",
+	                "perk_based_artefacts\\PLSDTH05",
+	                "perk_based_artefacts\\PLSDTH06",
+	                "perk_based_artefacts\\PLSDTH07",
+	                "perk_based_artefacts\\PLSDTH08",
+	                "perk_based_artefacts\\PLSDTH09",
+	                "perk_based_artefacts\\PLSDTH10",
+	            }
+	            for i = 1, math.random(3) do
+	                t[#t + 1] = table.remove(sounds, math.random(#sounds))
+	            end
+	            
+	            for i, v in ipairs(t) do
+	            	local o = sound_object(v)
+	            	o:play_at_pos(obj, obj:position(), 0, sound_object.s3d)
+	            end
+
+	            alife_release_id(id)
 				return
 			end
 			binder.return_home = true
