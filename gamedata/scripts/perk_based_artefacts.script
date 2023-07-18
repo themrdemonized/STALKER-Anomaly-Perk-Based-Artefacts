@@ -6008,8 +6008,11 @@ if ayykyu_fp_death and ayykyu_fp_death.actor_on_before_death then
 	local fp_death = ayykyu_fp_death.actor_on_before_death
 	ayykyu_fp_death.actor_on_before_death = function(whoID, flags)
 		for artefact, props in pairs(artefacts) do
-			if artefact_on_before_death_functions[artefact] then -- prevent dying with First Person Death mod enabled
-				return
+			for perk, t in pairs(artefact_on_before_death_functions) do
+				local sections = t:get_sections(artefact)
+				if sections[artefact] then
+					return -- prevent dying with First Person Death mod enabled
+				end
 			end
 		end
 		fp_death(whoID, flags)
