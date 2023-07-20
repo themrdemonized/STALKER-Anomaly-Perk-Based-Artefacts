@@ -423,13 +423,17 @@ local belt = {}
 virtual_artefacts = {}
 
 function add_virtual_artefact(sec)
-	virtual_artefacts[sec] = true
-	refresh_artefacts(true)
+	if sec then
+		virtual_artefacts[sec] = true
+		refresh_artefacts(true)
+	end
 end
 
 function remove_virtual_artefact(sec)
-	virtual_artefacts[sec] = nil
-	refresh_artefacts(true)
+	if sec then
+		virtual_artefacts[sec] = nil
+		refresh_artefacts(true)
+	end
 end
 
 -- Find artefact in a container
