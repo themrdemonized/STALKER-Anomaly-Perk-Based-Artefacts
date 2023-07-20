@@ -5098,9 +5098,9 @@ artefact_on_item_drag_dropped_functions = {
 			}, "af_sandstone" .. obj_2:name())
 			
 			add_virtual_artefact(artefact)
-			add_timed_effect(600, nil, nil, function()
+			add_timed_effect(600, nil, nil, function(artefact)
 				perk_based_artefacts.remove_virtual_artefact(artefact)
-			end, nil, "af_sandstone_remove_virtual_artefact")
+			end, {artefact}, "af_sandstone_remove_virtual_artefact")
 			play_sound_on_actor(get_random_array_element(af_sandstone.hit_types_sounds[hit_type]), 0.7, random_float(0.95, 1.05))
 			alife_release(obj_1)
 		end,
