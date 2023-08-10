@@ -269,7 +269,7 @@
     <text>
     %c[0,209,172,56]PERK: %c[d_orange]Culinary Hyperversity\n
     %c[0,81,63,22]  • %c[0,209,172,56]Convert energy of raw mutant meat to special effects.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Effect lasts for 1 minute, eating different mutant meat overrides previous effect.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Effect lasts for 90 seconds, eating different mutant meat overrides previous effect.\n
     %c[0,81,63,22]  • %c[0,209,172,56]Does not stack.\n \n
     %c[d_orange]Effects: \n
           %c[0,192,71,221] -   Flesh meat: %c[ui_gray_3]3%/sec health regen, 33% bullet damage penalty.\n

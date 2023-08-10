@@ -5,7 +5,7 @@
 <string_table>
   <string id="st_pba_af_cocoon_perk">
     <text>
-    %c[0,209,172,56]Perk: %c[d_orange]Piel de Piedra\n
+    %c[0,209,172,56]PERK: %c[d_orange]Piel de Piedra\n
     %c[0,81,63,22] • %c[0,209,172,56]Obtienes un 25 % de proteccion contra danos cuerpo a cuerpo al equipar el artefacto.\n 
     %c[0,81,63,22]  • %c[0,209,172,56]Recibir dano cuerpo a cuerpo te otorga acumulacion bonus de Piel de Piedra.\n
     %c[0,81,63,22]  • %c[0,209,172,56]Con cada acumulacion, obtienes un 15% de proteccion contra danos cuerpo a cuerpo, pero recibes una penalizacion de velocidad de un 10%.\n
@@ -17,7 +17,7 @@
   </string>
   <string id="st_pba_af_cell_perk">
     <text>
-    %c[0,209,172,56]Perk: %c[d_orange]Desintegrador\n
+    %c[0,209,172,56]PERK: %c[d_orange]Desintegrador\n
     %c[0,81,63,22]  • %c[0,209,172,56]Desintegra parte de la bala que viene hacia ti. Desafortunadamente, en el proceso se emite mucha radiacion, lo que lleva al usuario a sufrir enfermedad por radiacion.\n
     %c[0,81,63,22]  • %c[0,209,172,56]Reduce el dano por balas en un 15%.\n
     %c[0,81,63,22]  • %c[0,209,172,56]La cantidad recibida de dano se convierte en radiacion.\n
@@ -32,14 +32,14 @@
   </string>
   <string id="st_pba_af_fountain_perk">
     <text>
-    %c[0,209,172,56]Perk: %c[d_orange]Hora de ir de compras\n
+    %c[0,209,172,56]PERK: %c[d_orange]Hora de ir de compras\n
     %c[0,81,63,22]  • %c[0,209,172,56]El usuario recibe un reembolso del 4% en cada compra.\n
     %c[0,81,63,22]  • %c[0,209,172,56]Se acumula con varios artefactos del mismo tipo.
     </text>
   </string>
   <string id="st_pba_af_spaika_perk">
     <text>
-    %c[0,209,172,56]Perk: %c[d_orange]Ascension critica\n
+    %c[0,209,172,56]PERK: %c[d_orange]Ascension critica\n
     %c[0,81,63,22]  • %c[0,209,172,56]Los golpes consecutivos otorgan una bonificacion del 5% de dano a tu proximo disparo.\n
     %c[0,81,63,22]  • %c[0,209,172,56]Golpear al enemigo en el lugar critico otorga una bonificacion del 10%.\n
     %c[0,81,63,22]  • %c[0,209,172,56]Restaura la salud psiquica en cada golpe con una cantidad que depende de las acumulaciones.\n
@@ -51,7 +51,7 @@
   </string>
   <string id="st_pba_af_signet_perk">
     <text>
-    %c[0,209,172,56]Perk: %c[d_orange]Luz de la tranquilidad\n
+    %c[0,209,172,56]PERK: %c[d_orange]Luz de la tranquilidad\n
     %c[0,81,63,22]  • %c[0,209,172,56]Restaura la salud y la psi mientras esta cerca de la fogata\n
     %c[0,81,63,22]  • %c[0,209,172,56]Amplifica los efectos de los artefactos de recuperacion psiquica cerca de la fogata.\n
     %c[0,81,63,22]  • %c[0,209,172,56]Da hasta 5 minutos de salud pasiva y regeneracion psiquica despues de sentarse cerca de una fogata.\n
@@ -60,7 +60,7 @@
   </string>
   <string id="st_pba_af_repei_perk">
     <text>
-    %c[0,209,172,56]Perk: %c[d_orange]Laceracion menor\n
+    %c[0,209,172,56]PERK: %c[d_orange]Laceracion menor\n
     %c[0,81,63,22]  • %c[0,209,172,56]Tu arma pierde el 50% de la potencia pura, pero gana la capacidad de infligir dano hemorragico.\n
     %c[0,81,63,22]  • %c[0,209,172,56]Con cada golpe, el enemigo recibira una acumulacion de sangrado y comenzara a perder salud lentamente proporcional a la potencia pura del arma.\n
     %c[0,81,63,22]  • %c[0,209,172,56]Los NPC entraran en panico por la agonia y el dolor, haciendolos correr esporadicamente.\n
@@ -70,7 +70,7 @@
   </string>
   <string id="st_pba_af_bat_perk">
     <text>
-    %c[0,209,172,56]Perk: %c[d_orange]Alquimia de la Zona\n
+    %c[0,209,172,56]PERK: %c[d_orange]Alquimia de la Zona\n
 %c[0,81,63,22] • %c[0,209,172,56]Permite transmutar artefactos.\n
      %c[0,81,63,22] • %c[0,209,172,56]Los artefactos se pueden "actualizar", es decir, cambiar a un nivel mejor (Night Star -> Gravi -> Gold Fish), o se pueden "mutar", es decir, cambiado a un tipo diferente conservando el mismo nivel (Estrella de la noche -> Sangre de piedra -> Medusa)\n
      %c[0,81,63,22] • %c[0,209,172,56]Los artefactos de nivel superior solo se pueden mutar.\n
@@ -82,7 +82,7 @@
   </string>
   <string id="st_pba_af_sun_perk">
     <text>
-    %c[0,209,172,56]Perk: %c[d_orange]Energia solar\n
+    %c[0,209,172,56]PERK: %c[d_orange]Energia solar\n
 %c[0,81,63,22] • %c[0,209,172,56]Otorga un aumento de salud y resistencia con tiempo despejado y un poco de aumento de resistencia con un tiempo parcialmente despejado entre las 5 y las 21 en punto.\n
      %c[0,81,63,22] • %c[0,209,172,56]En otro momento o condiciones climaticas, se penaliza la resistencia.\n
      %c[0,81,63,22] • %c[0,209,172,56]Se acumula con varios artefactos en el cinturon.
@@ -90,7 +90,7 @@
   </string>
   <string id="st_pba_af_ear_perk">
     <text>
-    %c[0,209,172,56]Perk: %c[d_orange]Voluntad de vivir\n
+    %c[0,209,172,56]PERK: %c[d_orange]Voluntad de vivir\n
 %c[0,81,63,22] • %c[0,209,172,56]Proporciona una regeneracion de salud mas fuerte cuanto menos salud tengas, comenzando con un 30%.\n
      %c[0,81,63,22] • %c[0,209,172,56]Si la salud esta por debajo del 30 %, recibes hasta un 50 % menos de dano dependiendo de cuan baja sea tu salud.\n
      %c[0,81,63,22] • %c[0,209,172,56]Mas artefactos aumentan la regeneracion, el umbral superior de salud para que el efecto comience en un 3 % y la proteccion maxima contra danos en un 10 %.
@@ -98,7 +98,7 @@
   </string>
   <string id="st_pba_af_chelust_perk">
     <text>
-    %c[0,209,172,56]Perk: %c[d_orange]El peso de la devocion.\n
+    %c[0,209,172,56]PERK: %c[d_orange]El peso de la devocion.\n
 %c[0,81,63,22] • %c[0,209,172,56]Proporciona una pequena regeneracion de salud y resistencia.\n
      %c[0,81,63,22] • %c[0,209,172,56]Los miembros de Sin cuadruplican el efecto del artefacto y agregan regeneracion psiquica.\n
      %c[0,81,63,22] • %c[0,209,172,56]Sin companeros reciben regeneracion de salud uno por uno, comenzando por el que tiene la salud mas baja.\n
@@ -107,14 +107,14 @@
   </string>
   <string id="st_pba_af_atom_perk">
     <text>
-    %c[0,209,172,56]Perk: %c[d_orange]Bendicion de Arszi\n
+    %c[0,209,172,56]PERK: %c[d_orange]Bendicion de Arszi\n
 %c[0,81,63,22] • %c[0,209,172,56]Convierte la enfermedad por radiacion en aumento de resistencia y da una ligera cura de radiacion.\n
      %c[0,81,63,22] • %c[0,209,172,56]Se acumula con multiples artefactos.
     </text>
   </string>
   <string id="st_pba_af_lighthouse_perk">
     <text>
-    %c[0,209,172,56]Perk: %c[d_orange]La forma poco ortodoxa de viajar\n
+    %c[0,209,172,56]PERK: %c[d_orange]La forma poco ortodoxa de viajar\n
 %c[0,81,63,22] • %c[0,209,172,56]Matar a alguien te teletransportara al lugar de la muerte de tu victima.\n
      %c[0,81,63,22] • %c[0,209,172,56]El tiempo se ralentiza brevemente tras la teletransportacion.\n
      %c[0,81,63,22] • %c[0,209,172,56]Aturde a los NPC en las pequenas cercanias del destino de teletransportacion.\n
@@ -130,7 +130,7 @@
   </string>
   <string id="st_pba_af_fire_loop_perk">
     <text>
-    %c[0,209,172,56]Perk: %c[d_orange]Trato con el diablo\n
+    %c[0,209,172,56]PERK: %c[d_orange]Trato con el diablo\n
 %c[0,81,63,22] • %c[0,209,172,56]Artefacto revolucionario.\n
      %c[0,81,63,22] • %c[0,209,172,56]Mover el artefacto al cinturon firmara el Pacto con la Zona.\n
      %c[0,81,63,22] • %c[0,209,172,56]La Zona potencia tu Nudo y se convierte en el misterioso artefacto tambien conocido como Lucifer.\n \n
@@ -139,7 +139,7 @@
   </string>
   <string id="st_pba_af_zhelch_perk">
     <text>
-    %c[0,209,172,56]Perk: %c[d_orange]Ese stalker loco de la faccion Libertad\n
+    %c[0,209,172,56]PERK: %c[d_orange]Ese stalker loco de la faccion Libertad\n
 %c[0,81,63,22] • %c[0,209,172,56]Proporciona gran resistencia psi.\n
      %c[0,81,63,22] • %c[0,209,172,56]Drena salud psiquica para restaurar la salud.\n
      %c[0,81,63,22] • %c[0,209,172,56]Cuando la salud esta llena, restaura la salud psiquica.\n
@@ -150,7 +150,7 @@
   </string>
   <string id="st_pba_af_sandstone_perk">
     <text>
-    %c[0,209,172,56]Perk: %c[d_orange]Infusion de la Zona\n
+    %c[0,209,172,56]PERK: %c[d_orange]Infusion de la Zona\n
 %c[0,81,63,22] • %c[0,209,172,56]Al entrar en anomalias de varios tipos se infunde tu arma activa.\n
      %c[0,81,63,22] • %c[0,209,172,56]El arma imbuida pierde un 30 % de su potencia bruta pero gana un 70 % de potencia de dano elemental segun el tipo de anomalia.\n
      %c[0,81,63,22] • %c[0,209,172,56]Solo las anomalias electricas, termicas y quimicas son validas para la infusion.\n
@@ -164,7 +164,7 @@
   </string>
   <string id="st_pba_af_kislushka_perk">
     <text>
-    %c[0,209,172,56]Perk: %c[d_orange]De que color es tu sangre?\n
+    %c[0,209,172,56]PERK: %c[d_orange]De que color es tu sangre?\n
 %c[0,81,63,22] • %c[0,209,172,56]Cura en gran medida el sangrado a costa de la saciedad.\n
      %c[0,81,63,22] • %c[0,209,172,56]Cuantas mas heridas, mejor curacion proporciona.\n
      %c[0,81,63,22] • %c[0,209,172,56]Se acumula con multiples artefactos.
@@ -172,7 +172,7 @@
   </string>
   <string id="st_pba_af_black_angel_perk">
     <text>
-    %c[0,209,172,56]Perk: %c[d_orange]Esquiva esto\n
+    %c[0,209,172,56]PERK: %c[d_orange]Esquiva esto\n
 %c[0,81,63,22] • %c[0,209,172,56]Tiene un 25 % de probabilidad de reflejar el 35 % del dano de las balas.\n
      %c[0,81,63,22] • %c[0,209,172,56]Anula el dano del golpe al reflejarse.\n
      %c[0,81,63,22] • %c[0,209,172,56]Se acumula con multiples artefactos con rendimientos decrecientes. (maximo 70%)
@@ -180,7 +180,7 @@
   </string>
   <string id="st_pba_af_grapes_perk">
     <text>
-    %c[0,209,172,56]Perk: %c[d_orange]Insaciable\n
+    %c[0,209,172,56]PERK: %c[d_orange]Insaciable\n
     %c[0,81,63,22] • %c[0,209,172,56]Al consumir alimentos, aumenta considerablemente la recuperacion de salud.\n
      %c[0,81,63,22] • %c[0,209,172,56]Cada segundo, el 10% de las calorias consumidas se recuperan como salud.\n
      %c[0,81,63,22] • %c[0,209,172,56]El efecto dura 5 segundos.\n
@@ -189,14 +189,14 @@
   </string>
   <string id="st_pba_af_skull_miser_perk">
     <text>
-    %c[0,209,172,56]Perk: %c[d_orange]Consigue el premio gordo\n
+    %c[0,209,172,56]PERK: %c[d_orange]Consigue el premio gordo\n
 %c[0,81,63,22] • %c[0,209,172,56]Al matar a un NPC en la cabeza, dinero extra se genera de una manera moderna.\n
      %c[0,81,63,22] • %c[0,209,172,56]Mas artefactos generaran mas dinero.
     </text>
   </string>
   <string id="st_pba_af_star_phantom_perk">
     <text>
-    %c[0,209,172,56]Perk: %c[d_orange]Fantasma\n
+    %c[0,209,172,56]PERK: %c[d_orange]Fantasma\n
 %c[0,81,63,22] • %c[0,209,172,56]Hazte invisible para cualquiera durante 5 minutos.\n
      %c[0,81,63,22] • %c[0,209,172,56]No puedes sacar un arma, hablar con nadie ni interactuar con nada.\n
      %c[0,81,63,22] • %c[0,209,172,56]Se acumula con multiples artefactos.
@@ -204,7 +204,7 @@
   </string>
   <string id="st_pba_af_medallion_perk">
     <text>
-    %c[0,209,172,56]Perk: %c[d_orange]Chakram\n
+    %c[0,209,172,56]PERK: %c[d_orange]Chakram\n
 %c[0,81,63,22] • %c[0,209,172,56]El artefacto es un arma arrojadiza poderosa.\n
      %c[0,81,63,22] • %c[0,209,172,56]Buscara a los enemigos cercanos e infligira dano de laceracion al contacto.\n
      %c[0,81,63,22] • %c[0,209,172,56]Tiene la capacidad de rebotar en las paredes y los objetos.\n
@@ -215,7 +215,7 @@
   </string>
   <string id="st_pba_af_peas_perk">
     <text>
-    %c[0,209,172,56]Perk: %c[d_orange]Amigo de la noche\n
+    %c[0,209,172,56]PERK: %c[d_orange]Amigo de la noche\n
 %c[0,81,63,22] • %c[0,209,172,56]Da un bonus de curacion de sangrado y aumenta la velocidad, desde el anochecer hasta el amanecer en cualquier clima.\n
      %c[0,81,63,22] • %c[0,209,172,56]Disminuye la somnolencia nocturna, aumenta la somnolencia diurna.\n
      %c[0,81,63,22] • %c[0,209,172,56]El efecto se acumula con cada artefacto en el cinturon.
@@ -223,7 +223,7 @@
   </string>
   <string id="st_pba_af_generator_perk">
     <text>
-    %c[0,209,172,56]Perk: %c[d_orange]Godzilla se acerca\n
+    %c[0,209,172,56]PERK: %c[d_orange]Godzilla se acerca\n
 %c[0,81,63,22] • %c[0,209,172,56]Restaura la carga de las baterias de los objetos mientras corres.\n
      %c[0,81,63,22] • %c[0,209,172,56]No reactivara baterias completamente descargadas o dispositivos sin baterias.\n
      %c[0,81,63,22] • %c[0,209,172,56]Mas de 1 artefacto aumenta la velocidad de carrera.\n
@@ -232,7 +232,7 @@
   </string>
   <string id="st_pba_af_ball_perk">
     <text>
-    %c[0,209,172,56]Perk: %c[d_orange]El cascanueces\n
+    %c[0,209,172,56]PERK: %c[d_orange]El cascanueces\n
 %c[0,81,63,22] • %c[0,209,172,56]Amplifica el poderoso pie del jugador y le permite patear a mas mutantes, lo que resulta en una muerte instantanea.\n
      %c[0,81,63,22] • %c[0,209,172,56]Cada artefacto en el cinturon permite patear mas monstruos.\n
      %c[0,81,63,22] • %c[0,209,172,56]Tiene un tiempo de reutilizacion de 2 segundos con 1 artefacto, aumenta con mas artefactos en el cinturon en 1 segundo con cada artefacto.\n
@@ -254,7 +254,7 @@
   </string>
   <string id="st_pba_af_tapeworm_perk">
     <text>
-    %c[0,209,172,56]Perk: %c[d_orange]Aturdidor\n
+    %c[0,209,172,56]PERK: %c[d_orange]Aturdidor\n
 %c[0,81,63,22] • %c[0,209,172,56]Aturde al mutante mas cercano dentro de un radio de 3 metros.\n
      %c[0,81,63,22] • %c[0,209,172,56]Ademas, ser golpeado cuerpo a cuerpo por mutante o acosadores los aturdira.\n
      %c[0,81,63,22] • %c[0,209,172,56]El enemigo afectado quedara aturdido durante 3 segundos.\n
@@ -266,9 +266,9 @@
   </string>
   <string id="st_pba_af_moh_perk">
     <text>
-    %c[0,209,172,56]Perk: %c[d_orange]Hiperversidad culinaria\n
+    %c[0,209,172,56]PERK: %c[d_orange]Hiperversidad culinaria\n
     %c[0,81,63,22]  • %c[0,209,172,56]Convierte la energia de la carne mutante cruda en habilidades especiales.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]El efecto dura 1 minuto, comer diferentes carnes mutantes anula el efecto anterior.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]El efecto dura 90 segundos, comer diferentes carnes mutantes anula el efecto anterior.\n
     %c[0,81,63,22]  • %c[0,209,172,56]No se acumula.\n \n
     %c[d_orange]Efectos: \n
            %c[0,192,71,221] - Carne: %c[ui_gray_3]3 %/s de regeneracion de vida, 33 % de penalizacion por dano de bala.\n
@@ -285,7 +285,7 @@
   </string>
   <string id="st_pba_af_serofim_perk">
     <text>
-    %c[0,209,172,56]Perk: %c[d_orange]Lluvia de Reactivacion. \n
+    %c[0,209,172,56]PERK: %c[d_orange]Lluvia de Reactivacion. \n
     %c[0,81,63,22]  • %c[0,209,172,56]Al recibir un golpe fatal, el artefacto se destruye y el jugador revive.\n
     %c[0,81,63,22]  • %c[0,209,172,56]Se restaura el 50% de la salud, se curan todas las desventajas y se otorgan 5 segundos de inmunidad.\n
     %c[0,81,63,22]  • %c[0,209,172,56]Al revivir el arma actual se cae y la vision se arruina.\n
@@ -294,7 +294,7 @@
   </string>
   <string id="st_pba_af_elektron_perk">
     <text>
-    %c[0,209,172,56]Perk: %c[d_orange]Alto Voltaje\n
+    %c[0,209,172,56]PERK: %c[d_orange]Alto Voltaje\n
 %c[0,81,63,22] • %c[0,209,172,56]50% de proteccion contra anomalias electricas.\n
      %c[0,81,63,22] • %c[0,209,172,56]Pisar Electra recargara por completo las baterias de dispositivos activos del jugador.\n
      %c[0,81,63,22] • %c[0,209,172,56]Recarga una cantidad aleatoria de dispositivos y baterias combinados en el inventario.\n
@@ -310,7 +310,7 @@
   </string>
   <string id="st_pba_af_kogot_perk">
     <text>
-    %c[0,209,172,56]Perk: %c[d_orange]Sed de sangre\n
+    %c[0,209,172,56]PERK: %c[d_orange]Sed de sangre\n
      %c[0,81,63,22] • %c[0,209,172,56]30 % de aumento del dano cuerpo a cuerpo.\n
      %c[0,81,63,22] • %c[0,209,172,56]50 % de aumento de la velocidad de ataque cuerpo a cuerpo.\n
      %c[0,81,63,22] • %c[0,209,172,56]Efecto de vampiro: el 5 % del nuevo dano cuerpo a cuerpo se convierte en salud del jugador.\n
@@ -321,7 +321,7 @@
   </string>
   <string id="st_pba_af_dragon_eye_perk">
     <text>
-    %c[0,209,172,56]Perk: %c[d_orange]Ultraviolencia\n
+    %c[0,209,172,56]PERK: %c[d_orange]Ultraviolencia\n
     %c[0,81,63,22] • %c[0,209,172,56]Tu arma recibe la posibilidad de disparar un disparo explosivo.\n
      %c[0,81,63,22] • %c[0,209,172,56]El primer disparo que alcance al enemigo lo hara explotar violentamente.\n
     %c[0,81,63,22]  • %c[0,209,172,56]La explosion genera pedazos de carne voladoras y lastima a todos en un radio.\n

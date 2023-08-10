@@ -29,7 +29,7 @@
 	<string id="st_af_lucifer_descr">
 		<text>
 			Firmaste un Pacto con la Zona. Estas siendo recompensado con habilidades asombrosas a cambio de tu fuerza vital. Para evitar tu desaparicion y prolongar tu existencia, tienes la oportunidad de sacrificar las riquezas de otras zonas. La calidad de la oferta es importante, ya que se le compensara de forma adecuada. No se relaje y recuerde: el reloj no se detiene.\n \n
-			%c[0,209,172,56]Perk: %c[d_orange]El efecto Lucifer\n 
+			%c[0,209,172,56]PERK: %c[d_orange]El efecto Lucifer\n 
 			%c[0,81,63,22]  • %c[0,209,172,56]Lucifer te otorga una inmensa fuerza y ??habilidades, convirtiendote en un semidios.\n
 			%c[0,81,63,22]  • %c[0,209,172,56]En condiciones maximas recibes:\n
 			%c[0,192,71,221] -   50%%c[ui_gray_3] reduccion de cualquier dano\n

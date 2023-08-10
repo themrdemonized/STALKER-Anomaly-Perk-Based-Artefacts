@@ -2611,7 +2611,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			remove_speed("af_moh")
 		end,
 		add_effect = function(self, func, on_end)
-			add_simple_timed_effect(60, func, on_end, "af_moh_effect")
+			add_simple_timed_effect(90, func, on_end, "af_moh_effect")
 		end,
 		remove_effect = function(self)
 			trace("af_moh remove effect")
@@ -3795,24 +3795,26 @@ artefact_on_update_functions = {
 				trace("firing Signet, health %s", actor.health)
 
 				local status_effect_time = get_status_effect_remaining_time("af_signet")
-				local time = status_effect_time + status_effect_time_increment
-				time = min(status_effect_time_max, time)
-				add_status_effect(time, nil, "af_signet")
-				add_ui_func(
-					artefact,
-					true,
-					artefact,
-					function() return perk_based_artefacts.artefact_props.af_signet:ui_text_func() end,
-					function() return perk_based_artefacts.artefact_props.af_signet:ui_validate_func() end
-				)
-				add_timed_effect(
-					time,
-					function() return perk_based_artefacts.artefact_props.af_signet:timed_effect_func() end,
-					nil,
-					nil,
-					nil,
-					"af_signet"
-				)
+				if status_effect_time < status_effect_time_max then
+					local time = status_effect_time + status_effect_time_increment
+					time = min(status_effect_time_max, time)
+					add_status_effect(time, nil, "af_signet")
+					add_ui_func(
+						artefact,
+						true,
+						artefact,
+						function() return perk_based_artefacts.artefact_props.af_signet:ui_text_func() end,
+						function() return perk_based_artefacts.artefact_props.af_signet:ui_validate_func() end
+					)
+					add_timed_effect(
+						time,
+						function() return perk_based_artefacts.artefact_props.af_signet:timed_effect_func() end,
+						nil,
+						nil,
+						nil,
+						"af_signet"
+					)
+				end
 			end
 		end,
 	},
