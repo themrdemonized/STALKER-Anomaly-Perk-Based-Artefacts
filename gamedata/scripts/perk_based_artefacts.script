@@ -2603,6 +2603,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 				return self.sec
 			end
 		},
+		effect_time = 90,
 		add_speed = function(self, amount, is_sprint)
 			add_speed("af_moh", 1 + amount, is_sprint, true)
 		end,
@@ -2611,7 +2612,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			remove_speed("af_moh")
 		end,
 		add_effect = function(self, func, on_end)
-			add_simple_timed_effect(90, func, on_end, "af_moh_effect")
+			add_simple_timed_effect(self.effect_time, func, on_end, "af_moh_effect")
 		end,
 		remove_effect = function(self)
 			trace("af_moh remove effect")
@@ -2843,7 +2844,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 					self:reset()
 				end, "af_moh")
 
-				self.effect_time_trigger = time_elapsed + 60
+				self.effect_time_trigger = time_elapsed + self.effect_time
 				add_ui_func(
 					artefact,
 					true,
