@@ -7,7 +7,7 @@ local function get_object_by_id(id)
 	
 	local obj = db.storage[id] and db.storage[id].object or level.object_by_id(id)
 	if (not obj) then
-		callstack()
+		-- callstack()
 		printe("!ERROR get_object_by_id | no game object recieved from id (%s)", id)
 		return
 	end
