@@ -6018,15 +6018,18 @@ if ayykyu_fp_death and ayykyu_fp_death.actor_on_before_death then
 	ayykyu_fp_death.actor_on_before_death = function(whoID, flags)
 		for artefact, props in pairs(artefacts) do
 			for perk, t in pairs(artefact_on_before_death_functions) do
-				if type(t) == "function" and artefact == perk then
-					return
-				end
-				local sections = t.get_sections and t:get_sections(artefact)
-				if not sections then
-					sections = {[perk] = true}
-				end
-				if sections[artefact] then
-					return -- prevent dying with First Person Death mod enabled
+				if type(t) == "function" then 
+					if artefact == perk then
+						return
+					end
+				else
+					local sections = t.get_sections and t:get_sections(artefact)
+					if not sections then
+						sections = {[perk] = true}
+					end
+					if sections[artefact] then
+						return -- prevent dying with First Person Death mod enabled
+					end
 				end
 			end
 		end
@@ -6194,18 +6197,21 @@ end
 process_artefacts = function(perk_table, ...)
 	for artefact, props in pairs(artefacts) do
 		for perk, t in pairs(perk_table) do
-			if type(t) == "function" and perk == artefact then
-				t(db.actor, artefact, props.count, props.ids, props.names, ...)
-				break
-			end
-			local sections = t.get_sections and t:get_sections(artefact)
-			if not sections then
-				sections = {[perk] = true}
-			end
-			if sections[artefact] then
-				trace("artefact %s", artefact)
-				t:func(db.actor, artefact, props.count, props.ids, props.names, ...)
-				break
+			if type(t) == "function" then
+				if artefact == perk then
+					t(db.actor, artefact, props.count, props.ids, props.names, ...)
+					break
+				end
+			else
+				local sections = t.get_sections and t:get_sections(artefact)
+				if not sections then
+					sections = {[perk] = true}
+				end
+				if sections[artefact] then
+					trace("artefact %s", artefact)
+					t:func(db.actor, artefact, props.count, props.ids, props.names, ...)
+					break
+				end
 			end
 		end
 	end
@@ -6481,31 +6487,33 @@ function on_item_drag_dropped(obj_1, obj_2, slot_from, slot_to)
 	local sec1 = obj_1:section()
 	local sec2 = obj_2:section()
 	for k, v in pairs(artefact_on_item_drag_dropped_functions) do
-		if type(v) == "function" and k == sec1 then
-			v(db.actor, sec1, obj_1, obj_2, slot_from, slot_to)
-			break
-		end
-		if type(v) == "function" and k == sec2 then
-			v(db.actor, sec2, obj_2, obj_1, slot_to, slot_from)
-			break
-		end
+		if type(v) == "function" then 
+			if k == sec1 then
+				v(db.actor, sec1, obj_1, obj_2, slot_from, slot_to)
+				break
+			end
+			if k == sec2 then
+				v(db.actor, sec2, obj_2, obj_1, slot_to, slot_from)
+				break
+			end
+		else
+			local sections = v.get_sections and v:get_sections(sec1)
+			if not sections then
+				sections = {[k] = true}
+			end
+			if sections[sec1] then
+				v:func(db.actor, sec1, obj_1, obj_2, slot_from, slot_to)
+				break
+			end
 
-		local sections = v.get_sections and v:get_sections(sec1)
-		if not sections then
-			sections = {[k] = true}
-		end
-		if sections[sec1] then
-			v:func(db.actor, sec1, obj_1, obj_2, slot_from, slot_to)
-			break
-		end
-
-		local sections = v.get_sections and v:get_sections(sec2)
-		if not sections then
-			sections = {[k] = true}
-		end
-		if sections[sec2] then
-			v:func(db.actor, sec2, obj_2, obj_1, slot_to, slot_from)
-			break
+			local sections = v.get_sections and v:get_sections(sec2)
+			if not sections then
+				sections = {[k] = true}
+			end
+			if sections[sec2] then
+				v:func(db.actor, sec2, obj_2, obj_1, slot_to, slot_from)
+				break
+			end
 		end
 	end
 end
