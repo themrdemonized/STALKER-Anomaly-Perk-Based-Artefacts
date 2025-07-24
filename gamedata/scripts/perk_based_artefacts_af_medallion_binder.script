@@ -22,7 +22,7 @@ function af_medallion_grenade_binder:fastcall()
         local se_obj = alife_create("af_medallion", device().cam_pos:mad(device().cam_dir, 0.4), obj:level_vertex_id(), obj:game_vertex_id())
         local state = zz_item_artefact.readValidMData(se_obj)
         state.state = thrown_obj_state
-        state.state.condition = math.max((state.state.condition or 1) - 0.5, 0.02)
+        state.state.condition = math.max((state.state.condition or 1) - 0.25, 0.02)
         local props = {
             fly_direction = device().cam_dir,
             start_time = perk_based_artefacts.get_time_elapsed(),

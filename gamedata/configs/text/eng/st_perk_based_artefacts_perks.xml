@@ -209,7 +209,7 @@
     %c[0,81,63,22]  • %c[0,209,172,56]It will seek nearby foes and deal laceration damage upon contact.\n
     %c[0,81,63,22]  • %c[0,209,172,56]Has the ability to ricochet of the walls and the objects.\n
     %c[0,81,63,22]  • %c[0,209,172,56]After some time or if its too far away, it will return to the wielder.\n
-    %c[0,81,63,22]  • %c[0,209,172,56]Normally has 2 uses, denoted by the condition of the artefact.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Each use will decrease the condition of the artefact.\n
     %c[0,81,63,22]  • %c[0,209,172,56]Move the artefact to grenade slot manually or Right Click-Engage on it and then throw it like a grenade.
     </text>
   </string>

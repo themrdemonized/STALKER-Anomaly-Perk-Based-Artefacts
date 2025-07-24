@@ -1041,7 +1041,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 		hud_fov = nil,
 		npc_stun = function(self, pos, stun_and_attack)
 			level.iterate_nearest(pos, self.npc_stun_radius, function(npc)
-				if IsStalker(npc) and npc:position():distance_to(pos) < self.npc_stun_radius and (stun_and_attack or xr_combat_ignore.is_enemy(npc, db.actor)) then
+				if npc:id() ~= AC_ID and IsStalker(npc) and npc:position():distance_to(pos) < self.npc_stun_radius and (stun_and_attack or xr_combat_ignore.is_enemy(npc, db.actor)) then
 					if npc:movement_type() == move.walk or npc:movement_type() == move.run then
 				        npc:set_movement_type(move.stand)
 				    end
@@ -1080,6 +1080,8 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			end
 			trace("Teleporting actor")
 
+			local npc_pos = npc:position()
+
 			-- Time event hell
 			-- Put everything in next frame TE so if that fails, nothing will happen
 			CreateTimeEvent("af_lighthouse", "af_lighthouse_0", 0, function()
@@ -1113,7 +1115,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 					set_pp_effector_factor(c_id_ppe.black_infinite, k ^ 2.5)
 
 					if k == 1 then
-						actor:set_actor_position(npc:position())
+						actor:set_actor_position(npc_pos)
 
 						add_cooldown(self.cooldown_time, self.cooldown_name)
 						add_ui_func(
@@ -1126,7 +1128,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 
 						exec_console_cmd("time_factor " .. self.min_tf)
 						play_sound_on_actor(get_random_array_element(self.sounds), 0.7, random_float(0.95, 1.05))
-						self:npc_stun(npc:position(), stun_and_attack)
+						self:npc_stun(npc_pos, stun_and_attack)
 
 						CreateTimeEvent("af_lighthouse", "af_lighthouse_2", 0, function()
 							local tg = time_global()
@@ -5557,7 +5559,7 @@ artefact_binder_on_update_functions = {
 			binder.target_radius = 45
 			binder.target_radius_sqr = binder.target_radius ^ 2
 
-			binder.attack_time = 40
+			binder.attack_time = 70
 			binder.attack_radius = 1.5
 			binder.attack_radius_sqr = binder.attack_radius ^ 2
 
@@ -6100,7 +6102,7 @@ local crow_death = bind_crow.crow_binder.death_callback
 bind_crow.crow_binder.death_callback = function(self, victim, who)
 	if has_artefacts_for_prop("af_lighthouse") and who and who:id() == AC_ID and victim then
 		local props = get_first_artefact_for_prop("af_lighthouse")
-		artefact_props.af_lighthouse:on_death(db.actor, props.count, props.ids, props.names, victim, who, nil, nil)
+		artefact_props.af_lighthouse:on_death(db.actor, "af_lighthouse", props.count, props.ids, props.names, victim, who, nil, nil)
 	end	
 	crow_death(self, victim, who)
 end
@@ -6178,6 +6180,10 @@ end
 -- Azazel mode patching
 local azazel_on_before_death = gamemode_azazel.actor_on_before_death
 gamemode_azazel.actor_on_before_death = function(whoID,flags)
+	if not alife_storage_manager.get_state().enable_azazel_mode then
+		return
+	end
+
 	if has_artefacts_for_prop("af_serofim") then
 		return
 	end
