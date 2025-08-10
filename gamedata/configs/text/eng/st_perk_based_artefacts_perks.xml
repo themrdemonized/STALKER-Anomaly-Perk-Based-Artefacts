@@ -217,6 +217,7 @@
     <text>
     %c[0,209,172,56]PERK: %c[d_orange]Friend of the Night\n
     %c[0,81,63,22]  • %c[0,209,172,56]Gives bleeding cure, speed and jump increase from 21 to 5 o'clock at any weather.\n
+    %c[0,81,63,22]  • %c[0,209,172,56]Slightly aids visibility at night.\n
     %c[0,81,63,22]  • %c[0,209,172,56]Decreases sleepiness at night, increases sleepiness at day.\n
     %c[0,81,63,22]  • %c[0,209,172,56]Stacks with multiple artefacts.
     </text>

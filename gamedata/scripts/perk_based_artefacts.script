@@ -66,6 +66,8 @@ local floor = math.floor
 local max = math.max
 local min = math.min
 local random = math.random
+local randomseed = math.randomseed
+local huge = math.huge
 
 local string_find = string.find
 local string_gsub = string.gsub
@@ -104,6 +106,7 @@ local c_id_ppe = {
 	snd_shock = 5607,
 	transmutate = 69420,
 	phantom_star = 69421,
+	peas = 69422,
 }
 
 local last_hit
@@ -393,16 +396,21 @@ function change_thirst(item)
 	end
 end
 
-function add_pp_effector_const_smooth(ppfile, id, looped, time)
+function add_pp_effector_const_smooth(ppfile, id, looped, time, max_factor_func, stop_on_end)
+	max_factor_func = max_factor_func or function() return 1 end
+	if stop_on_end == nil then stop_on_end = true end
+
 	add_pp_effector(ppfile, id, looped)
 	local factor = 0.0001
-	local inc_per_update = 0.001 * (1 / time)
+	local inc_per_update = 0.001 * (max_factor_func() / time)
 	set_pp_effector_factor(id, 0.005)
 	CreateTimeEvent(ppfile, id, 0, function()
-		factor = math.min(1, factor + inc_per_update * device().time_delta)
+		factor = min(max_factor_func(), factor + inc_per_update * device().time_delta)
 		trace("%s, %s, factor %s", ppfile, id, factor)
 		set_pp_effector_factor(id, factor)
-		return factor == 1
+		if stop_on_end then
+			return factor >= max_factor_func()
+		end
 	end)
 end
 
@@ -825,11 +833,11 @@ end
 speed_boosts = { -- Table of speed boosts for different artefacts
 	af_peas = {
 		name = "af_peas_boost",
-		boost = 0.085
+		boost = 0.095
 	},
 	af_generator = {
 		name = "af_generator_boost",
-		boost = 0.05
+		boost = 0.11
 	},
 	af_kogot = {
 		name = "af_kogot_boost",
@@ -844,7 +852,7 @@ speed_boosts = { -- Table of speed boosts for different artefacts
 jump_boosts = { -- Table of jump boosts for different artefacts
 	af_peas = {
 		name = "af_peas_boost",
-		boost = 0.12
+		boost = 0.14
 	},
 }
 
@@ -1605,6 +1613,26 @@ artefact_props = { -- Special props of artefacts that are used in processing
 				change_sleep(change)
 				add_cooldown(10, "af_peas_moon_sleep")
 			end
+		end,
+		pp_effector_enabled = false,
+		pp_effector_factor = 0,
+		add_pp_effector = function(self, artefact_count)
+			self.pp_effector_factor = 0.2 + 0.1 * (min(artefact_count, 5))
+			if self.pp_effector_enabled then return end
+			self.pp_effector_enabled = true
+
+			add_pp_effector_const_smooth("brightness.ppe", c_id_ppe.peas, true, 15, function() return self.pp_effector_factor end, false)
+			CreateTimeEvent("af_peas_remove_time_effect", 0, 0.1, function()
+				if has_artefacts_for_prop("af_peas") then return end
+				self:remove_pp_effector()
+				return true
+			end)
+		end,
+		remove_pp_effector = function(self)
+			if not self.pp_effector_enabled then return end
+			self.pp_effector_enabled = false
+
+			remove_pp_effector_const_smooth("brightness.ppe", c_id_ppe.peas)
 		end,
 		eff = 0,
 		ui_text_func = function(self)
@@ -3405,10 +3433,10 @@ artefact_props = { -- Special props of artefacts that are used in processing
 				self.randomseed = seed
 				self.randomseed_update_time = seed
 			else
-				math.randomseed(self.randomseed)
-				self.randomseed = self.randomseed + math.random(100, 200) + math.random()
+				randomseed(self.randomseed)
+				self.randomseed = self.randomseed + random(100, 200) + random()
 			end
-			math.randomseed(self.randomseed)
+			randomseed(self.randomseed)
 
 			mdata_save("af_bat_randomseed", self.randomseed)
 			mdata_save("af_bat_randomseed_update_time", self.randomseed_update_time)
@@ -3430,7 +3458,7 @@ artefact_props = { -- Special props of artefacts that are used in processing
 			end
 			trace("Bat, resulting artefact %s", new_sec)
 			self:transmutate(obj, new_sec)
-			math.randomseed(os.time())
+			randomseed(os.time())
 		end
 	},
 	af_grapes = {
@@ -3740,7 +3768,7 @@ artefact_on_update_functions = {
 			local actor_health = round_100(actor.health)
 			local af_lucifer = artefact_props.af_lucifer
 
-			local k = 1 - math.min(1, normalize(actor_health, 0, health_threshold))
+			local k = 1 - min(1, normalize(actor_health, 0, health_threshold))
 			af_ear.sound.volume = k
 			af_ear.sound.frequency = 1 + 0.5 * k
 
@@ -3761,14 +3789,17 @@ artefact_on_update_functions = {
 			if hours >= 21 or hours <= 5 then
 				local bleeding_cure_boost = af_peas.bleeding_cure_boost * artefact_count
 				actor.bleeding = bleeding_cure_boost
-
+	
 				add_speed(speed_boosts.af_peas.name, 1 + speed_boosts.af_peas.boost * artefact_count, false, true)
 				add_jump(jump_boosts.af_peas.name, 1 + jump_boosts.af_peas.boost * artefact_count, true)
 				for i = 1, artefact_count do
 					af_peas:change_sleep(false)
 				end
 				af_peas:ui_func("++", artefact)
+
+				af_peas:add_pp_effector(artefact_count)
 			else
+				af_peas:remove_pp_effector()
 				remove_speed(speed_boosts.af_peas.name)
 				remove_jump(jump_boosts.af_peas.name)
 				for i = 1, artefact_count do
@@ -5344,7 +5375,7 @@ artefact_on_key_press_functions = {
 
 			local bind = dik_to_bind(key)
 			if (bind == key_bindings.kUSE) then
-				local distance = math.huge
+				local distance = huge
 				local target
 				local pointed = level.get_target_obj()
 				level.iterate_nearest(actor:position(), af_ball.scan_radius + 1, function(obj)
@@ -5593,7 +5624,7 @@ artefact_binder_on_update_functions = {
 				return target_pos
 			end
 
-			local closest_distance = math.huge
+			local closest_distance = huge
 			binder.target_list_func = function(target)
 				if 	target:id() ~= AC_ID 
 				and (IsMonster(target) or (
@@ -5634,13 +5665,13 @@ artefact_binder_on_update_functions = {
 					return
 				end
 
-				closest_distance = math.huge
+				closest_distance = huge
 				empty_table(binder.target_list)
 				level.iterate_nearest(obj:position(), 150, binder.target_list_func)
 
 				-- If there is closest target but havent chosen because of obstacles, fly towards first found one
 				if not binder.target_current_id and is_not_empty(binder.target_list) then
-					local dist = math.huge
+					local dist = huge
 					for id, distance in pairs(binder.target_list) do
 						if distance < dist then
 							dist = distance
@@ -5752,7 +5783,7 @@ artefact_binder_on_update_functions = {
 
 				-- Get interpolation based on homing speed
 				local homing_speed = binder.homing_speed * device().time_delta
-				local coeff = math.min(homing_speed / angle, 1)
+				local coeff = min(homing_speed / angle, 1)
 
 				-- print_tip("projectile %s%s, homing to obj %s, angle %s, hom speed %s, coeff %s", self.section, self.weapon_id, obj:name(), angle, homing_speed, coeff)
 
@@ -5883,8 +5914,8 @@ artefact_binder_on_update_functions = {
 	                "perk_based_artefacts\\PLSDTH09",
 	                "perk_based_artefacts\\PLSDTH10",
 	            }
-	            for i = 1, math.random(3) do
-	                t[#t + 1] = table.remove(sounds, math.random(#sounds))
+	            for i = 1, random(3) do
+	                t[#t + 1] = table.remove(sounds, random(#sounds))
 	            end
 	            
 	            for i, v in ipairs(t) do
@@ -6190,6 +6221,17 @@ gamemode_azazel.actor_on_before_death = function(whoID,flags)
 	remove_lucifer()
 
 	azazel_on_before_death(whoID, flags)
+end
+
+-- Disable killcam with Dragon's Eye and Beacon equipped
+if killcam then
+	local checkAggroedEntities = killcam.checkAggroedEntities
+	killcam.checkAggroedEntities = function()
+		if has_artefacts_for_prop("af_dragon_eye") or has_artefacts_for_prop("af_lighthouse") then
+			return true
+		end
+		return checkAggroedEntities()
+	end
 end
 
 -- Removing stack effects on refreshing artefacts
@@ -6600,65 +6642,69 @@ AddUniqueCall(throttle(function()
 end))
 
 function actor_on_first_update()
-	get_actor_psy_table()
-	level.set_snd_volume(1)
-	exec_console_cmd("time_factor 1")
-	if level.set_music_volume then level.set_music_volume(1) end
+	nextTick(function()
+		get_actor_psy_table()
+		level.set_snd_volume(1)
+		exec_console_cmd("time_factor 1")
+		if level.set_music_volume then level.set_music_volume(1) end
 
-	force_refresh_state()
-	local tg_now = time_global()
-	local tg_add = (tg_now - tg_lag) * 0.001
-	trace("tg_now %s, tg_add %s", tg_now, tg_add)
+		force_refresh_state()
+		local tg_now = time_global()
+		local tg_add = (tg_now - tg_lag) * 0.001
+		trace("tg_now %s, tg_add %s", tg_now, tg_add)
 
-	actor_level = level_name()
-	time_factor = get_time_factor()
+		actor_level = level_name()
+		time_factor = get_time_factor()
 
-	for key, effect in pairs(timed_effects) do
-		effect.timer = effect.timer + tg_add
-	end
+		for key, effect in pairs(timed_effects) do
+			effect.timer = effect.timer + tg_add
+		end
 
-	for key, effect in pairs(cooldowns) do
-		cooldowns[key] = cooldowns[key] + tg_add
-	end
+		for key, effect in pairs(cooldowns) do
+			cooldowns[key] = cooldowns[key] + tg_add
+		end
 
-	for key, effect in pairs(status_effects) do
-		effect.timer = effect.timer + tg_add
-	end
+		for key, effect in pairs(status_effects) do
+			effect.timer = effect.timer + tg_add
+		end
 
-	RegisterScriptCallback("actor_item_to_slot", refresh_state)
-	RegisterScriptCallback("actor_item_to_belt", refresh_state)
-	RegisterScriptCallback("actor_item_to_ruck", refresh_state)
-	RegisterScriptCallback("actor_on_item_drop", refresh_state)
-	RegisterScriptCallback("actor_on_update", actor_on_update)
-	RegisterScriptCallback("actor_on_weapon_fired", actor_on_weapon_fired)
-	RegisterScriptCallback("actor_on_before_hit", actor_on_before_hit)
-	RegisterScriptCallback("actor_on_hit_callback", actor_on_hit_callback)
-	RegisterScriptCallback("actor_on_before_death", actor_on_before_death)
-	RegisterScriptCallback("actor_on_item_use", actor_on_item_use)
-	RegisterScriptCallback("ActorMenu_on_item_drag_drop", on_item_drag_dropped)
-	RegisterScriptCallback("npc_on_before_hit", npc_on_before_hit)
-	RegisterScriptCallback("npc_on_hit_callback", npc_on_hit_callback)
-	RegisterScriptCallback("npc_on_death_callback", npc_on_death_callback)
-	RegisterScriptCallback("monster_on_before_hit", monster_on_before_hit)
-	RegisterScriptCallback("monster_on_hit_callback", monster_on_hit_callback)
-	RegisterScriptCallback("monster_on_death_callback", monster_on_death_callback)
-	RegisterScriptCallback("on_before_level_changing", on_before_level_changing)
-	RegisterScriptCallback("heli_on_hit_callback", heli_on_hit_callback)
-	RegisterScriptCallback("on_key_press", on_key_press)
+		RegisterScriptCallback("actor_item_to_slot", refresh_state)
+		RegisterScriptCallback("actor_item_to_belt", refresh_state)
+		RegisterScriptCallback("actor_item_to_ruck", refresh_state)
+		RegisterScriptCallback("actor_on_item_drop", refresh_state)
+		RegisterScriptCallback("actor_on_update", actor_on_update)
+		RegisterScriptCallback("actor_on_weapon_fired", actor_on_weapon_fired)
+		RegisterScriptCallback("actor_on_before_hit", actor_on_before_hit)
+		RegisterScriptCallback("actor_on_hit_callback", actor_on_hit_callback)
+		RegisterScriptCallback("actor_on_before_death", actor_on_before_death)
+		RegisterScriptCallback("actor_on_item_use", actor_on_item_use)
+		RegisterScriptCallback("ActorMenu_on_item_drag_drop", on_item_drag_dropped)
+		RegisterScriptCallback("npc_on_before_hit", npc_on_before_hit)
+		RegisterScriptCallback("npc_on_hit_callback", npc_on_hit_callback)
+		RegisterScriptCallback("npc_on_death_callback", npc_on_death_callback)
+		RegisterScriptCallback("monster_on_before_hit", monster_on_before_hit)
+		RegisterScriptCallback("monster_on_hit_callback", monster_on_hit_callback)
+		RegisterScriptCallback("monster_on_death_callback", monster_on_death_callback)
+		RegisterScriptCallback("on_before_level_changing", on_before_level_changing)
+		RegisterScriptCallback("heli_on_hit_callback", heli_on_hit_callback)
+		RegisterScriptCallback("on_key_press", on_key_press)
 
-	-- 1.5.2
-	if _G.CHudItem__PlayHUDMotion then
-		RegisterScriptCallback("actor_on_hud_animation_play", actor_on_hud_animation_play)
-	end
+		-- 1.5.2
+		if _G.CHudItem__PlayHUDMotion then
+			RegisterScriptCallback("actor_on_hud_animation_play", actor_on_hud_animation_play)
+		end
 
-	-- Modded exes
-	if _G.CBulletOnInit then
-		RegisterScriptCallback("bullet_on_init", bullet_on_init)
-	end
-	if _G.CBulletOnImpact then
-		RegisterScriptCallback("bullet_on_impact", bullet_on_impact)
-		RegisterScriptCallback("bullet_on_remove", bullet_on_remove)
-	end
+		-- Modded exes
+		if _G.CBulletOnInit then
+			RegisterScriptCallback("bullet_on_init", bullet_on_init)
+		end
+		if _G.CBulletOnImpact then
+			RegisterScriptCallback("bullet_on_impact", bullet_on_impact)
+			RegisterScriptCallback("bullet_on_remove", bullet_on_remove)
+		end
+		
+		return true
+	end)
 end
 
 function on_trade_started_set_values()
